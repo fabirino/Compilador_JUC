@@ -1,9 +1,10 @@
 %{
     #include <string.h>
+    #include <stdio.h>
+    
     int contador_linhas = 1;
     int contador_colunas = 1;
     int flag = 0;
-    int flag_erros = 0;
 %}
 
 carateres               ([a-z]|[A-z]|"_"|"$")([a-z]|[A-z]|"_"|"$"|[0-9])*
@@ -15,7 +16,7 @@ SeqEscInv               \a|\b|\v|\'|\?|\ooo|\xhh|\xhhhh
 %X COMMENT STRING    
 %% 
 
-" "                           {contador_colunas++;}       
+"\ "                          {contador_colunas++;}       
 "\r\n"|"\r"|"\n"              {contador_colunas=1; contador_linhas++;}      
 "true"|"false"                {if (flag) printf("BOOLIT\n");contador_colunas+=yyleng;}
 "&&"                          {if (flag) printf("END\n");contador_colunas+=yyleng;}
@@ -69,41 +70,44 @@ SeqEscInv               \a|\b|\v|\'|\?|\ooo|\xhh|\xhhhh
 ("_"|{inteiros}+)"."({inteiros}+("e"{sinal}{inteiros}+)?)?     {printf("REALLIT\n");contador_colunas+=yyleng;}
 "."{inteiros}+(("e"|"E"){sinal}{inteiros}+)?                   {printf("REALLIT\n");contador_colunas+=yyleng;}
 
-\/\/(.*)                       {contador_colunas+=yyleng;}  /*comentario para linha unica */
+\/\/(.*)                    {contador_colunas+=yyleng;}  /*comentario para linha unica */
 
 \"                          {BEGIN STRING;contador_colunas+=yyleng;}
-<STRING>{carateres}         {if (flag) printf("STRLIT\n");contador_colunas+=yyleng;}
-<STRING><<EOF>>             {if (flag_erros) printf("Line %d, col %d: unterminated string literal", contador_linhas, contador_colunas);}
-<STRING>\"                  {BEGIN 0; contador_colunas+=yyleng;}
+<STRING>\"                  {if (flag) printf("STRLIT\n");BEGIN 0; contador_colunas+=yyleng;}
+<STRING>"\n\r"|"\r"|"\n"    {contador_colunas=1; contador_linhas++;}
+<STRING><<EOF>>             {printf("Line %d, col %d: unterminated string literal\n", contador_linhas, contador_colunas);exit(0);}
+<STRING>(.*)                {contador_colunas+=yyleng;}
 
 \/\*                        {BEGIN COMMENT;contador_colunas+=yyleng;}
 <COMMENT>\*\/               {BEGIN 0; contador_colunas+=yyleng;}
 <COMMENT>"\n\r"|"\r"|"\n"   {contador_colunas=1; contador_linhas++;}
-<COMMENT><<EOF>>            {if (flag_erros) printf("Line %d, col %d: unterminated comment", contador_linhas, contador_colunas);}
+<COMMENT><<EOF>>            {printf("Line %d, col %d: unterminated comment\n", contador_linhas, contador_colunas);exit(0);}
 <COMMENT>(.*)               {contador_colunas+=yyleng;}
+
 
 %%
 
 int main(int argc, char *argv[]) {
 
-    if(argc == 1){
+    if(argc == 2){
         if(!strcmp(argv[1], "-l")){
             flag = 1;
-        }
-        if(!strcmp(argv[1], "-e1")){
-            flag_erros = 1;
-        }
+        }else if(strcmp(argv[1], "-e1")!=0){
+                printf("Flag nao existe");
+                return 0;
+        } 
     }
     
-    if(argc == 2){
-        if(!strcmp(argv[1], "-l")|!strcmp(argv[2], "-l")){
-            flag = 1;
-        }
-        if(!strcmp(argv[1], "-e1")|!strcmp(argv[2], "-e1")){
-            flag_erros = 1;
+    if(argc == 3){
+        for(int i = 1;i<argc;i++){
+            if(!strcmp(argv[i], "-l")) flag = 1;
+            else if(strcmp(argv[i], "-e1")!=0){
+                printf("Flag nao existe");
+                return 0;
+            }
         }
     }
-    
+
     yylex();
     return 0;
 }
