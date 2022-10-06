@@ -84,6 +84,7 @@ SeqEscInv               \a|\b|\v|\'|\?|\ooo|\xhh|\xhhhh
 <COMMENT><<EOF>>            {printf("Line %d, col %d: unterminated comment\n", contador_linhas, contador_colunas);exit(0);}
 <COMMENT>(.*)               {contador_colunas+=yyleng;}
 
+.                           {printf("Line %d, col %d: illegal character (<%s>)\n", contador_linhas, contador_colunas,yytext);}  
 
 %%
 
