@@ -5,19 +5,21 @@
     int contador_linhas = 1;
     int contador_colunas = 1;
     int flag = 0;
+    char buffer[1000];
+    int escape = 1;
 %}
 
-carateres               ([a-z]|[A-z]|"_"|"$")([a-z]|[A-z]|"_"|"$"|[0-9])*
+carateres               ([a-z]|[A-Z]|"_"|"$")([a-z]|[A-Z]|"_"|"$"|[0-9])*
 naturais                [1-9]
 inteiros                [0-9]
 sinal                   "-"|"+"
-SeqEscInv               \a|\b|\v|\'|\?|\ooo|\xhh|\xhhhh
+SeqEscInv               "\\"[^("f"|"n"|"t"|"\\"|\")]
 
 %X COMMENT STRING    
 %% 
-
-"\ "                          {contador_colunas++;}       
-"\r\n"|"\r"|"\n"              {contador_colunas=1; contador_linhas++;}      
+       
+"\r\n"|"\r"|"\n"              {contador_colunas=1; contador_linhas++;}
+{SeqEscInv}                   {printf("Line %d, col %d: invalid escape sequence (%s)\n", contador_linhas, contador_colunas,yytext);contador_colunas+=yyleng;}      
 "true"|"false"                {if (flag) printf("BOOLIT\n");contador_colunas+=yyleng;}
 "&&"                          {if (flag) printf("END\n");contador_colunas+=yyleng;}
 "="                           {if (flag) printf("ASSIGN\n");contador_colunas+=yyleng;}
@@ -64,27 +66,31 @@ SeqEscInv               \a|\b|\v|\'|\?|\ooo|\xhh|\xhhhh
 
 {carateres}                   {if (flag) printf("ID(%s)\n", yytext);contador_colunas+=yyleng;}
 
-"_"|"0"|{naturais}{inteiros}*                                  {if (flag) printf("INTLIT\n");contador_colunas+=yyleng;}
+"_"|"0"|{naturais}{inteiros}*                                  {if (flag) printf("INTLIT(%s) \n",yytext);contador_colunas+=yyleng;}
 
-("_"|{inteiros}+)("e"|"E"){sinal}{inteiros}+                   {printf("REALLIT\n");contador_colunas+=yyleng;}
-("_"|{inteiros}+)"."({inteiros}+("e"{sinal}{inteiros}+)?)?     {printf("REALLIT\n");contador_colunas+=yyleng;}
-"."{inteiros}+(("e"|"E"){sinal}{inteiros}+)?                   {printf("REALLIT\n");contador_colunas+=yyleng;}
+("_"|{inteiros}+)("e"|"E"){sinal}{inteiros}+                   {printf("REALLIT(%s) \n",yytext);contador_colunas+=yyleng;}
+("_"|{inteiros}+)"."({inteiros}+("e"{sinal}{inteiros}+)?)?     {printf("REALLIT(%s) \n",yytext);contador_colunas+=yyleng;}
+"."{inteiros}+(("e"|"E"){sinal}{inteiros}+)?                   {printf("REALLIT(%s) \n",yytext);contador_colunas+=yyleng;}
 
-\/\/(.*)                    {contador_colunas+=yyleng;}  /*comentario para linha unica */
+\/\/(.*)                      {contador_colunas+=yyleng;}  /*comentario para linha unica */
 
-\"                          {BEGIN STRING;contador_colunas+=yyleng;}
-<STRING>\"                  {if (flag) printf("STRLIT\n");BEGIN 0; contador_colunas+=yyleng;}
-<STRING>"\n\r"|"\r"|"\n"    {contador_colunas=1; contador_linhas++;}
-<STRING><<EOF>>             {printf("Line %d, col %d: unterminated string literal\n", contador_linhas, contador_colunas);exit(0);}
-<STRING>(.*)                {contador_colunas+=yyleng;}
+\"                            {BEGIN STRING;contador_colunas+=yyleng;memset(buffer, 0, sizeof(buffer));escape = 1;}
+<STRING>{SeqEscInv}           {printf("Line %d, col %d: invalid escape sequence (%s)\n", contador_linhas, contador_colunas,yytext);contador_colunas+=yyleng;escape =0;}      
+<STRING>[^("\n\r"|"\r"|"\n")] {contador_colunas+=yyleng;strcat(buffer,yytext);}
+<STRING>"\n\r"|"\r"|"\n"      {printf("Line %d, col %d: unterminated string literal\n", contador_linhas, contador_colunas);contador_colunas=1; contador_linhas++;}
+<STRING>\"                    {if ((flag) && (escape)) printf("STRLIT(\"%s\") \n",buffer);BEGIN 0; contador_colunas+=yyleng;}
+<STRING><<EOF>>               {printf("Line %d, col %d: unterminated string literal\n", contador_linhas, contador_colunas);exit(0);}
 
 \/\*                        {BEGIN COMMENT;contador_colunas+=yyleng;}
-<COMMENT>\*\/               {BEGIN 0; contador_colunas+=yyleng;}
+<COMMENT>{SeqEscInv}        {printf("Line %d, col %d: invalid escape sequence (%s)\n", contador_linhas, contador_colunas,yytext);contador_colunas+=yyleng;}      
 <COMMENT>"\n\r"|"\r"|"\n"   {contador_colunas=1; contador_linhas++;}
 <COMMENT><<EOF>>            {printf("Line %d, col %d: unterminated comment\n", contador_linhas, contador_colunas);exit(0);}
+<COMMENT>\*\/               {BEGIN 0; contador_colunas+=yyleng;}
 <COMMENT>(.*)               {contador_colunas+=yyleng;}
 
-.                           {printf("Line %d, col %d: illegal character (<%s>)\n", contador_linhas, contador_colunas,yytext);}  
+"\ "                        {contador_colunas++;}
+
+.                           {printf("Line %d, col %d: illegal character (%s)\n", contador_linhas, contador_colunas,yytext);escape = 0;}  
 
 %%
 
