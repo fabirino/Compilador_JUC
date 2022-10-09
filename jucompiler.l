@@ -1,6 +1,6 @@
 %{
-    #include <string.h>
     #include <stdio.h>
+    #include <string.h>
     
     int contador_linhas = 1;
     int contador_colunas = 1;
@@ -64,6 +64,8 @@ SeqEscInv               "\\"[^("f"|"n"|"t"|"\\"|\")]
 "void"                        {if (flag) printf("VOID\n");contador_colunas+=yyleng;}
 "while"                       {if (flag) printf("WHILE\n");contador_colunas+=yyleng;}
 
+"++"|"--"|"null"|"Integer"|"System"     {if (flag) printf("RESERVED(%s)\n", yytext);contador_colunas+=yyleng;}
+
 {carateres}                   {if (flag) printf("ID(%s)\n", yytext);contador_colunas+=yyleng;}
 
 "_"|"0"|{naturais}{inteiros}*                                  {if (flag) printf("INTLIT(%s) \n",yytext);contador_colunas+=yyleng;}
@@ -82,6 +84,7 @@ SeqEscInv               "\\"[^("f"|"n"|"t"|"\\"|\")]
 <STRING><<EOF>>               {printf("Line %d, col %d: unterminated string literal\n", contador_linhas, contador_colunas);exit(0);}
 
 \/\*                        {BEGIN COMMENT;contador_colunas+=yyleng;}
+<COMMENT>\/\*               {contador_colunas+=yyleng;}
 <COMMENT>{SeqEscInv}        {printf("Line %d, col %d: invalid escape sequence (%s)\n", contador_linhas, contador_colunas,yytext);contador_colunas+=yyleng;}      
 <COMMENT>"\n\r"|"\r"|"\n"   {contador_colunas=1; contador_linhas++;}
 <COMMENT><<EOF>>            {printf("Line %d, col %d: unterminated comment\n", contador_linhas, contador_colunas);exit(0);}
