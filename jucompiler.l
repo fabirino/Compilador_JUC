@@ -21,7 +21,7 @@ SeqEscInv               "\\"[^("f"|"n"|"t"|"\\"|\")]
 "\r\n"|"\r"|"\n"              {contador_colunas=1; contador_linhas++;}
 {SeqEscInv}                   {printf("Line %d, col %d: invalid escape sequence (%s)\n", contador_linhas, contador_colunas,yytext);contador_colunas+=yyleng;}      
 "true"|"false"                {if (flag) printf("BOOLIT\n");contador_colunas+=yyleng;}
-"&&"                          {if (flag) printf("END\n");contador_colunas+=yyleng;}
+"&&"                          {if (flag) printf("AND\n");contador_colunas+=yyleng;}
 "="                           {if (flag) printf("ASSIGN\n");contador_colunas+=yyleng;}
 "*"                           {if (flag) printf("STAR\n");contador_colunas+=yyleng;}
 ","                           {if (flag) printf("COMMA\n");contador_colunas+=yyleng;}
@@ -70,8 +70,8 @@ SeqEscInv               "\\"[^("f"|"n"|"t"|"\\"|\")]
 
 "_"|"0"|{naturais}{inteiros}*                                  {if (flag) printf("INTLIT(%s) \n",yytext);contador_colunas+=yyleng;}
 
-("_"|{inteiros}+)("e"|"E"){sinal}{inteiros}+                   {printf("REALLIT(%s) \n",yytext);contador_colunas+=yyleng;}
-("_"|{inteiros}+)"."({inteiros}+("e"{sinal}{inteiros}+)?)?     {printf("REALLIT(%s) \n",yytext);contador_colunas+=yyleng;}
+("_"|{inteiros}+)(".")?("e"|"E"){sinal}?{inteiros}+                   {printf("REALLIT(%s) \n",yytext);contador_colunas+=yyleng;}
+("_"|{inteiros}+)"."({inteiros}+("e"{sinal}?{inteiros}+)?)?     {printf("REALLIT(%s) \n",yytext);contador_colunas+=yyleng;}
 "."{inteiros}+(("e"|"E"){sinal}{inteiros}+)?                   {printf("REALLIT(%s) \n",yytext);contador_colunas+=yyleng;}
 
 \/\/(.*)                      {contador_colunas+=yyleng;}  /*comentario para linha unica */
@@ -87,8 +87,8 @@ SeqEscInv               "\\"[^("f"|"n"|"t"|"\\"|\")]
 <COMMENT>\/\*               {contador_colunas+=yyleng;}
 <COMMENT>{SeqEscInv}        {printf("Line %d, col %d: invalid escape sequence (%s)\n", contador_linhas, contador_colunas,yytext);contador_colunas+=yyleng;}      
 <COMMENT>"\n\r"|"\r"|"\n"   {contador_colunas=1; contador_linhas++;}
-<COMMENT><<EOF>>            {printf("Line %d, col %d: unterminated comment\n", contador_linhas, contador_colunas);exit(0);}
 <COMMENT>\*\/               {BEGIN 0; contador_colunas+=yyleng;}
+<COMMENT><<EOF>>            {printf("Line %d, col %d: unterminated comment\n", contador_linhas, contador_colunas);exit(0);}
 <COMMENT>(.*)               {contador_colunas+=yyleng;}
 
 "\ "                        {contador_colunas++;}
