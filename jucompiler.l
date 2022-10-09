@@ -63,6 +63,7 @@ SeqEscInv               "\\"[^("f"|"n"|"t"|"\\"|\")]
 "String"                      {if (flag) printf("STRING\n");contador_colunas+=yyleng;}
 "void"                        {if (flag) printf("VOID\n");contador_colunas+=yyleng;}
 "while"                       {if (flag) printf("WHILE\n");contador_colunas+=yyleng;}
+\t                            {contador_colunas+=yyleng;}
 
 "++"|"--"|"null"|"Integer"|"System"     {if (flag) printf("RESERVED(%s)\n", yytext);contador_colunas+=yyleng;}
 
