@@ -19,5 +19,5 @@
 - 
 
 ### Ficheiros Sem Sucesso
-- ErrorsAndOthers.java
-- EsteEPuxado.java (ta quase)
+- newlines.java (ta quase,line 14,...)
+- SRTLIT_AND_ERRORS.java (ultima linha tem bug)
