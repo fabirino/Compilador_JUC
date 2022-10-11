@@ -8,20 +8,25 @@
     int escape = 1;
     char buf[1000];
     char *s;
+    int col_string =1;
+    int col_comment = 1;
+    int line_comment = 1;
 %}
 
 carateres               ([a-z]|[A-Z]|"_"|"$")([a-z]|[A-Z]|"_"|"$"|[0-9])*
 naturais                [1-9]
 inteiros                [0-9]
 sinal                   "-"|"+"
-SeqEscInv               "\\"[^("f"|"n"|"t"|"\\"|\")]|"\"
+SeqEscInv               "\\"[^("r|"f"|"n"|"t"|"\\"|\"|"*")]
 
 %X COMMENT STRING    
 %% 
-       
+
 "\r\n"|"\r"|"\n"              {contador_colunas=1; contador_linhas++;}
-{SeqEscInv}                   {printf("Line %d, col %d: invalid escape sequence (%s)\n", contador_linhas, contador_colunas,yytext);contador_colunas+=yyleng;}      
-"true"|"false"                {if (flag) printf("BOOLIT\n");contador_colunas+=yyleng;}
+"\\\n"                        {printf("Line %d, col %d: invalid escape sequence(\\)\n", contador_linhas++, contador_colunas);contador_colunas=1;}
+"\\\r"                        {printf("Line %d, col %d: invalid escape sequence(\\)\n", contador_linhas++, contador_colunas);contador_colunas=1;}
+{SeqEscInv}                   {printf("Line %d, col %d: invalid escape sequence(%s)\n", contador_linhas, contador_colunas,yytext);contador_colunas+=yyleng;}   
+"true"|"false"                {if (flag) printf("BOOLIT(%s)\n",yytext);contador_colunas+=yyleng;}
 "&&"                          {if (flag) printf("AND\n");contador_colunas+=yyleng;}
 "="                           {if (flag) printf("ASSIGN\n");contador_colunas+=yyleng;}
 "*"                           {if (flag) printf("STAR\n");contador_colunas+=yyleng;}
@@ -66,42 +71,51 @@ SeqEscInv               "\\"[^("f"|"n"|"t"|"\\"|\")]|"\"
 "while"                       {if (flag) printf("WHILE\n");contador_colunas+=yyleng;}
 \t                            {contador_colunas+=yyleng;}
 
-"++"|"--"|"null"|"Integer"|"System"     {if (flag) printf("RESERVED(%s)\n", yytext);contador_colunas+=yyleng;}
+"++"|"--"|"null"|"Integer"|"System"|"break"|"byte"|"case"|"catch"|"char"|"const"|"enum"|"extends"|"final"|"finally"|"float"      {if (flag) printf("RESERVED(%s)\n", yytext);contador_colunas+=yyleng;}
+"for"|"implements"|"import"|"instanceof"|"interface"|"long"|"native"|"new"|"protected"|"short"|"strictfp"|"super"|"this"         {if (flag) printf("RESERVED(%s)\n", yytext);contador_colunas+=yyleng;}
+"throw"|"throws"|"transient"|"try"|"volatile"|"abstract"|"continue"|"switch"|"assert"|"default"|"package"|"synchronized"         {if (flag) printf("RESERVED(%s)\n", yytext);contador_colunas+=yyleng;}
+"do"|"goto"|"private"                                                                                                            {if (flag) printf("RESERVED(%s)\n", yytext);contador_colunas+=yyleng;}
 
 {carateres}                   {if (flag) printf("ID(%s)\n", yytext);contador_colunas+=yyleng;}
 
-"_"|"0"|{naturais}{inteiros}*                                  {if (flag) printf("INTLIT(%s) \n",yytext);contador_colunas+=yyleng;}
+"0"|("_"*({naturais}{inteiros}*))*                                  {if (flag) printf("INTLIT(%s)\n",yytext);contador_colunas+=yyleng;}
 
-("_"|{inteiros}+)(".")?("e"|"E"){sinal}?{inteiros}+                   {printf("REALLIT(%s) \n",yytext);contador_colunas+=yyleng;}
-("_"|{inteiros}+)"."({inteiros}+("e"{sinal}?{inteiros}+)?)?     {printf("REALLIT(%s) \n",yytext);contador_colunas+=yyleng;}
-"."{inteiros}+(("e"|"E"){sinal}{inteiros}+)?                   {printf("REALLIT(%s) \n",yytext);contador_colunas+=yyleng;}
+(("_"*{inteiros}+))+(".")?("e"|"E"){sinal}?{inteiros}("_"*{inteiros}+)*                   {printf("REALLIT(%s)\n",yytext);contador_colunas+=yyleng;}
+(("_"*{inteiros}+))+"."(("_"*{inteiros}+)+(("e"|"E"){sinal}?("_"*{inteiros}+)+)?)?     {printf("REALLIT(%s)\n",yytext);contador_colunas+=yyleng;}
+"."("_"*{inteiros}+)+(("e"|"E"){sinal}?("_"*{inteiros}+)+)?                   {printf("REALLIT(%s)\n",yytext);contador_colunas+=yyleng;}
 
 \/\/(.*)                      {contador_colunas+=yyleng;}  /*comentario para linha unica */
 
-\"                            { BEGIN STRING; s = buf; escape = 1;}
+\"                            { BEGIN STRING; s = buf; escape = 1;col_string = contador_colunas;contador_colunas+=yyleng;}
 <STRING>\\\"                  { *s++ = '\\';*s++ = '\"'; contador_colunas+=yyleng;}
 <STRING>\\\\                  { *s++ = '\\';*s++ = '\\'; contador_colunas+=yyleng;}
 <STRING>\"                    { 
                                 *s = 0;
                                 BEGIN 0;
-                                if ((flag) && (escape)) printf("STRLIT(\"%s\") \n",buf);
+                                if ((flag) && (escape)) printf("STRLIT(\"%s\")\n",buf);
+                                contador_colunas+=yyleng;
                               }
-<STRING>\n\r|\r|\n            {*s = 0;BEGIN 0;printf("Line %d, col %d: unterminated string literal\n", contador_linhas, contador_colunas);contador_colunas=1; contador_linhas++;}
-<STRING>{SeqEscInv}           {printf("Line %d, col %d: invalid escape sequence (%s)\n", contador_linhas, contador_colunas,yytext);contador_colunas+=yyleng;escape =0;}      
+<STRING>\n\r|\r|\n            {*s = 0;BEGIN 0;printf("Line %d, col %d: unterminated string literal\n", contador_linhas, col_string);contador_colunas=1; contador_linhas++;}
+<STRING>"\\\n"                {printf("Line %d, col %d: invalid escape sequence(\\)\n", contador_linhas, contador_colunas);*s = 0;
+                                BEGIN 0;printf("Line %d, col %d: unterminated string literal\n", contador_linhas, col_string);
+                                contador_colunas=1; contador_linhas++;}
+<STRING>"\\\r"                {printf("Line %d, col %d: invalid escape sequence(\\)\n", contador_linhas, contador_colunas);*s = 0;
+                                BEGIN 0;printf("Line %d, col %d: unterminated string literal\n", contador_linhas, col_string);
+                                contador_colunas=1; contador_linhas++;}
+<STRING>{SeqEscInv}           {printf("Line %d, col %d: invalid escape sequence(%s)\n", contador_linhas, contador_colunas,yytext);escape =0;contador_colunas+=yyleng;}      
 <STRING>.                     { *s++ = *yytext; contador_colunas+=yyleng;}
-<STRING><<EOF>>               {printf("Line %d, col %d: unterminated string literal\n", contador_linhas, contador_colunas);exit(0);}
+<STRING><<EOF>>               {printf("Line %d, col %d: unterminated string literal\n", contador_linhas, col_string);exit(0);}
 
-\/\*                        {BEGIN COMMENT;contador_colunas+=yyleng;s = buf;}
+\/\*                        {BEGIN COMMENT;col_comment = contador_colunas;line_comment =contador_linhas; contador_colunas+=yyleng;}
 <COMMENT>\/\*               {contador_colunas+=yyleng;}
-<COMMENT>{SeqEscInv}        {printf("Line %d, col %d: invalid escape sequence (%s)\n", contador_linhas, contador_colunas,yytext);contador_colunas+=yyleng;}      
 <COMMENT>\n\r|\r|\n         {contador_colunas=1; contador_linhas++;}
-<COMMENT>\*\/               {*s = 0;BEGIN 0; contador_colunas+=yyleng;*s = 0;}
-<COMMENT>.                  { *s++ = *yytext; contador_colunas+=yyleng;}
-<COMMENT><<EOF>>            {printf("Line %d, col %d: unterminated comment\n", contador_linhas, contador_colunas);exit(0);}
+<COMMENT>\*\/               {BEGIN 0; contador_colunas+=yyleng;}
+<COMMENT>.                  { contador_colunas+=yyleng;}
+<COMMENT><<EOF>>            {printf("Line %d, col %d: unterminated comment\n", line_comment, col_comment);exit(0);}
 
 "\ "                        {contador_colunas++;}
 
-.                           {printf("Line %d, col %d: illegal character (%s)\n", contador_linhas, contador_colunas,yytext);escape = 0;}  
+.                           {printf("Line %d, col %d: illegal character(%s)\n", contador_linhas, contador_colunas,yytext);escape = 0;contador_colunas+=yyleng;}  
 
 %%
 

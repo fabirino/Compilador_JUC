@@ -12,6 +12,11 @@
 - Comments4.java
 - Num.java
 - errors_e1.java
+- IdentifiersAndKeywords1.java
+- IdentifiersAndKeywords2.java
+- ids.java
+- InsertionSort_e1.java
+- 
 
 ### Ficheiros Sem Sucesso
 - ErrorsAndOthers.java
