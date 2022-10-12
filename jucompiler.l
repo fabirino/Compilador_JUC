@@ -17,15 +17,12 @@ carateres               ([a-z]|[A-Z]|"_"|"$")([a-z]|[A-Z]|"_"|"$"|[0-9])*
 naturais                [1-9]
 inteiros                [0-9]
 sinal                   "-"|"+"
-SeqEscInv               "\\"[^("r|"f"|"n"|"t"|"\\"|\")]
+SeqEscInv               "\\"[^("r|"f"|"n"|"t"|\")]
 
 %X COMMENT STRING    
 %% 
 (\r)?\n|(\n)?\r                       {contador_colunas=1; contador_linhas++;}
-"\\\n"                        {printf("Line %d, col %d: invalid escape sequence(\\)\n", contador_linhas++, contador_colunas);contador_colunas=1;}
-"\\\r"                        {printf("Line %d, col %d: invalid escape sequence(\\)\n", contador_linhas++, contador_colunas);contador_colunas=1;}
-{SeqEscInv}                   {printf("Line %d, col %d: invalid escape sequence(%s)\n", contador_linhas, contador_colunas,yytext);contador_colunas+=yyleng;}   
-"true"|"false"                {if (flag) printf("BOOLIT(%s)\n",yytext);contador_colunas+=yyleng;}
+"true"|"false"                {if (flag) printf("BOOLLIT(%s)\n",yytext);contador_colunas+=yyleng;}
 "&&"                          {if (flag) printf("AND\n");contador_colunas+=yyleng;}
 "="                           {if (flag) printf("ASSIGN\n");contador_colunas+=yyleng;}
 "*"                           {if (flag) printf("STAR\n");contador_colunas+=yyleng;}
@@ -95,10 +92,10 @@ SeqEscInv               "\\"[^("r|"f"|"n"|"t"|"\\"|\")]
                                 contador_colunas+=yyleng;
                               }
 <STRING>(\r)?\n|(\n)?\r             {*s = 0;BEGIN 0;printf("Line %d, col %d: unterminated string literal\n", contador_linhas, col_string);contador_colunas=1; contador_linhas++;}
-<STRING>"\\\n"|"\\\r"|"\\\r\n"                {printf("Line %d, col %d: invalid escape sequence(\\)\n", contador_linhas, contador_colunas);*s = 0;
+<STRING>"\\\n"|"\\\r"|"\\\r\n"                {printf("Line %d, col %d: invalid escape sequence (\\)\n", contador_linhas, contador_colunas);*s = 0;
                                 BEGIN 0;printf("Line %d, col %d: unterminated string literal\n", contador_linhas, col_string);
                                 contador_colunas=1; contador_linhas++;}
-<STRING>{SeqEscInv}           {printf("Line %d, col %d: invalid escape sequence(%s)\n", contador_linhas, contador_colunas,yytext);escape =0;contador_colunas+=yyleng;}      
+<STRING>{SeqEscInv}|\\[\(|\)]           {printf("Line %d, col %d: invalid escape sequence (%s)\n", contador_linhas, contador_colunas,yytext);escape =0;contador_colunas+=yyleng;}      
 <STRING>.                     { *s++ = *yytext; contador_colunas+=yyleng;}
 <STRING><<EOF>>               {printf("Line %d, col %d: unterminated string literal\n", contador_linhas, col_string);exit(0);}
 
@@ -112,7 +109,7 @@ SeqEscInv               "\\"[^("r|"f"|"n"|"t"|"\\"|\")]
 "\ "                        {contador_colunas++;}
 \014                        {contador_colunas++;}
 
-.                           {printf("Line %d, col %d: illegal character(%s)\n", contador_linhas, contador_colunas,yytext);escape = 0;contador_colunas+=yyleng;}  
+.                           {printf("Line %d, col %d: illegal character (%s)\n", contador_linhas, contador_colunas,yytext);contador_colunas+=yyleng;}  
 
 %%
 

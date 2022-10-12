@@ -16,8 +16,10 @@
 - IdentifiersAndKeywords2.java
 - ids.java
 - InsertionSort_e1.java
-- 
+- ...
 
 ### Ficheiros Sem Sucesso
 - newlines.java (ta quase,line 14,...)
-- SRTLIT_AND_ERRORS.java (ultima linha tem bug)
+
+
+`Accepted: 31 / 32`

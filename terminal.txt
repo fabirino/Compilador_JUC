@@ -3,3 +3,4 @@ clang-14 -o jucompiler lex.yy.c
 ./jucompiler -l < Factorial.java > Factorial.out
 ./jucompiler < Factorial.java
 diff ficheiro1 ficheiro2
+./Comp2022.git/test.sh jucompiler.l
