@@ -18,10 +18,13 @@ naturais                [1-9]
 inteiros                [0-9]
 sinal                   "-"|"+"
 SeqEscInv               "\\"[^("r|"f"|"n"|"t"|\")]
+HEX                     [0-9a-f]+
+
+word                    \xHEX
 
 %X COMMENT STRING    
 %% 
-(\r)?\n|(\n)?\r                       {contador_colunas=1; contador_linhas++;}
+(\r)?\n|(\n)?\r               {contador_colunas=1; contador_linhas++;}
 "true"|"false"                {if (flag) printf("BOOLLIT(%s)\n",yytext);contador_colunas+=yyleng;}
 "&&"                          {if (flag) printf("AND\n");contador_colunas+=yyleng;}
 "="                           {if (flag) printf("ASSIGN\n");contador_colunas+=yyleng;}
@@ -107,7 +110,9 @@ SeqEscInv               "\\"[^("r|"f"|"n"|"t"|\")]
 <COMMENT><<EOF>>            {printf("Line %d, col %d: unterminated comment\n", line_comment, col_comment);exit(0);}
 
 "\ "                        {contador_colunas++;}
-\014                        {contador_colunas++;}
+
+�                           {printf("Line %d, col %d: illegal character (%c)\n", contador_linhas, contador_colunas,yytext[0]);contador_colunas++;}
+\014                          {contador_colunas++;}
 
 .                           {printf("Line %d, col %d: illegal character (%s)\n", contador_linhas, contador_colunas,yytext);contador_colunas+=yyleng;}  
 
