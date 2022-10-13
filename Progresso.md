@@ -23,3 +23,9 @@
 
 
 `Accepted: 31 / 32`
+
+### MOOSHAK
+- Comments (15 points) -> `10`
+- Illegal characters (10 points). -> `0`
+- Unterminated comments (20 points) -> `10`
+- Miscellaneous (40 points) -> `35`
