@@ -111,6 +111,7 @@ word                    \xHEX
 
 "\ "                        {contador_colunas++;}
 
+
 �                           {printf("Line %d, col %d: illegal character (%c)\n", contador_linhas, contador_colunas,yytext[0]);contador_colunas++;}
 \014                          {contador_colunas++;}
 
