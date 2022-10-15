@@ -51,8 +51,6 @@ novalinha               (\r?\n)|(\r\n?)
 <COMMENT2>{novalinha}         {contador_colunas = 1;contador_linhas++; BEGIN 0;}
 <COMMENT2>.                   {contador_colunas+=yyleng;}
 
-"\ "                          {contador_colunas++;}
-
 {novalinha}                   {contador_colunas=1; contador_linhas++;}
 
 "true"|"false"                {if (flag) printf("BOOLLIT(%s)\n",yytext);contador_colunas+=yyleng;}
@@ -109,9 +107,9 @@ novalinha               (\r?\n)|(\r\n?)
 
 "0"|{naturais}("_"*({inteiros}+))*                                  {if (flag) printf("INTLIT(%s)\n",yytext);contador_colunas+=yyleng;}
 
-(("_"*{inteiros}+))+(".")?("e"|"E"){sinal}?{inteiros}("_"*{inteiros}+)*                   {printf("REALLIT(%s)\n",yytext);contador_colunas+=yyleng;}
-(("_"*{inteiros}+))+"."(("_"*{inteiros}+)+(("e"|"E"){sinal}?("_"*{inteiros}+)+)?)?     {printf("REALLIT(%s)\n",yytext);contador_colunas+=yyleng;}
-"."("_"*{inteiros}+)+(("e"|"E"){sinal}?("_"*{inteiros}+)+)?                   {printf("REALLIT(%s)\n",yytext);contador_colunas+=yyleng;}
+(("_"*{inteiros}+))+(".")?("e"|"E"){sinal}?{inteiros}("_"*{inteiros}+)*                {if (flag) printf("REALLIT(%s)\n",yytext);contador_colunas+=yyleng;}
+(("_"*{inteiros}+))+"."(("_"*{inteiros}+)+(("e"|"E"){sinal}?("_"*{inteiros}+)+)?)?     {if (flag) printf("REALLIT(%s)\n",yytext);contador_colunas+=yyleng;}
+"."("_"*{inteiros}+)+(("e"|"E"){sinal}?("_"*{inteiros}+)+)?                   {if (flag) printf("REALLIT(%s)\n",yytext);contador_colunas+=yyleng;}
 
 .                           {printf("Line %d, col %d: illegal character (%s)\n", contador_linhas, contador_colunas,yytext);contador_colunas+=yyleng;}  
 
