@@ -98,7 +98,7 @@ novalinha               (\r?\n)|(\r\n?)
 "String"                      {if (flag) printf("STRING\n");contador_colunas+=yyleng;}
 "void"                        {if (flag) printf("VOID\n");contador_colunas+=yyleng;}
 "while"                       {if (flag) printf("WHILE\n");contador_colunas+=yyleng;}
-\t                            {contador_colunas+=yyleng;}
+\t|\f|"\ "|\014               {contador_colunas+=yyleng;}
 
 "++"|"--"|"null"|"Integer"|"System"|"break"|"byte"|"case"|"catch"|"char"|"const"|"enum"|"extends"|"final"|"finally"|"float"      {if (flag) printf("RESERVED(%s)\n", yytext);contador_colunas+=yyleng;}
 "for"|"implements"|"import"|"instanceof"|"interface"|"long"|"native"|"new"|"protected"|"short"|"strictfp"|"super"|"this"         {if (flag) printf("RESERVED(%s)\n", yytext);contador_colunas+=yyleng;}
@@ -112,8 +112,6 @@ novalinha               (\r?\n)|(\r\n?)
 (("_"*{inteiros}+))+(".")?("e"|"E"){sinal}?{inteiros}("_"*{inteiros}+)*                   {printf("REALLIT(%s)\n",yytext);contador_colunas+=yyleng;}
 (("_"*{inteiros}+))+"."(("_"*{inteiros}+)+(("e"|"E"){sinal}?("_"*{inteiros}+)+)?)?     {printf("REALLIT(%s)\n",yytext);contador_colunas+=yyleng;}
 "."("_"*{inteiros}+)+(("e"|"E"){sinal}?("_"*{inteiros}+)+)?                   {printf("REALLIT(%s)\n",yytext);contador_colunas+=yyleng;}
-
-\t|\f|" "             {contador_colunas+=yyleng;}
 
 .                           {printf("Line %d, col %d: illegal character (%s)\n", contador_linhas, contador_colunas,yytext);contador_colunas+=yyleng;}  
 
