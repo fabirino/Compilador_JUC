@@ -1,4 +1,8 @@
 %{
+    /* ===================================================================================
+	Compiladores -  Eduardo Figueiredo 2020213717
+                    Fabio Santos       2020212310
+    ======================================================================================= */
     #include <stdio.h>
     #include <string.h>
     
@@ -19,6 +23,52 @@ inteiros                [0-9]
 sinal                   "-"|"+"
 SeqEscInv               "\\"[^("r|"f"|"n"|"t"|\")]
 novalinha               (\r?\n)|(\r\n?)
+
+BOOLLIT                 "true"|"false" 
+AND                     "&&"
+ASSIGN                  "="
+STAR                    "*"
+COMMA                   ","
+DIV                     "/"
+EQ                      "=="
+GE                      ">="
+GT                      ">"
+LBRACE                  "{"
+LE                      "<="
+LPAR                    "("
+LSQ                     "["
+LT                      "<"
+MINUS                   "-"
+MOD                     "%"
+NE                      "!="
+NOT                     "!"
+OR                      "||"
+PLUS                    "+"
+RBRACE                  "}"
+RPAR                    ")"
+RSQ                     "]"
+SEMICOLON               ";"
+ARROW                   "->"
+LSHIFT                  "<<"
+RSHIFT                  ">>"
+XOR                     "^"
+BOOL                    "boolean"
+CLASS                   "class"
+DOTLENGTH               ".length"
+DOUBLE                  "double"
+ELSE                    "else"
+IF                      "if"
+INT                     "int"
+PRINT                   "System.out.print"
+PARSEINT                "Integer.parseInt"
+PUBLIC                  "public"
+RETURN                  "return"
+STATIC                  "static"
+STRING                  "string"
+VOID                    "void"
+WHILE                   "while"
+
+RESERVED                ("++"|"--"|"null"|"Integer"|"System"|"break"|"byte"|"case"|"catch"|"char"|"const"|"enum"|"extends"|"final"|"finally"|"float"|"for"|"implements"|"import"|"instanceof"|"interface"|"long"|"native"|"new"|"protected"|"short"|"strictfp"|"super"|"this"|"throw"|"throws"|"transient"|"try"|"volatile"|"abstract"|"continue"|"switch"|"assert"|"default"|"package"|"synchronized"|"do"|"goto"|"private")
 
 %X COMMENT STRING  COMMENT2  
 %% 
@@ -53,55 +103,52 @@ novalinha               (\r?\n)|(\r\n?)
 
 {novalinha}                   {contador_colunas=1; contador_linhas++;}
 
-"true"|"false"                {if (flag) printf("BOOLLIT(%s)\n",yytext);contador_colunas+=yyleng;}
-"&&"                          {if (flag) printf("AND\n");contador_colunas+=yyleng;}
-"="                           {if (flag) printf("ASSIGN\n");contador_colunas+=yyleng;}
-"*"                           {if (flag) printf("STAR\n");contador_colunas+=yyleng;}
-","                           {if (flag) printf("COMMA\n");contador_colunas+=yyleng;}
-"/"                           {if (flag) printf("DIV\n");contador_colunas+=yyleng;}
-"=="                          {if (flag) printf("EQ\n");contador_colunas+=yyleng;}
-">="                          {if (flag) printf("GE\n");contador_colunas+=yyleng;}
-">"                           {if (flag) printf("GT\n");contador_colunas+=yyleng;}
-"{"                           {if (flag) printf("LBRACE\n");contador_colunas+=yyleng;}
-"<="                          {if (flag) printf("LE\n");contador_colunas+=yyleng;}
-"("                           {if (flag) printf("LPAR\n");contador_colunas+=yyleng;}
-"["                           {if (flag) printf("LSQ\n");contador_colunas+=yyleng;}
-"<"                           {if (flag) printf("LT\n");contador_colunas+=yyleng;}
-"-"                           {if (flag) printf("MINUS\n");contador_colunas+=yyleng;}
-"%"                           {if (flag) printf("MOD\n");contador_colunas+=yyleng;}
-"!="                          {if (flag) printf("NE\n");contador_colunas+=yyleng;}
-"!"                           {if (flag) printf("NOT\n");contador_colunas+=yyleng;}
-"||"                          {if (flag) printf("OR\n");contador_colunas+=yyleng;}
-"+"                           {if (flag) printf("PLUS\n");contador_colunas+=yyleng;}
-"}"                           {if (flag) printf("RBRACE\n");contador_colunas+=yyleng;}
-")"                           {if (flag) printf("RPAR\n");contador_colunas+=yyleng;}
-"]"                           {if (flag) printf("RSQ\n");contador_colunas+=yyleng;}
-";"                           {if (flag) printf("SEMICOLON\n");contador_colunas+=yyleng;}
-"->"                          {if (flag) printf("ARROW\n");contador_colunas+=yyleng;}
-"<<"                          {if (flag) printf("LSHIFT\n");contador_colunas+=yyleng;}
-">>"                          {if (flag) printf("RSHIFT\n");contador_colunas+=yyleng;}
-"^"                           {if (flag) printf("XOR\n");contador_colunas+=yyleng;}
-"boolean"                     {if (flag) printf("BOOL\n");contador_colunas+=yyleng;}
-"class"                       {if (flag) printf("CLASS\n");contador_colunas+=yyleng;}
-".length"                     {if (flag) printf("DOTLENGTH\n");contador_colunas+=yyleng;}
-"double"                      {if (flag) printf("DOUBLE\n");contador_colunas+=yyleng;}
-"else"                        {if (flag) printf("ELSE\n");contador_colunas+=yyleng;}
-"if"                          {if (flag) printf("IF\n");contador_colunas+=yyleng;}
-"int"                         {if (flag) printf("INT\n");contador_colunas+=yyleng;}
-"System.out.print"            {if (flag) printf("PRINT\n");contador_colunas+=yyleng;}
-"Integer.parseInt"            {if (flag) printf("PARSEINT\n");contador_colunas+=yyleng;}
-"public"                      {if (flag) printf("PUBLIC\n");contador_colunas+=yyleng;}
-"return"                      {if (flag) printf("RETURN\n");contador_colunas+=yyleng;}
-"static"                      {if (flag) printf("STATIC\n");contador_colunas+=yyleng;}
-"String"                      {if (flag) printf("STRING\n");contador_colunas+=yyleng;}
-"void"                        {if (flag) printf("VOID\n");contador_colunas+=yyleng;}
-"while"                       {if (flag) printf("WHILE\n");contador_colunas+=yyleng;}
+{BOOLLIT}                     {if (flag) printf("BOOLLIT(%s)\n",yytext);contador_colunas+=yyleng;}
+{AND}                         {if (flag) printf("AND\n");contador_colunas+=yyleng;}
+{ASSIGN}                      {if (flag) printf("ASSIGN\n");contador_colunas+=yyleng;}
+{STAR}                        {if (flag) printf("STAR\n");contador_colunas+=yyleng;}
+{COMMA}                       {if (flag) printf("COMMA\n");contador_colunas+=yyleng;}
+{DIV}                         {if (flag) printf("DIV\n");contador_colunas+=yyleng;}
+{EQ}                          {if (flag) printf("EQ\n");contador_colunas+=yyleng;}
+{GE}                          {if (flag) printf("GE\n");contador_colunas+=yyleng;}
+{GT}                          {if (flag) printf("GT\n");contador_colunas+=yyleng;}
+{LBRACE}                      {if (flag) printf("LBRACE\n");contador_colunas+=yyleng;}
+{LE}                          {if (flag) printf("LE\n");contador_colunas+=yyleng;}
+{LPAR}                        {if (flag) printf("LPAR\n");contador_colunas+=yyleng;}
+{LSQ}                         {if (flag) printf("LSQ\n");contador_colunas+=yyleng;}
+{LT}                          {if (flag) printf("LT\n");contador_colunas+=yyleng;}
+{MINUS}                       {if (flag) printf("MINUS\n");contador_colunas+=yyleng;}
+{MOD}                         {if (flag) printf("MOD\n");contador_colunas+=yyleng;}
+{NE}                          {if (flag) printf("NE\n");contador_colunas+=yyleng;}
+{NOT}                         {if (flag) printf("NOT\n");contador_colunas+=yyleng;}
+{OR}                          {if (flag) printf("OR\n");contador_colunas+=yyleng;}
+{PLUS}                        {if (flag) printf("PLUS\n");contador_colunas+=yyleng;}
+{RBRACE}                      {if (flag) printf("RBRACE\n");contador_colunas+=yyleng;}
+{RPAR}                        {if (flag) printf("RPAR\n");contador_colunas+=yyleng;}
+{RSQ}                         {if (flag) printf("RSQ\n");contador_colunas+=yyleng;}
+{SEMICOLON}                   {if (flag) printf("SEMICOLON\n");contador_colunas+=yyleng;}
+{ARROW}                       {if (flag) printf("ARROW\n");contador_colunas+=yyleng;}
+{LSHIFT}                      {if (flag) printf("LSHIFT\n");contador_colunas+=yyleng;}
+{RSHIFT}                      {if (flag) printf("RSHIFT\n");contador_colunas+=yyleng;}
+{XOR}                         {if (flag) printf("XOR\n");contador_colunas+=yyleng;}
+{BOOL}                        {if (flag) printf("BOOL\n");contador_colunas+=yyleng;}
+{CLASS}                       {if (flag) printf("CLASS\n");contador_colunas+=yyleng;}
+{DOTLENGTH}                   {if (flag) printf("DOTLENGTH\n");contador_colunas+=yyleng;}
+{DOUBLE}                      {if (flag) printf("DOUBLE\n");contador_colunas+=yyleng;}
+{ELSE}                        {if (flag) printf("ELSE\n");contador_colunas+=yyleng;}
+{IF}                          {if (flag) printf("IF\n");contador_colunas+=yyleng;}
+{INT}                         {if (flag) printf("INT\n");contador_colunas+=yyleng;}
+{PRINT}                       {if (flag) printf("PRINT\n");contador_colunas+=yyleng;}
+{PARSEINT}                    {if (flag) printf("PARSEINT\n");contador_colunas+=yyleng;}
+{PUBLIC}                      {if (flag) printf("PUBLIC\n");contador_colunas+=yyleng;}
+{RETURN}                      {if (flag) printf("RETURN\n");contador_colunas+=yyleng;}
+{STATIC}                      {if (flag) printf("STATIC\n");contador_colunas+=yyleng;}
+{STRING}                      {if (flag) printf("STRING\n");contador_colunas+=yyleng;}
+{VOID}                        {if (flag) printf("VOID\n");contador_colunas+=yyleng;}
+{WHILE}                       {if (flag) printf("WHILE\n");contador_colunas+=yyleng;}
 \t|\f|"\ "|\014               {contador_colunas+=yyleng;}
 
-"++"|"--"|"null"|"Integer"|"System"|"break"|"byte"|"case"|"catch"|"char"|"const"|"enum"|"extends"|"final"|"finally"|"float"      {if (flag) printf("RESERVED(%s)\n", yytext);contador_colunas+=yyleng;}
-"for"|"implements"|"import"|"instanceof"|"interface"|"long"|"native"|"new"|"protected"|"short"|"strictfp"|"super"|"this"         {if (flag) printf("RESERVED(%s)\n", yytext);contador_colunas+=yyleng;}
-"throw"|"throws"|"transient"|"try"|"volatile"|"abstract"|"continue"|"switch"|"assert"|"default"|"package"|"synchronized"         {if (flag) printf("RESERVED(%s)\n", yytext);contador_colunas+=yyleng;}
-"do"|"goto"|"private"                                                                                                            {if (flag) printf("RESERVED(%s)\n", yytext);contador_colunas+=yyleng;}
+{RESERVED}      {if (flag) printf("RESERVED(%s)\n", yytext);contador_colunas+=yyleng;}                                                                                                         {if (flag) printf("RESERVED(%s)\n", yytext);contador_colunas+=yyleng;}
 
 {carateres}                   {if (flag) printf("ID(%s)\n", yytext);contador_colunas+=yyleng;}
 

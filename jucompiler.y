@@ -1,0 +1,38 @@
+%{
+    // Eduardo Figueiredo 2020213717
+    // Fábio Santos       2020212310
+
+%}
+
+%TOKEN 
+
+%%
+
+Program: CLASS ID LBRACE (MethodDecl | FieldDecl | SEMICOLON)* RBRACE // Qualquer coisa com simbolos terminais
+MethodDecl: PUBLIC STATIC MethodHeader MethodBody
+FieldDecl: PUBLIC STATIC Type ID
+Type: BOOL | INT | DOUBLE
+MethodHeader: (Type | VOID) ID LPAR FormalParams* RPAR
+FormalParams: Type ID (COMMA Type ID)*
+            | STRING LSQ RSQ ID
+MethodBody: LBRACE {Statment | VarDecl} RBRACE
+VarDecl: Type ID {COMMA ID} SEMICOLON
+Statement: IF LPAR Expr RPAR Statment ELSE Statment
+         | IF LPAR Expr RPAR Statment
+         | WHILE LPAR Expr RPAR Statement
+         | RETURN [ Expr ] SEMICOLON
+         | [(MethodInvocation | Assignment | ParseArgs)] SEMICOLON
+         | PRINT LPAR Expr RPAR SEMICOLON
+         | PRINT LPAR STRLIT RPAR SEMICOLON
+MethodInvocation: ID PAR {Expr {COMMA Expr}} RPAR
+ParseArgs: PARSEINT LPAR ID LSQ Expr RSQ RPAR
+Expr: Expr (PLUS | MINUS | STAR | DIV MOD ) Expr
+    | Expr (AND | OR | XOR | LSHIFT | RSHIFT) Expr
+    | Expr (EQ | GE | GT | LE | LT | NE) Expr
+    | (MINUS | NOT | PLUS) Expr
+    | LPAR Expr RPAR
+    | MethodInvocation | Assignment | ParseArgs
+    | ID [DOTLENGTH]
+    | INTLIT | REALLIT | BOOLLIT
+%%
+
