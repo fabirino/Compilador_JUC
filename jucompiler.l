@@ -64,11 +64,15 @@ PARSEINT                "Integer.parseInt"
 PUBLIC                  "public"
 RETURN                  "return"
 STATIC                  "static"
-STRING                  "string"
+STRING                  "String"
 VOID                    "void"
 WHILE                   "while"
 
-RESERVED                ("++"|"--"|"null"|"Integer"|"System"|"break"|"byte"|"case"|"catch"|"char"|"const"|"enum"|"extends"|"final"|"finally"|"float"|"for"|"implements"|"import"|"instanceof"|"interface"|"long"|"native"|"new"|"protected"|"short"|"strictfp"|"super"|"this"|"throw"|"throws"|"transient"|"try"|"volatile"|"abstract"|"continue"|"switch"|"assert"|"default"|"package"|"synchronized"|"do"|"goto"|"private")
+RESERVED                "++"|"--"|"null"|"Integer"|"System"|"break"|"byte"|"case"|"catch"|"char"|"const"|"enum"|"extends"|"final"|"finally"|"float"|"for"|"implements"|"import"|"instanceof"|"interface"|"long"|"native"|"new"|"protected"|"short"|"strictfp"|"super"|"this"|"throw"|"throws"|"transient"|"try"|"volatile"|"abstract"|"continue"|"switch"|"assert"|"default"|"package"|"synchronized"|"do"|"goto"|"private"             
+
+INTLIT                  ("0"|{naturais}("_"*({inteiros}+))*)
+
+REALLIT                (("_"*{inteiros}+))+"."(("_"*{inteiros}+)+(("e"|"E"){sinal}?("_"*{inteiros}+)+)?)?|"."("_"*{inteiros}+)+(("e"|"E"){sinal}?("_"*{inteiros}+)+)? | (("_"*{inteiros}+))+(".")?("e"|"E"){sinal}?{inteiros}("_"*{inteiros}+)*  
 
 %X COMMENT STRING  COMMENT2  
 %% 
@@ -91,7 +95,7 @@ RESERVED                ("++"|"--"|"null"|"Integer"|"System"|"break"|"byte"|"cas
 <STRING><<EOF>>                 {printf("Line %d, col %d: unterminated string literal\n", contador_linhas, col_string);exit(0);}
 <STRING>.                       { *s++ = *yytext; contador_colunas+=yyleng;}
 
-\/\*                         {col_comment = contador_colunas + yyleng;line_comment =contador_linhas;  BEGIN COMMENT;}
+\/\*                          {col_comment = contador_colunas + yyleng;line_comment =contador_linhas;  BEGIN COMMENT;}
 <COMMENT>"*/"                 {contador_colunas = col_comment + yyleng; contador_linhas =  line_comment;  BEGIN 0;}
 <COMMENT>{novalinha}          {col_comment=1; line_comment++;}
 <COMMENT><<EOF>>              {printf("Line %d, col %d: unterminated comment\n", contador_linhas, contador_colunas);exit(0);}
@@ -148,17 +152,17 @@ RESERVED                ("++"|"--"|"null"|"Integer"|"System"|"break"|"byte"|"cas
 {WHILE}                       {if (flag) printf("WHILE\n");contador_colunas+=yyleng;}
 \t|\f|"\ "|\014               {contador_colunas+=yyleng;}
 
-{RESERVED}      {if (flag) printf("RESERVED(%s)\n", yytext);contador_colunas+=yyleng;}                                                                                                         {if (flag) printf("RESERVED(%s)\n", yytext);contador_colunas+=yyleng;}
+{RESERVED}                    {if (flag) printf("RESERVED(%s)\n", yytext);contador_colunas+=yyleng;}
 
 {carateres}                   {if (flag) printf("ID(%s)\n", yytext);contador_colunas+=yyleng;}
 
-"0"|{naturais}("_"*({inteiros}+))*                                  {if (flag) printf("INTLIT(%s)\n",yytext);contador_colunas+=yyleng;}
+{INTLIT}                      {if (flag) printf("INTLIT(%s)\n",yytext);contador_colunas+=yyleng;}
 
 (("_"*{inteiros}+))+(".")?("e"|"E"){sinal}?{inteiros}("_"*{inteiros}+)*                {if (flag) printf("REALLIT(%s)\n",yytext);contador_colunas+=yyleng;}
 (("_"*{inteiros}+))+"."(("_"*{inteiros}+)+(("e"|"E"){sinal}?("_"*{inteiros}+)+)?)?     {if (flag) printf("REALLIT(%s)\n",yytext);contador_colunas+=yyleng;}
 "."("_"*{inteiros}+)+(("e"|"E"){sinal}?("_"*{inteiros}+)+)?                   {if (flag) printf("REALLIT(%s)\n",yytext);contador_colunas+=yyleng;}
 
-.                           {printf("Line %d, col %d: illegal character (%s)\n", contador_linhas, contador_colunas,yytext);contador_colunas+=yyleng;}  
+.                             {printf("Line %d, col %d: illegal character (%s)\n", contador_linhas, contador_colunas,yytext);contador_colunas+=yyleng;}  
 
 %%
 
