@@ -37,29 +37,3 @@ Expr: Expr (PLUS | MINUS | STAR | DIV MOD ) Expr
     | ID [DOTLENGTH]
     | INTLIT | REALLIT | BOOLLIT
 %%
-
-int main(int argc, char *argv[]) {
-
-    if(argc == 2){
-        if(!strcmp(argv[1], "-l")){
-            flag = 1;
-        }else if(strcmp(argv[1], "-e1")!=0){
-                printf("Flag nao existe");
-                return 0;
-        } 
-    }
-    
-    if(argc == 3){
-        for(int i = 1;i<argc;i++){
-            if(!strcmp(argv[i], "-l")) flag = 1;
-            else if(strcmp(argv[i], "-e1")!=0){
-                printf("Flag nao existe");
-                return 0;
-            }
-        }
-    }
-
-    yylex();
-    return 0;
-}
-
