@@ -1,29 +1,32 @@
 %{
     /* ===================================================================================
 	Compiladores -  Eduardo Figueiredo 2020213717
-                    Fabio Santos       2020212310
+                 -  Fabio Santos       2020212310
     ====================================================================================== */
+    #include "y.tab.h"
     #include <stdio.h>
     #include <string.h>
     
     int contador_linhas = 1;
     int contador_colunas = 1;
-    int flag = 0;
+    int flagLexx = 0;
+    int flagYacc = 0;
     int escape = 1;
-    char buf[1000];
+    char buf[1024];
     char *s;
     int col_string =1;
     int col_comment = 1;
     int line_comment = 1;
+    int printTree = 0;
 %}
 
-ID               ([a-z]|[A-Z]|"_"|"$")([a-z]|[A-Z]|"_"|"$"|[0-9])*
+ID                      ([a-z]|[A-Z]|"_"|"$")([a-z]|[A-Z]|"_"|"$"|[0-9])*
 naturais                [1-9]
 inteiros                [0-9]
 sinal                   "-"|"+"
 SeqEscInv               "\\"[^("r|"f"|"n"|"t"|\")]
 novalinha               (\r?\n)|(\r\n?)
-                     
+
 BOOLLIT                 "true"|"false" 
 AND                     "&&"
 ASSIGN                  "="
@@ -77,26 +80,28 @@ REALLIT2                (("_"*{inteiros}+))+"."(("_"*{inteiros}+)+(("e"|"E"){sin
 REALLIT3                "."("_"*{inteiros}+)+(("e"|"E"){sinal}?("_"*{inteiros}+)+)?   
 REALLIT                 {REALLIT1}|{REALLIT2}|{REALLIT3}
 
-%X COMMENT STRING  COMMENT2  
+%X COMMENT STRING1  COMMENT2  
 %% 
 
-\"                            { BEGIN STRING; s = buf; escape = 1;col_string = contador_colunas;contador_colunas+=yyleng;}
-<STRING>{novalinha}           {*s = 0;BEGIN 0;printf("Line %d, col %d: unterminated string literal\n", contador_linhas, col_string);contador_colunas=1; contador_linhas++;}
-<STRING>\\\"                  { *s++ = '\\';*s++ = '\"'; contador_colunas+=yyleng;}
-<STRING>\\\\                  { *s++ = '\\';*s++ = '\\'; contador_colunas+=yyleng;}
-<STRING>\"                    { 
+\"                             {BEGIN STRING1; s = buf; escape = 1;col_string = contador_colunas;contador_colunas+=yyleng;}
+<STRING1>{novalinha}           {*s = 0;BEGIN 0;printf("Line %d, col %d: unterminated string literal\n", contador_linhas, col_string);contador_colunas=1; contador_linhas++;}
+<STRING1>\\\"                  { *s++ = '\\';*s++ = '\"'; contador_colunas+=yyleng;}
+<STRING1>\\\\                  { *s++ = '\\';*s++ = '\\'; contador_colunas+=yyleng;}
+<STRING1>\"                    { 
                                 *s = 0;
                                 BEGIN 0;
-                                if ((flag) && (escape)) printf("STRLIT(\"%s\")\n",buf);
+                                if ((flagLexx) && (escape)) printf("STRLIT(\"%s\")\n",buf);
                                 contador_colunas+=yyleng;
+                                if((flagYacc) && (escape)) {strcpy(STRLIT,buf);return STRLIT;}//FIXME: pode dar erro aqui
                               }
-<STRING>"\\\n"|"\\\r"|"\\\r\n"  {printf("Line %d, col %d: invalid escape sequence (\\)\n", contador_linhas, contador_colunas);*s = 0;
+<STRING1>"\\\n"|"\\\r"|"\\\r\n"  {printf("Line %d, col %d: invalid escape sequence (\\)\n", contador_linhas, contador_colunas);*s = 0;
                                     BEGIN 0;printf("Line %d, col %d: unterminated string literal\n", contador_linhas, col_string);
                                     contador_colunas=1; contador_linhas++;
                                 }
-<STRING>{SeqEscInv}|\\[\(|\)]   {printf("Line %d, col %d: invalid escape sequence (%s)\n", contador_linhas, contador_colunas,yytext);escape =0;contador_colunas+=yyleng;}      
-<STRING><<EOF>>                 {printf("Line %d, col %d: unterminated string literal\n", contador_linhas, col_string);exit(0);}
-<STRING>.                       { *s++ = *yytext; contador_colunas+=yyleng;}
+<STRING1>{SeqEscInv}|\\[\(|\)]   {printf("Line %d, col %d: invalid escape sequence (%s)\n", contador_linhas, contador_colunas,yytext);escape =0;contador_colunas+=yyleng;}      
+<STRING1><<EOF>>                 {printf("Line %d, col %d: unterminated string literal\n", contador_linhas, col_string);exit(0);}
+<STRING1>.                       { *s++ = *yytext; contador_colunas+=yyleng;}
+
 
 \/\*                          {col_comment = contador_colunas + yyleng;line_comment =contador_linhas;  BEGIN COMMENT;}
 <COMMENT>"*/"                 {contador_colunas = col_comment + yyleng; contador_linhas =  line_comment;  BEGIN 0;}
@@ -110,63 +115,111 @@ REALLIT                 {REALLIT1}|{REALLIT2}|{REALLIT3}
 
 {novalinha}                   {contador_colunas=1; contador_linhas++;}
 
-{BOOLLIT}                     {if (flag) printf("BOOLLIT(%s)\n",yytext);contador_colunas+=yyleng;return BOOLLIT;}
-{AND}                         {if (flag) printf("AND\n");contador_colunas+=yyleng;return AND;}
-{ASSIGN}                      {if (flag) printf("ASSIGN\n");contador_colunas+=yyleng;return ASSIGN;}
-{STAR}                        {if (flag) printf("STAR\n");contador_colunas+=yyleng;return STAR;}
-{COMMA}                       {if (flag) printf("COMMA\n");contador_colunas+=yyleng;return COMMA;}
-{DIV}                         {if (flag) printf("DIV\n");contador_colunas+=yyleng;return DIV;}
-{EQ}                          {if (flag) printf("EQ\n");contador_colunas+=yyleng;return EQ;}
-{GE}                          {if (flag) printf("GE\n");contador_colunas+=yyleng;return GE;}
-{GT}                          {if (flag) printf("GT\n");contador_colunas+=yyleng;return GT;}
-{LBRACE}                      {if (flag) printf("LBRACE\n");contador_colunas+=yyleng;return LBRACE;}
-{LE}                          {if (flag) printf("LE\n");contador_colunas+=yyleng;return LE;}
-{LPAR}                        {if (flag) printf("LPAR\n");contador_colunas+=yyleng;return LPAR;}
-{LSQ}                         {if (flag) printf("LSQ\n");contador_colunas+=yyleng;return LSQ;}
-{LT}                          {if (flag) printf("LT\n");contador_colunas+=yyleng;return LT;}
-{MINUS}                       {if (flag) printf("MINUS\n");contador_colunas+=yyleng;return MINUS;}
-{MOD}                         {if (flag) printf("MOD\n");contador_colunas+=yyleng;return MOD;}
-{NE}                          {if (flag) printf("NE\n");contador_colunas+=yyleng;return NE;}
-{NOT}                         {if (flag) printf("NOT\n");contador_colunas+=yyleng;return NOT;}
-{OR}                          {if (flag) printf("OR\n");contador_colunas+=yyleng;return OR;}
-{PLUS}                        {if (flag) printf("PLUS\n");contador_colunas+=yyleng;return PLUS;}
-{RBRACE}                      {if (flag) printf("RBRACE\n");contador_colunas+=yyleng;return RBRACE;}
-{RPAR}                        {if (flag) printf("RPAR\n");contador_colunas+=yyleng;return RPAR;}
-{RSQ}                         {if (flag) printf("RSQ\n");contador_colunas+=yyleng;return RSQ;}
-{SEMICOLON}                   {if (flag) printf("SEMICOLON\n");contador_colunas+=yyleng;return SEMICOLON;}
-{ARROW}                       {if (flag) printf("ARROW\n");contador_colunas+=yyleng;return ARROW;}
-{LSHIFT}                      {if (flag) printf("LSHIFT\n");contador_colunas+=yyleng;return LSHIFT;}
-{RSHIFT}                      {if (flag) printf("RSHIFT\n");contador_colunas+=yyleng;return RSHIFT;}
-{XOR}                         {if (flag) printf("XOR\n");contador_colunas+=yyleng;return XOR;}
-{BOOL}                        {if (flag) printf("BOOL\n");contador_colunas+=yyleng;return BOOL;}
-{CLASS}                       {if (flag) printf("CLASS\n");contador_colunas+=yyleng;return CLASS;}
-{DOTLENGTH}                   {if (flag) printf("DOTLENGTH\n");contador_colunas+=yyleng;return DOTLENGTH;}
-{DOUBLE}                      {if (flag) printf("DOUBLE\n");contador_colunas+=yyleng;return DOUBLE;}
-{ELSE}                        {if (flag) printf("ELSE\n");contador_colunas+=yyleng;return ELSE;}
-{IF}                          {if (flag) printf("IF\n");contador_colunas+=yyleng;return IF;}
-{INT}                         {if (flag) printf("INT\n");contador_colunas+=yyleng;return INT;}
-{PRINT}                       {if (flag) printf("PRINT\n");contador_colunas+=yyleng;return PRINT;}
-{PARSEINT}                    {if (flag) printf("PARSEINT\n");contador_colunas+=yyleng;return PARSEINT;}
-{PUBLIC}                      {if (flag) printf("PUBLIC\n");contador_colunas+=yyleng;return PUBLIC;}
-{RETURN}                      {if (flag) printf("RETURN\n");contador_colunas+=yyleng;return RETURN;}
-{STATIC}                      {if (flag) printf("STATIC\n");contador_colunas+=yyleng;return STATIC;}
-{STRING}                      {if (flag) printf("STRING\n");contador_colunas+=yyleng;return STRING;}
-{VOID}                        {if (flag) printf("VOID\n");contador_colunas+=yyleng;return VOID;}
-{WHILE}                       {if (flag) printf("WHILE\n");contador_colunas+=yyleng;return WHILE;}
+{BOOLLIT}                     {if (flagLexx) printf("BOOLLIT(%s)\n",yytext);contador_colunas+=yyleng; if(flagYacc) {return BOOLLIT;}}
+{AND}                         {if (flagLexx) printf("AND\n");contador_colunas+=yyleng;                if(flagYacc) {return AND;}}
+{ASSIGN}                      {if (flagLexx) printf("ASSIGN\n");contador_colunas+=yyleng;             if(flagYacc) {return ASSIGN;}}
+{STAR}                        {if (flagLexx) printf("STAR\n");contador_colunas+=yyleng;               if(flagYacc) {return STAR;}}
+{COMMA}                       {if (flagLexx) printf("COMMA\n");contador_colunas+=yyleng;              if(flagYacc) {return COMMA;}}
+{DIV}                         {if (flagLexx) printf("DIV\n");contador_colunas+=yyleng;                if(flagYacc) {return DIV;}}
+{EQ}                          {if (flagLexx) printf("EQ\n");contador_colunas+=yyleng;                 if(flagYacc) {return EQ;}}
+{GE}                          {if (flagLexx) printf("GE\n");contador_colunas+=yyleng;                 if(flagYacc) {return GE;}}
+{GT}                          {if (flagLexx) printf("GT\n");contador_colunas+=yyleng;                 if(flagYacc) {return GT;}}
+{LBRACE}                      {if (flagLexx) printf("LBRACE\n");contador_colunas+=yyleng;             if(flagYacc) {return LBRACE;}}
+{LE}                          {if (flagLexx) printf("LE\n");contador_colunas+=yyleng;                 if(flagYacc) {return LE;}}
+{LPAR}                        {if (flagLexx) printf("LPAR\n");contador_colunas+=yyleng;               if(flagYacc) {return LPAR;}}
+{LSQ}                         {if (flagLexx) printf("LSQ\n");contador_colunas+=yyleng;                if(flagYacc) {return LSQ;}}
+{LT}                          {if (flagLexx) printf("LT\n");contador_colunas+=yyleng;                 if(flagYacc) {return LT;}}
+{MINUS}                       {if (flagLexx) printf("MINUS\n");contador_colunas+=yyleng;              if(flagYacc) {return MINUS;}}
+{MOD}                         {if (flagLexx) printf("MOD\n");contador_colunas+=yyleng;                if(flagYacc) {return MOD;}}
+{NE}                          {if (flagLexx) printf("NE\n");contador_colunas+=yyleng;                 if(flagYacc) {return NE;}}
+{NOT}                         {if (flagLexx) printf("NOT\n");contador_colunas+=yyleng;                if(flagYacc) {return NOT;}}
+{OR}                          {if (flagLexx) printf("OR\n");contador_colunas+=yyleng;                 if(flagYacc) {return OR;}}
+{PLUS}                        {if (flagLexx) printf("PLUS\n");contador_colunas+=yyleng;               if(flagYacc) {return PLUS;}}
+{RBRACE}                      {if (flagLexx) printf("RBRACE\n");contador_colunas+=yyleng;             if(flagYacc) {return RBRACE;}}
+{RPAR}                        {if (flagLexx) printf("RPAR\n");contador_colunas+=yyleng;               if(flagYacc) {return RPAR;}}
+{RSQ}                         {if (flagLexx) printf("RSQ\n");contador_colunas+=yyleng;                if(flagYacc) {return RSQ;}}
+{SEMICOLON}                   {if (flagLexx) printf("SEMICOLON\n");contador_colunas+=yyleng;          if(flagYacc) {return SEMICOLON;}}
+{ARROW}                       {if (flagLexx) printf("ARROW\n");contador_colunas+=yyleng;}   
+{LSHIFT}                      {if (flagLexx) printf("LSHIFT\n");contador_colunas+=yyleng;             if(flagYacc) {return LSHIFT;}}
+{RSHIFT}                      {if (flagLexx) printf("RSHIFT\n");contador_colunas+=yyleng;             if(flagYacc) {return RSHIFT;}}
+{XOR}                         {if (flagLexx) printf("XOR\n");contador_colunas+=yyleng;                if(flagYacc) {return XOR;}}
+{BOOL}                        {if (flagLexx) printf("BOOL\n");contador_colunas+=yyleng;               if(flagYacc) {return BOOL;}}
+{CLASS}                       {if (flagLexx) printf("CLASS\n");contador_colunas+=yyleng;              if(flagYacc) {return CLASS;}}
+{DOTLENGTH}                   {if (flagLexx) printf("DOTLENGTH\n");contador_colunas+=yyleng;          if(flagYacc) {return DOTLENGTH;}}
+{DOUBLE}                      {if (flagLexx) printf("DOUBLE\n");contador_colunas+=yyleng;             if(flagYacc) {return DOUBLE;}}
+{ELSE}                        {if (flagLexx) printf("ELSE\n");contador_colunas+=yyleng;               if(flagYacc) {return ELSE;}}
+{IF}                          {if (flagLexx) printf("IF\n");contador_colunas+=yyleng;                 if(flagYacc) {return IF;}}
+{INT}                         {if (flagLexx) printf("INT\n");contador_colunas+=yyleng;                if(flagYacc) {return INT;}}
+{PRINT}                       {if (flagLexx) printf("PRINT\n");contador_colunas+=yyleng;              if(flagYacc) {return PRINT;}}
+{PARSEINT}                    {if (flagLexx) printf("PARSEINT\n");contador_colunas+=yyleng;           if(flagYacc) {return PARSEINT;}}
+{PUBLIC}                      {if (flagLexx) printf("PUBLIC\n");contador_colunas+=yyleng;             if(flagYacc) {return PUBLIC;}}
+{RETURN}                      {if (flagLexx) printf("RETURN\n");contador_colunas+=yyleng;             if(flagYacc) {return RETURN;}}
+{STATIC}                      {if (flagLexx) printf("STATIC\n");contador_colunas+=yyleng;             if(flagYacc) {return STATIC;}}
+{STRING}                      {if (flagLexx) printf("STRING\n");contador_colunas+=yyleng;             if(flagYacc) {return STRING;}}
+{VOID}                        {if (flagLexx) printf("VOID\n");contador_colunas+=yyleng;               if(flagYacc) {return VOID;}}
+{WHILE}                       {if (flagLexx) printf("WHILE\n");contador_colunas+=yyleng;              if(flagYacc) {return WHILE;}}
 \t|\f|"\ "|\014               {contador_colunas+=yyleng;}
 
-{RESERVED}                    {if (flag) printf("RESERVED(%s)\n", yytext);contador_colunas+=yyleng;return RESERVED;}
+{RESERVED}                    {if (flagLexx) printf("RESERVED(%s)\n",yytext);contador_colunas+=yyleng;}
 
-{ID}                   {if (flag) printf("ID(%s)\n", yytext);contador_colunas+=yyleng;return ID;}
+{ID}                          {if (flagLexx) printf("ID(%s)\n", yytext);contador_colunas+=yyleng;     if(flagYacc) {return ID;}}
 
-{INTLIT}                      {if (flag) printf("INTLIT(%s)\n",yytext);contador_colunas+=yyleng;return INTLIT;}
+{INTLIT}                      {if (flagLexx) printf("INTLIT(%s)\n",yytext);contador_colunas+=yyleng;  if(flagYacc) {return INTLIT;}}
 
-{REALLIT}                     {if (flag) printf("REALLIT(%s)\n",yytext);contador_colunas+=yyleng;return REALLIT;}
+{REALLIT}                     {if (flagLexx) printf("REALLIT(%s)\n",yytext);contador_colunas+=yyleng; if(flagYacc) {return REALLIT;}}
 
 .                             {printf("Line %d, col %d: illegal character (%s)\n", contador_linhas, contador_colunas,yytext);contador_colunas+=yyleng;}  
 
 %%
 
+int main(int argc, char *argv[]) {
+
+    if(argc == 2){
+        if(!strcmp(argv[1], "-l")){
+            flagLexx = 1;
+            yylex();
+        }else if(strcmp(argv[1], "-e1")!=0){
+            printf("Flag nao existe");
+            yylex();
+        }else if (strcmp(argv[1], "-t") == 0){
+            printTree=1;
+            flagYacc=1;
+            yyparse();
+        //erros do yyac
+        }else if(strcmp(argv[1], "-e2") == 0){
+            flagYacc=1;
+            yyparse();
+        } 
+    }
+    
+    if(argc == 3){
+        for(int i = 1;i<argc;i++){
+            if(!strcmp(argv[i], "-l")){
+                flagLexx = 1;  
+                yylex();
+            } 
+            else if(strcmp(argv[i], "-e1")!=0){
+                printf("Flag nao existe");
+                return 0;
+            }
+        }
+    }
+
+    return 0;
+}
+
 int yywrap() {
     return 1;
+}
+
+void yyerror ( const char *s) {
+    switch(strlen(yytext)){
+        case 0:
+            printf("Line %d, col %d: %s: %s\n", contador_linhas,contador_colunas,s, yytext);
+            break;
+        default:
+            printf("Line %d, col %d: %s: %s\n", contador_linhas,(int)(contador_colunas-yyleng),s, yytext);
+            break;
+    }
+
 }

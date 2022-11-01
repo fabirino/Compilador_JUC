@@ -1,0 +1,2776 @@
+Gramática
+
+    0 $accept: Program $end
+
+    1 Program: CLASS ID LBRACE Declarations RBRACE
+    2        | CLASS ID LBRACE RBRACE
+
+    3 Declarations: MethodDecl
+    4             | FieldDecl
+    5             | SEMICOLON
+    6             | Declarations MethodDecl
+    7             | Declarations FieldDecl
+    8             | Declarations SEMICOLON
+
+    9 MethodDecl: PUBLIC STATIC MethodHeader MethodBody
+
+   10 FieldDecl: PUBLIC STATIC Type ID SEMICOLON
+   11          | PUBLIC STATIC Type ID Variaveis SEMICOLON
+   12          | error SEMICOLON
+
+   13 Variaveis: COMMA ID
+   14          | Variaveis COMMA ID
+
+   15 Type: BOOL
+   16     | INT
+   17     | DOUBLE
+
+   18 MethodHeader: Type ID LPAR FormalParams RPAR
+   19             | VOID ID LPAR FormalParams RPAR
+   20             | Type ID LPAR RPAR
+   21             | VOID ID LPAR RPAR
+
+   22 FormalParams: Type ID Parametros
+   23             | Type ID
+   24             | STRING LSQ RSQ ID
+
+   25 Parametros: COMMA Type ID
+   26           | Parametros COMMA Type ID
+
+   27 MethodBody: LBRACE Expressao RBRACE
+   28           | LBRACE RBRACE
+
+   29 Expressao: Statement
+   30          | VarDecl
+   31          | Expressao Statement
+   32          | Expressao VarDecl
+
+   33 VarDecl: Type ID Variaveis SEMICOLON
+   34        | Type ID SEMICOLON
+
+   35 Statement: LBRACE Statement RBRACE
+   36          | LBRACE RBRACE
+   37          | IF LPAR Expr RPAR Statement ELSE Statement
+   38          | IF LPAR Expr RPAR Statement
+   39          | WHILE LPAR Expr RPAR Statement
+   40          | RETURN Expr SEMICOLON
+   41          | RETURN SEMICOLON
+   42          | Gramatica SEMICOLON
+   43          | SEMICOLON
+   44          | PRINT LPAR Expr RPAR SEMICOLON
+   45          | PRINT LPAR STRLIT RPAR SEMICOLON
+   46          | error SEMICOLON
+
+   47 Gramatica: MethodInvocation
+   48          | Assignment
+   49          | ParseArgs
+
+   50 MethodInvocation: ID LPAR CommaExpr RPAR
+   51                 | ID LPAR RPAR
+   52                 | ID LPAR error RPAR
+
+   53 CommaExpr: Expr
+   54          | CommaExpr COMMA Expr
+
+   55 Assignment: ID ASSIGN Expr
+
+   56 ParseArgs: PARSEINT LPAR ID LSQ Expr RSQ RPAR
+   57          | PARSEINT LPAR error RPAR
+
+   58 Expr: Expr PLUS Expr
+   59     | Expr MINUS Expr
+   60     | Expr STAR Expr
+   61     | Expr DIV Expr
+   62     | Expr MOD Expr
+   63     | Expr AND Expr
+   64     | Expr OR Expr
+   65     | Expr XOR Expr
+   66     | Expr LSHIFT Expr
+   67     | Expr RSHIFT Expr
+   68     | Expr EQ Expr
+   69     | Expr GE Expr
+   70     | Expr GT Expr
+   71     | Expr LE Expr
+   72     | Expr LT Expr
+   73     | Expr NE Expr
+   74     | MINUS Expr
+   75     | NOT Expr
+   76     | PLUS Expr
+   77     | LPAR Expr RPAR
+   78     | MethodInvocation
+   79     | Assignment
+   80     | ParseArgs
+   81     | ID DOTLENGTH
+   82     | ID
+   83     | INTLIT
+   84     | REALLIT
+   85     | BOOLLIT
+   86     | LPAR error RPAR
+
+
+Terminais, com regras onde aparecem
+
+    $end (0) 0
+    error (256) 12 46 52 57 86
+    BOOLLIT (258) 85
+    AND (259) 63
+    ASSIGN (260) 55
+    STAR (261) 60
+    COMMA (262) 13 14 25 26 54
+    DIV (263) 61
+    EQ (264) 68
+    GE (265) 69
+    GT (266) 70
+    LBRACE (267) 1 2 27 28 35 36
+    LE (268) 71
+    LPAR (269) 18 19 20 21 37 38 39 44 45 50 51 52 56 57 77 86
+    LSQ (270) 24 56
+    LT (271) 72
+    MINUS (272) 59 74
+    MOD (273) 62
+    NE (274) 73
+    NOT (275) 75
+    OR (276) 64
+    PLUS (277) 58 76
+    RBRACE (278) 1 2 27 28 35 36
+    RPAR (279) 18 19 20 21 37 38 39 44 45 50 51 52 56 57 77 86
+    RSQ (280) 24 56
+    SEMICOLON (281) 5 8 10 11 12 33 34 40 41 42 43 44 45 46
+    LSHIFT (282) 66
+    RSHIFT (283) 67
+    XOR (284) 65
+    BOOL (285) 15
+    CLASS (286) 1 2
+    DOTLENGTH (287) 81
+    DOUBLE (288) 17
+    ELSE (289) 37
+    IF (290) 37 38
+    INT (291) 16
+    PRINT (292) 44 45
+    PARSEINT (293) 56 57
+    PUBLIC (294) 9 10 11
+    RETURN (295) 40 41
+    STATIC (296) 9 10 11
+    STRING (297) 24
+    VOID (298) 19 21
+    WHILE (299) 39
+    ID (300) 1 2 10 11 13 14 18 19 20 21 22 23 24 25 26 33 34 50 51 52 55 56 81 82
+    INTLIT (301) 83
+    REALLIT (302) 84
+    STRLIT (303) 45
+
+
+Não terminais, com regras onde aparecem
+
+    $accept (49)
+        à esquerda: 0
+    Program (50)
+        à esquerda: 1 2
+        à direita: 0
+    Declarations (51)
+        à esquerda: 3 4 5 6 7 8
+        à direita: 1 6 7 8
+    MethodDecl (52)
+        à esquerda: 9
+        à direita: 3 6
+    FieldDecl (53)
+        à esquerda: 10 11 12
+        à direita: 4 7
+    Variaveis (54)
+        à esquerda: 13 14
+        à direita: 11 14 33
+    Type (55)
+        à esquerda: 15 16 17
+        à direita: 10 11 18 20 22 23 25 26 33 34
+    MethodHeader (56)
+        à esquerda: 18 19 20 21
+        à direita: 9
+    FormalParams (57)
+        à esquerda: 22 23 24
+        à direita: 18 19
+    Parametros (58)
+        à esquerda: 25 26
+        à direita: 22 26
+    MethodBody (59)
+        à esquerda: 27 28
+        à direita: 9
+    Expressao (60)
+        à esquerda: 29 30 31 32
+        à direita: 27 31 32
+    VarDecl (61)
+        à esquerda: 33 34
+        à direita: 30 32
+    Statement (62)
+        à esquerda: 35 36 37 38 39 40 41 42 43 44 45 46
+        à direita: 29 31 35 37 38 39
+    Gramatica (63)
+        à esquerda: 47 48 49
+        à direita: 42
+    MethodInvocation (64)
+        à esquerda: 50 51 52
+        à direita: 47 78
+    CommaExpr (65)
+        à esquerda: 53 54
+        à direita: 50 54
+    Assignment (66)
+        à esquerda: 55
+        à direita: 48 79
+    ParseArgs (67)
+        à esquerda: 56 57
+        à direita: 49 80
+    Expr (68)
+        à esquerda: 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84 85 86
+        à direita: 37 38 39 40 44 53 54 55 56 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77
+
+
+Estado 0
+
+    0 $accept: • Program $end
+
+    CLASS  troca e vai para estado 1
+
+    Program  vai para estado 2
+
+
+Estado 1
+
+    1 Program: CLASS • ID LBRACE Declarations RBRACE
+    2        | CLASS • ID LBRACE RBRACE
+
+    ID  troca e vai para estado 3
+
+
+Estado 2
+
+    0 $accept: Program • $end
+
+    $end  troca e vai para estado 4
+
+
+Estado 3
+
+    1 Program: CLASS ID • LBRACE Declarations RBRACE
+    2        | CLASS ID • LBRACE RBRACE
+
+    LBRACE  troca e vai para estado 5
+
+
+Estado 4
+
+    0 $accept: Program $end •
+
+    $default  aceitar
+
+
+Estado 5
+
+    1 Program: CLASS ID LBRACE • Declarations RBRACE
+    2        | CLASS ID LBRACE • RBRACE
+
+    error      troca e vai para estado 6
+    RBRACE     troca e vai para estado 7
+    SEMICOLON  troca e vai para estado 8
+    PUBLIC     troca e vai para estado 9
+
+    Declarations  vai para estado 10
+    MethodDecl    vai para estado 11
+    FieldDecl     vai para estado 12
+
+
+Estado 6
+
+   12 FieldDecl: error • SEMICOLON
+
+    SEMICOLON  troca e vai para estado 13
+
+
+Estado 7
+
+    2 Program: CLASS ID LBRACE RBRACE •
+
+    $default  redução com regra 2 (Program)
+
+
+Estado 8
+
+    5 Declarations: SEMICOLON •
+
+    $default  redução com regra 5 (Declarations)
+
+
+Estado 9
+
+    9 MethodDecl: PUBLIC • STATIC MethodHeader MethodBody
+   10 FieldDecl: PUBLIC • STATIC Type ID SEMICOLON
+   11          | PUBLIC • STATIC Type ID Variaveis SEMICOLON
+
+    STATIC  troca e vai para estado 14
+
+
+Estado 10
+
+    1 Program: CLASS ID LBRACE Declarations • RBRACE
+    6 Declarations: Declarations • MethodDecl
+    7             | Declarations • FieldDecl
+    8             | Declarations • SEMICOLON
+
+    error      troca e vai para estado 6
+    RBRACE     troca e vai para estado 15
+    SEMICOLON  troca e vai para estado 16
+    PUBLIC     troca e vai para estado 9
+
+    MethodDecl  vai para estado 17
+    FieldDecl   vai para estado 18
+
+
+Estado 11
+
+    3 Declarations: MethodDecl •
+
+    $default  redução com regra 3 (Declarations)
+
+
+Estado 12
+
+    4 Declarations: FieldDecl •
+
+    $default  redução com regra 4 (Declarations)
+
+
+Estado 13
+
+   12 FieldDecl: error SEMICOLON •
+
+    $default  redução com regra 12 (FieldDecl)
+
+
+Estado 14
+
+    9 MethodDecl: PUBLIC STATIC • MethodHeader MethodBody
+   10 FieldDecl: PUBLIC STATIC • Type ID SEMICOLON
+   11          | PUBLIC STATIC • Type ID Variaveis SEMICOLON
+
+    BOOL    troca e vai para estado 19
+    DOUBLE  troca e vai para estado 20
+    INT     troca e vai para estado 21
+    VOID    troca e vai para estado 22
+
+    Type          vai para estado 23
+    MethodHeader  vai para estado 24
+
+
+Estado 15
+
+    1 Program: CLASS ID LBRACE Declarations RBRACE •
+
+    $default  redução com regra 1 (Program)
+
+
+Estado 16
+
+    8 Declarations: Declarations SEMICOLON •
+
+    $default  redução com regra 8 (Declarations)
+
+
+Estado 17
+
+    6 Declarations: Declarations MethodDecl •
+
+    $default  redução com regra 6 (Declarations)
+
+
+Estado 18
+
+    7 Declarations: Declarations FieldDecl •
+
+    $default  redução com regra 7 (Declarations)
+
+
+Estado 19
+
+   15 Type: BOOL •
+
+    $default  redução com regra 15 (Type)
+
+
+Estado 20
+
+   17 Type: DOUBLE •
+
+    $default  redução com regra 17 (Type)
+
+
+Estado 21
+
+   16 Type: INT •
+
+    $default  redução com regra 16 (Type)
+
+
+Estado 22
+
+   19 MethodHeader: VOID • ID LPAR FormalParams RPAR
+   21             | VOID • ID LPAR RPAR
+
+    ID  troca e vai para estado 25
+
+
+Estado 23
+
+   10 FieldDecl: PUBLIC STATIC Type • ID SEMICOLON
+   11          | PUBLIC STATIC Type • ID Variaveis SEMICOLON
+   18 MethodHeader: Type • ID LPAR FormalParams RPAR
+   20             | Type • ID LPAR RPAR
+
+    ID  troca e vai para estado 26
+
+
+Estado 24
+
+    9 MethodDecl: PUBLIC STATIC MethodHeader • MethodBody
+
+    LBRACE  troca e vai para estado 27
+
+    MethodBody  vai para estado 28
+
+
+Estado 25
+
+   19 MethodHeader: VOID ID • LPAR FormalParams RPAR
+   21             | VOID ID • LPAR RPAR
+
+    LPAR  troca e vai para estado 29
+
+
+Estado 26
+
+   10 FieldDecl: PUBLIC STATIC Type ID • SEMICOLON
+   11          | PUBLIC STATIC Type ID • Variaveis SEMICOLON
+   18 MethodHeader: Type ID • LPAR FormalParams RPAR
+   20             | Type ID • LPAR RPAR
+
+    COMMA      troca e vai para estado 30
+    LPAR       troca e vai para estado 31
+    SEMICOLON  troca e vai para estado 32
+
+    Variaveis  vai para estado 33
+
+
+Estado 27
+
+   27 MethodBody: LBRACE • Expressao RBRACE
+   28           | LBRACE • RBRACE
+
+    error      troca e vai para estado 34
+    LBRACE     troca e vai para estado 35
+    RBRACE     troca e vai para estado 36
+    SEMICOLON  troca e vai para estado 37
+    BOOL       troca e vai para estado 19
+    DOUBLE     troca e vai para estado 20
+    IF         troca e vai para estado 38
+    INT        troca e vai para estado 21
+    PRINT      troca e vai para estado 39
+    PARSEINT   troca e vai para estado 40
+    RETURN     troca e vai para estado 41
+    WHILE      troca e vai para estado 42
+    ID         troca e vai para estado 43
+
+    Type              vai para estado 44
+    Expressao         vai para estado 45
+    VarDecl           vai para estado 46
+    Statement         vai para estado 47
+    Gramatica         vai para estado 48
+    MethodInvocation  vai para estado 49
+    Assignment        vai para estado 50
+    ParseArgs         vai para estado 51
+
+
+Estado 28
+
+    9 MethodDecl: PUBLIC STATIC MethodHeader MethodBody •
+
+    $default  redução com regra 9 (MethodDecl)
+
+
+Estado 29
+
+   19 MethodHeader: VOID ID LPAR • FormalParams RPAR
+   21             | VOID ID LPAR • RPAR
+
+    RPAR    troca e vai para estado 52
+    BOOL    troca e vai para estado 19
+    DOUBLE  troca e vai para estado 20
+    INT     troca e vai para estado 21
+    STRING  troca e vai para estado 53
+
+    Type          vai para estado 54
+    FormalParams  vai para estado 55
+
+
+Estado 30
+
+   13 Variaveis: COMMA • ID
+
+    ID  troca e vai para estado 56
+
+
+Estado 31
+
+   18 MethodHeader: Type ID LPAR • FormalParams RPAR
+   20             | Type ID LPAR • RPAR
+
+    RPAR    troca e vai para estado 57
+    BOOL    troca e vai para estado 19
+    DOUBLE  troca e vai para estado 20
+    INT     troca e vai para estado 21
+    STRING  troca e vai para estado 53
+
+    Type          vai para estado 54
+    FormalParams  vai para estado 58
+
+
+Estado 32
+
+   10 FieldDecl: PUBLIC STATIC Type ID SEMICOLON •
+
+    $default  redução com regra 10 (FieldDecl)
+
+
+Estado 33
+
+   11 FieldDecl: PUBLIC STATIC Type ID Variaveis • SEMICOLON
+   14 Variaveis: Variaveis • COMMA ID
+
+    COMMA      troca e vai para estado 59
+    SEMICOLON  troca e vai para estado 60
+
+
+Estado 34
+
+   46 Statement: error • SEMICOLON
+
+    SEMICOLON  troca e vai para estado 61
+
+
+Estado 35
+
+   35 Statement: LBRACE • Statement RBRACE
+   36          | LBRACE • RBRACE
+
+    error      troca e vai para estado 34
+    LBRACE     troca e vai para estado 35
+    RBRACE     troca e vai para estado 62
+    SEMICOLON  troca e vai para estado 37
+    IF         troca e vai para estado 38
+    PRINT      troca e vai para estado 39
+    PARSEINT   troca e vai para estado 40
+    RETURN     troca e vai para estado 41
+    WHILE      troca e vai para estado 42
+    ID         troca e vai para estado 43
+
+    Statement         vai para estado 63
+    Gramatica         vai para estado 48
+    MethodInvocation  vai para estado 49
+    Assignment        vai para estado 50
+    ParseArgs         vai para estado 51
+
+
+Estado 36
+
+   28 MethodBody: LBRACE RBRACE •
+
+    $default  redução com regra 28 (MethodBody)
+
+
+Estado 37
+
+   43 Statement: SEMICOLON •
+
+    $default  redução com regra 43 (Statement)
+
+
+Estado 38
+
+   37 Statement: IF • LPAR Expr RPAR Statement ELSE Statement
+   38          | IF • LPAR Expr RPAR Statement
+
+    LPAR  troca e vai para estado 64
+
+
+Estado 39
+
+   44 Statement: PRINT • LPAR Expr RPAR SEMICOLON
+   45          | PRINT • LPAR STRLIT RPAR SEMICOLON
+
+    LPAR  troca e vai para estado 65
+
+
+Estado 40
+
+   56 ParseArgs: PARSEINT • LPAR ID LSQ Expr RSQ RPAR
+   57          | PARSEINT • LPAR error RPAR
+
+    LPAR  troca e vai para estado 66
+
+
+Estado 41
+
+   40 Statement: RETURN • Expr SEMICOLON
+   41          | RETURN • SEMICOLON
+
+    BOOLLIT    troca e vai para estado 67
+    LPAR       troca e vai para estado 68
+    MINUS      troca e vai para estado 69
+    NOT        troca e vai para estado 70
+    PLUS       troca e vai para estado 71
+    SEMICOLON  troca e vai para estado 72
+    PARSEINT   troca e vai para estado 40
+    ID         troca e vai para estado 73
+    INTLIT     troca e vai para estado 74
+    REALLIT    troca e vai para estado 75
+
+    MethodInvocation  vai para estado 76
+    Assignment        vai para estado 77
+    ParseArgs         vai para estado 78
+    Expr              vai para estado 79
+
+
+Estado 42
+
+   39 Statement: WHILE • LPAR Expr RPAR Statement
+
+    LPAR  troca e vai para estado 80
+
+
+Estado 43
+
+   50 MethodInvocation: ID • LPAR CommaExpr RPAR
+   51                 | ID • LPAR RPAR
+   52                 | ID • LPAR error RPAR
+   55 Assignment: ID • ASSIGN Expr
+
+    ASSIGN  troca e vai para estado 81
+    LPAR    troca e vai para estado 82
+
+
+Estado 44
+
+   33 VarDecl: Type • ID Variaveis SEMICOLON
+   34        | Type • ID SEMICOLON
+
+    ID  troca e vai para estado 83
+
+
+Estado 45
+
+   27 MethodBody: LBRACE Expressao • RBRACE
+   31 Expressao: Expressao • Statement
+   32          | Expressao • VarDecl
+
+    error      troca e vai para estado 34
+    LBRACE     troca e vai para estado 35
+    RBRACE     troca e vai para estado 84
+    SEMICOLON  troca e vai para estado 37
+    BOOL       troca e vai para estado 19
+    DOUBLE     troca e vai para estado 20
+    IF         troca e vai para estado 38
+    INT        troca e vai para estado 21
+    PRINT      troca e vai para estado 39
+    PARSEINT   troca e vai para estado 40
+    RETURN     troca e vai para estado 41
+    WHILE      troca e vai para estado 42
+    ID         troca e vai para estado 43
+
+    Type              vai para estado 44
+    VarDecl           vai para estado 85
+    Statement         vai para estado 86
+    Gramatica         vai para estado 48
+    MethodInvocation  vai para estado 49
+    Assignment        vai para estado 50
+    ParseArgs         vai para estado 51
+
+
+Estado 46
+
+   30 Expressao: VarDecl •
+
+    $default  redução com regra 30 (Expressao)
+
+
+Estado 47
+
+   29 Expressao: Statement •
+
+    $default  redução com regra 29 (Expressao)
+
+
+Estado 48
+
+   42 Statement: Gramatica • SEMICOLON
+
+    SEMICOLON  troca e vai para estado 87
+
+
+Estado 49
+
+   47 Gramatica: MethodInvocation •
+
+    $default  redução com regra 47 (Gramatica)
+
+
+Estado 50
+
+   48 Gramatica: Assignment •
+
+    $default  redução com regra 48 (Gramatica)
+
+
+Estado 51
+
+   49 Gramatica: ParseArgs •
+
+    $default  redução com regra 49 (Gramatica)
+
+
+Estado 52
+
+   21 MethodHeader: VOID ID LPAR RPAR •
+
+    $default  redução com regra 21 (MethodHeader)
+
+
+Estado 53
+
+   24 FormalParams: STRING • LSQ RSQ ID
+
+    LSQ  troca e vai para estado 88
+
+
+Estado 54
+
+   22 FormalParams: Type • ID Parametros
+   23             | Type • ID
+
+    ID  troca e vai para estado 89
+
+
+Estado 55
+
+   19 MethodHeader: VOID ID LPAR FormalParams • RPAR
+
+    RPAR  troca e vai para estado 90
+
+
+Estado 56
+
+   13 Variaveis: COMMA ID •
+
+    $default  redução com regra 13 (Variaveis)
+
+
+Estado 57
+
+   20 MethodHeader: Type ID LPAR RPAR •
+
+    $default  redução com regra 20 (MethodHeader)
+
+
+Estado 58
+
+   18 MethodHeader: Type ID LPAR FormalParams • RPAR
+
+    RPAR  troca e vai para estado 91
+
+
+Estado 59
+
+   14 Variaveis: Variaveis COMMA • ID
+
+    ID  troca e vai para estado 92
+
+
+Estado 60
+
+   11 FieldDecl: PUBLIC STATIC Type ID Variaveis SEMICOLON •
+
+    $default  redução com regra 11 (FieldDecl)
+
+
+Estado 61
+
+   46 Statement: error SEMICOLON •
+
+    $default  redução com regra 46 (Statement)
+
+
+Estado 62
+
+   36 Statement: LBRACE RBRACE •
+
+    $default  redução com regra 36 (Statement)
+
+
+Estado 63
+
+   35 Statement: LBRACE Statement • RBRACE
+
+    RBRACE  troca e vai para estado 93
+
+
+Estado 64
+
+   37 Statement: IF LPAR • Expr RPAR Statement ELSE Statement
+   38          | IF LPAR • Expr RPAR Statement
+
+    BOOLLIT   troca e vai para estado 67
+    LPAR      troca e vai para estado 68
+    MINUS     troca e vai para estado 69
+    NOT       troca e vai para estado 70
+    PLUS      troca e vai para estado 71
+    PARSEINT  troca e vai para estado 40
+    ID        troca e vai para estado 73
+    INTLIT    troca e vai para estado 74
+    REALLIT   troca e vai para estado 75
+
+    MethodInvocation  vai para estado 76
+    Assignment        vai para estado 77
+    ParseArgs         vai para estado 78
+    Expr              vai para estado 94
+
+
+Estado 65
+
+   44 Statement: PRINT LPAR • Expr RPAR SEMICOLON
+   45          | PRINT LPAR • STRLIT RPAR SEMICOLON
+
+    BOOLLIT   troca e vai para estado 67
+    LPAR      troca e vai para estado 68
+    MINUS     troca e vai para estado 69
+    NOT       troca e vai para estado 70
+    PLUS      troca e vai para estado 71
+    PARSEINT  troca e vai para estado 40
+    ID        troca e vai para estado 73
+    INTLIT    troca e vai para estado 74
+    REALLIT   troca e vai para estado 75
+    STRLIT    troca e vai para estado 95
+
+    MethodInvocation  vai para estado 76
+    Assignment        vai para estado 77
+    ParseArgs         vai para estado 78
+    Expr              vai para estado 96
+
+
+Estado 66
+
+   56 ParseArgs: PARSEINT LPAR • ID LSQ Expr RSQ RPAR
+   57          | PARSEINT LPAR • error RPAR
+
+    error  troca e vai para estado 97
+    ID     troca e vai para estado 98
+
+
+Estado 67
+
+   85 Expr: BOOLLIT •
+
+    $default  redução com regra 85 (Expr)
+
+
+Estado 68
+
+   77 Expr: LPAR • Expr RPAR
+   86     | LPAR • error RPAR
+
+    error     troca e vai para estado 99
+    BOOLLIT   troca e vai para estado 67
+    LPAR      troca e vai para estado 68
+    MINUS     troca e vai para estado 69
+    NOT       troca e vai para estado 70
+    PLUS      troca e vai para estado 71
+    PARSEINT  troca e vai para estado 40
+    ID        troca e vai para estado 73
+    INTLIT    troca e vai para estado 74
+    REALLIT   troca e vai para estado 75
+
+    MethodInvocation  vai para estado 76
+    Assignment        vai para estado 77
+    ParseArgs         vai para estado 78
+    Expr              vai para estado 100
+
+
+Estado 69
+
+   74 Expr: MINUS • Expr
+
+    BOOLLIT   troca e vai para estado 67
+    LPAR      troca e vai para estado 68
+    MINUS     troca e vai para estado 69
+    NOT       troca e vai para estado 70
+    PLUS      troca e vai para estado 71
+    PARSEINT  troca e vai para estado 40
+    ID        troca e vai para estado 73
+    INTLIT    troca e vai para estado 74
+    REALLIT   troca e vai para estado 75
+
+    MethodInvocation  vai para estado 76
+    Assignment        vai para estado 77
+    ParseArgs         vai para estado 78
+    Expr              vai para estado 101
+
+
+Estado 70
+
+   75 Expr: NOT • Expr
+
+    BOOLLIT   troca e vai para estado 67
+    LPAR      troca e vai para estado 68
+    MINUS     troca e vai para estado 69
+    NOT       troca e vai para estado 70
+    PLUS      troca e vai para estado 71
+    PARSEINT  troca e vai para estado 40
+    ID        troca e vai para estado 73
+    INTLIT    troca e vai para estado 74
+    REALLIT   troca e vai para estado 75
+
+    MethodInvocation  vai para estado 76
+    Assignment        vai para estado 77
+    ParseArgs         vai para estado 78
+    Expr              vai para estado 102
+
+
+Estado 71
+
+   76 Expr: PLUS • Expr
+
+    BOOLLIT   troca e vai para estado 67
+    LPAR      troca e vai para estado 68
+    MINUS     troca e vai para estado 69
+    NOT       troca e vai para estado 70
+    PLUS      troca e vai para estado 71
+    PARSEINT  troca e vai para estado 40
+    ID        troca e vai para estado 73
+    INTLIT    troca e vai para estado 74
+    REALLIT   troca e vai para estado 75
+
+    MethodInvocation  vai para estado 76
+    Assignment        vai para estado 77
+    ParseArgs         vai para estado 78
+    Expr              vai para estado 103
+
+
+Estado 72
+
+   41 Statement: RETURN SEMICOLON •
+
+    $default  redução com regra 41 (Statement)
+
+
+Estado 73
+
+   50 MethodInvocation: ID • LPAR CommaExpr RPAR
+   51                 | ID • LPAR RPAR
+   52                 | ID • LPAR error RPAR
+   55 Assignment: ID • ASSIGN Expr
+   81 Expr: ID • DOTLENGTH
+   82     | ID •
+
+    ASSIGN     troca e vai para estado 81
+    LPAR       troca e vai para estado 82
+    DOTLENGTH  troca e vai para estado 104
+
+    $default  redução com regra 82 (Expr)
+
+
+Estado 74
+
+   83 Expr: INTLIT •
+
+    $default  redução com regra 83 (Expr)
+
+
+Estado 75
+
+   84 Expr: REALLIT •
+
+    $default  redução com regra 84 (Expr)
+
+
+Estado 76
+
+   78 Expr: MethodInvocation •
+
+    $default  redução com regra 78 (Expr)
+
+
+Estado 77
+
+   79 Expr: Assignment •
+
+    $default  redução com regra 79 (Expr)
+
+
+Estado 78
+
+   80 Expr: ParseArgs •
+
+    $default  redução com regra 80 (Expr)
+
+
+Estado 79
+
+   40 Statement: RETURN Expr • SEMICOLON
+   58 Expr: Expr • PLUS Expr
+   59     | Expr • MINUS Expr
+   60     | Expr • STAR Expr
+   61     | Expr • DIV Expr
+   62     | Expr • MOD Expr
+   63     | Expr • AND Expr
+   64     | Expr • OR Expr
+   65     | Expr • XOR Expr
+   66     | Expr • LSHIFT Expr
+   67     | Expr • RSHIFT Expr
+   68     | Expr • EQ Expr
+   69     | Expr • GE Expr
+   70     | Expr • GT Expr
+   71     | Expr • LE Expr
+   72     | Expr • LT Expr
+   73     | Expr • NE Expr
+
+    AND        troca e vai para estado 105
+    STAR       troca e vai para estado 106
+    DIV        troca e vai para estado 107
+    EQ         troca e vai para estado 108
+    GE         troca e vai para estado 109
+    GT         troca e vai para estado 110
+    LE         troca e vai para estado 111
+    LT         troca e vai para estado 112
+    MINUS      troca e vai para estado 113
+    MOD        troca e vai para estado 114
+    NE         troca e vai para estado 115
+    OR         troca e vai para estado 116
+    PLUS       troca e vai para estado 117
+    SEMICOLON  troca e vai para estado 118
+    LSHIFT     troca e vai para estado 119
+    RSHIFT     troca e vai para estado 120
+    XOR        troca e vai para estado 121
+
+
+Estado 80
+
+   39 Statement: WHILE LPAR • Expr RPAR Statement
+
+    BOOLLIT   troca e vai para estado 67
+    LPAR      troca e vai para estado 68
+    MINUS     troca e vai para estado 69
+    NOT       troca e vai para estado 70
+    PLUS      troca e vai para estado 71
+    PARSEINT  troca e vai para estado 40
+    ID        troca e vai para estado 73
+    INTLIT    troca e vai para estado 74
+    REALLIT   troca e vai para estado 75
+
+    MethodInvocation  vai para estado 76
+    Assignment        vai para estado 77
+    ParseArgs         vai para estado 78
+    Expr              vai para estado 122
+
+
+Estado 81
+
+   55 Assignment: ID ASSIGN • Expr
+
+    BOOLLIT   troca e vai para estado 67
+    LPAR      troca e vai para estado 68
+    MINUS     troca e vai para estado 69
+    NOT       troca e vai para estado 70
+    PLUS      troca e vai para estado 71
+    PARSEINT  troca e vai para estado 40
+    ID        troca e vai para estado 73
+    INTLIT    troca e vai para estado 74
+    REALLIT   troca e vai para estado 75
+
+    MethodInvocation  vai para estado 76
+    Assignment        vai para estado 77
+    ParseArgs         vai para estado 78
+    Expr              vai para estado 123
+
+
+Estado 82
+
+   50 MethodInvocation: ID LPAR • CommaExpr RPAR
+   51                 | ID LPAR • RPAR
+   52                 | ID LPAR • error RPAR
+
+    error     troca e vai para estado 124
+    BOOLLIT   troca e vai para estado 67
+    LPAR      troca e vai para estado 68
+    MINUS     troca e vai para estado 69
+    NOT       troca e vai para estado 70
+    PLUS      troca e vai para estado 71
+    RPAR      troca e vai para estado 125
+    PARSEINT  troca e vai para estado 40
+    ID        troca e vai para estado 73
+    INTLIT    troca e vai para estado 74
+    REALLIT   troca e vai para estado 75
+
+    MethodInvocation  vai para estado 76
+    CommaExpr         vai para estado 126
+    Assignment        vai para estado 77
+    ParseArgs         vai para estado 78
+    Expr              vai para estado 127
+
+
+Estado 83
+
+   33 VarDecl: Type ID • Variaveis SEMICOLON
+   34        | Type ID • SEMICOLON
+
+    COMMA      troca e vai para estado 30
+    SEMICOLON  troca e vai para estado 128
+
+    Variaveis  vai para estado 129
+
+
+Estado 84
+
+   27 MethodBody: LBRACE Expressao RBRACE •
+
+    $default  redução com regra 27 (MethodBody)
+
+
+Estado 85
+
+   32 Expressao: Expressao VarDecl •
+
+    $default  redução com regra 32 (Expressao)
+
+
+Estado 86
+
+   31 Expressao: Expressao Statement •
+
+    $default  redução com regra 31 (Expressao)
+
+
+Estado 87
+
+   42 Statement: Gramatica SEMICOLON •
+
+    $default  redução com regra 42 (Statement)
+
+
+Estado 88
+
+   24 FormalParams: STRING LSQ • RSQ ID
+
+    RSQ  troca e vai para estado 130
+
+
+Estado 89
+
+   22 FormalParams: Type ID • Parametros
+   23             | Type ID •
+
+    COMMA  troca e vai para estado 131
+
+    $default  redução com regra 23 (FormalParams)
+
+    Parametros  vai para estado 132
+
+
+Estado 90
+
+   19 MethodHeader: VOID ID LPAR FormalParams RPAR •
+
+    $default  redução com regra 19 (MethodHeader)
+
+
+Estado 91
+
+   18 MethodHeader: Type ID LPAR FormalParams RPAR •
+
+    $default  redução com regra 18 (MethodHeader)
+
+
+Estado 92
+
+   14 Variaveis: Variaveis COMMA ID •
+
+    $default  redução com regra 14 (Variaveis)
+
+
+Estado 93
+
+   35 Statement: LBRACE Statement RBRACE •
+
+    $default  redução com regra 35 (Statement)
+
+
+Estado 94
+
+   37 Statement: IF LPAR Expr • RPAR Statement ELSE Statement
+   38          | IF LPAR Expr • RPAR Statement
+   58 Expr: Expr • PLUS Expr
+   59     | Expr • MINUS Expr
+   60     | Expr • STAR Expr
+   61     | Expr • DIV Expr
+   62     | Expr • MOD Expr
+   63     | Expr • AND Expr
+   64     | Expr • OR Expr
+   65     | Expr • XOR Expr
+   66     | Expr • LSHIFT Expr
+   67     | Expr • RSHIFT Expr
+   68     | Expr • EQ Expr
+   69     | Expr • GE Expr
+   70     | Expr • GT Expr
+   71     | Expr • LE Expr
+   72     | Expr • LT Expr
+   73     | Expr • NE Expr
+
+    AND     troca e vai para estado 105
+    STAR    troca e vai para estado 106
+    DIV     troca e vai para estado 107
+    EQ      troca e vai para estado 108
+    GE      troca e vai para estado 109
+    GT      troca e vai para estado 110
+    LE      troca e vai para estado 111
+    LT      troca e vai para estado 112
+    MINUS   troca e vai para estado 113
+    MOD     troca e vai para estado 114
+    NE      troca e vai para estado 115
+    OR      troca e vai para estado 116
+    PLUS    troca e vai para estado 117
+    RPAR    troca e vai para estado 133
+    LSHIFT  troca e vai para estado 119
+    RSHIFT  troca e vai para estado 120
+    XOR     troca e vai para estado 121
+
+
+Estado 95
+
+   45 Statement: PRINT LPAR STRLIT • RPAR SEMICOLON
+
+    RPAR  troca e vai para estado 134
+
+
+Estado 96
+
+   44 Statement: PRINT LPAR Expr • RPAR SEMICOLON
+   58 Expr: Expr • PLUS Expr
+   59     | Expr • MINUS Expr
+   60     | Expr • STAR Expr
+   61     | Expr • DIV Expr
+   62     | Expr • MOD Expr
+   63     | Expr • AND Expr
+   64     | Expr • OR Expr
+   65     | Expr • XOR Expr
+   66     | Expr • LSHIFT Expr
+   67     | Expr • RSHIFT Expr
+   68     | Expr • EQ Expr
+   69     | Expr • GE Expr
+   70     | Expr • GT Expr
+   71     | Expr • LE Expr
+   72     | Expr • LT Expr
+   73     | Expr • NE Expr
+
+    AND     troca e vai para estado 105
+    STAR    troca e vai para estado 106
+    DIV     troca e vai para estado 107
+    EQ      troca e vai para estado 108
+    GE      troca e vai para estado 109
+    GT      troca e vai para estado 110
+    LE      troca e vai para estado 111
+    LT      troca e vai para estado 112
+    MINUS   troca e vai para estado 113
+    MOD     troca e vai para estado 114
+    NE      troca e vai para estado 115
+    OR      troca e vai para estado 116
+    PLUS    troca e vai para estado 117
+    RPAR    troca e vai para estado 135
+    LSHIFT  troca e vai para estado 119
+    RSHIFT  troca e vai para estado 120
+    XOR     troca e vai para estado 121
+
+
+Estado 97
+
+   57 ParseArgs: PARSEINT LPAR error • RPAR
+
+    RPAR  troca e vai para estado 136
+
+
+Estado 98
+
+   56 ParseArgs: PARSEINT LPAR ID • LSQ Expr RSQ RPAR
+
+    LSQ  troca e vai para estado 137
+
+
+Estado 99
+
+   86 Expr: LPAR error • RPAR
+
+    RPAR  troca e vai para estado 138
+
+
+Estado 100
+
+   58 Expr: Expr • PLUS Expr
+   59     | Expr • MINUS Expr
+   60     | Expr • STAR Expr
+   61     | Expr • DIV Expr
+   62     | Expr • MOD Expr
+   63     | Expr • AND Expr
+   64     | Expr • OR Expr
+   65     | Expr • XOR Expr
+   66     | Expr • LSHIFT Expr
+   67     | Expr • RSHIFT Expr
+   68     | Expr • EQ Expr
+   69     | Expr • GE Expr
+   70     | Expr • GT Expr
+   71     | Expr • LE Expr
+   72     | Expr • LT Expr
+   73     | Expr • NE Expr
+   77     | LPAR Expr • RPAR
+
+    AND     troca e vai para estado 105
+    STAR    troca e vai para estado 106
+    DIV     troca e vai para estado 107
+    EQ      troca e vai para estado 108
+    GE      troca e vai para estado 109
+    GT      troca e vai para estado 110
+    LE      troca e vai para estado 111
+    LT      troca e vai para estado 112
+    MINUS   troca e vai para estado 113
+    MOD     troca e vai para estado 114
+    NE      troca e vai para estado 115
+    OR      troca e vai para estado 116
+    PLUS    troca e vai para estado 117
+    RPAR    troca e vai para estado 139
+    LSHIFT  troca e vai para estado 119
+    RSHIFT  troca e vai para estado 120
+    XOR     troca e vai para estado 121
+
+
+Estado 101
+
+   58 Expr: Expr • PLUS Expr
+   59     | Expr • MINUS Expr
+   60     | Expr • STAR Expr
+   61     | Expr • DIV Expr
+   62     | Expr • MOD Expr
+   63     | Expr • AND Expr
+   64     | Expr • OR Expr
+   65     | Expr • XOR Expr
+   66     | Expr • LSHIFT Expr
+   67     | Expr • RSHIFT Expr
+   68     | Expr • EQ Expr
+   69     | Expr • GE Expr
+   70     | Expr • GT Expr
+   71     | Expr • LE Expr
+   72     | Expr • LT Expr
+   73     | Expr • NE Expr
+   74     | MINUS Expr •
+
+    STAR  troca e vai para estado 106
+    DIV   troca e vai para estado 107
+    MOD   troca e vai para estado 114
+
+    $default  redução com regra 74 (Expr)
+
+
+Estado 102
+
+   58 Expr: Expr • PLUS Expr
+   59     | Expr • MINUS Expr
+   60     | Expr • STAR Expr
+   61     | Expr • DIV Expr
+   62     | Expr • MOD Expr
+   63     | Expr • AND Expr
+   64     | Expr • OR Expr
+   65     | Expr • XOR Expr
+   66     | Expr • LSHIFT Expr
+   67     | Expr • RSHIFT Expr
+   68     | Expr • EQ Expr
+   69     | Expr • GE Expr
+   70     | Expr • GT Expr
+   71     | Expr • LE Expr
+   72     | Expr • LT Expr
+   73     | Expr • NE Expr
+   75     | NOT Expr •
+
+    $default  redução com regra 75 (Expr)
+
+
+Estado 103
+
+   58 Expr: Expr • PLUS Expr
+   59     | Expr • MINUS Expr
+   60     | Expr • STAR Expr
+   61     | Expr • DIV Expr
+   62     | Expr • MOD Expr
+   63     | Expr • AND Expr
+   64     | Expr • OR Expr
+   65     | Expr • XOR Expr
+   66     | Expr • LSHIFT Expr
+   67     | Expr • RSHIFT Expr
+   68     | Expr • EQ Expr
+   69     | Expr • GE Expr
+   70     | Expr • GT Expr
+   71     | Expr • LE Expr
+   72     | Expr • LT Expr
+   73     | Expr • NE Expr
+   76     | PLUS Expr •
+
+    STAR  troca e vai para estado 106
+    DIV   troca e vai para estado 107
+    MOD   troca e vai para estado 114
+
+    $default  redução com regra 76 (Expr)
+
+
+Estado 104
+
+   81 Expr: ID DOTLENGTH •
+
+    $default  redução com regra 81 (Expr)
+
+
+Estado 105
+
+   63 Expr: Expr AND • Expr
+
+    BOOLLIT   troca e vai para estado 67
+    LPAR      troca e vai para estado 68
+    MINUS     troca e vai para estado 69
+    NOT       troca e vai para estado 70
+    PLUS      troca e vai para estado 71
+    PARSEINT  troca e vai para estado 40
+    ID        troca e vai para estado 73
+    INTLIT    troca e vai para estado 74
+    REALLIT   troca e vai para estado 75
+
+    MethodInvocation  vai para estado 76
+    Assignment        vai para estado 77
+    ParseArgs         vai para estado 78
+    Expr              vai para estado 140
+
+
+Estado 106
+
+   60 Expr: Expr STAR • Expr
+
+    BOOLLIT   troca e vai para estado 67
+    LPAR      troca e vai para estado 68
+    MINUS     troca e vai para estado 69
+    NOT       troca e vai para estado 70
+    PLUS      troca e vai para estado 71
+    PARSEINT  troca e vai para estado 40
+    ID        troca e vai para estado 73
+    INTLIT    troca e vai para estado 74
+    REALLIT   troca e vai para estado 75
+
+    MethodInvocation  vai para estado 76
+    Assignment        vai para estado 77
+    ParseArgs         vai para estado 78
+    Expr              vai para estado 141
+
+
+Estado 107
+
+   61 Expr: Expr DIV • Expr
+
+    BOOLLIT   troca e vai para estado 67
+    LPAR      troca e vai para estado 68
+    MINUS     troca e vai para estado 69
+    NOT       troca e vai para estado 70
+    PLUS      troca e vai para estado 71
+    PARSEINT  troca e vai para estado 40
+    ID        troca e vai para estado 73
+    INTLIT    troca e vai para estado 74
+    REALLIT   troca e vai para estado 75
+
+    MethodInvocation  vai para estado 76
+    Assignment        vai para estado 77
+    ParseArgs         vai para estado 78
+    Expr              vai para estado 142
+
+
+Estado 108
+
+   68 Expr: Expr EQ • Expr
+
+    BOOLLIT   troca e vai para estado 67
+    LPAR      troca e vai para estado 68
+    MINUS     troca e vai para estado 69
+    NOT       troca e vai para estado 70
+    PLUS      troca e vai para estado 71
+    PARSEINT  troca e vai para estado 40
+    ID        troca e vai para estado 73
+    INTLIT    troca e vai para estado 74
+    REALLIT   troca e vai para estado 75
+
+    MethodInvocation  vai para estado 76
+    Assignment        vai para estado 77
+    ParseArgs         vai para estado 78
+    Expr              vai para estado 143
+
+
+Estado 109
+
+   69 Expr: Expr GE • Expr
+
+    BOOLLIT   troca e vai para estado 67
+    LPAR      troca e vai para estado 68
+    MINUS     troca e vai para estado 69
+    NOT       troca e vai para estado 70
+    PLUS      troca e vai para estado 71
+    PARSEINT  troca e vai para estado 40
+    ID        troca e vai para estado 73
+    INTLIT    troca e vai para estado 74
+    REALLIT   troca e vai para estado 75
+
+    MethodInvocation  vai para estado 76
+    Assignment        vai para estado 77
+    ParseArgs         vai para estado 78
+    Expr              vai para estado 144
+
+
+Estado 110
+
+   70 Expr: Expr GT • Expr
+
+    BOOLLIT   troca e vai para estado 67
+    LPAR      troca e vai para estado 68
+    MINUS     troca e vai para estado 69
+    NOT       troca e vai para estado 70
+    PLUS      troca e vai para estado 71
+    PARSEINT  troca e vai para estado 40
+    ID        troca e vai para estado 73
+    INTLIT    troca e vai para estado 74
+    REALLIT   troca e vai para estado 75
+
+    MethodInvocation  vai para estado 76
+    Assignment        vai para estado 77
+    ParseArgs         vai para estado 78
+    Expr              vai para estado 145
+
+
+Estado 111
+
+   71 Expr: Expr LE • Expr
+
+    BOOLLIT   troca e vai para estado 67
+    LPAR      troca e vai para estado 68
+    MINUS     troca e vai para estado 69
+    NOT       troca e vai para estado 70
+    PLUS      troca e vai para estado 71
+    PARSEINT  troca e vai para estado 40
+    ID        troca e vai para estado 73
+    INTLIT    troca e vai para estado 74
+    REALLIT   troca e vai para estado 75
+
+    MethodInvocation  vai para estado 76
+    Assignment        vai para estado 77
+    ParseArgs         vai para estado 78
+    Expr              vai para estado 146
+
+
+Estado 112
+
+   72 Expr: Expr LT • Expr
+
+    BOOLLIT   troca e vai para estado 67
+    LPAR      troca e vai para estado 68
+    MINUS     troca e vai para estado 69
+    NOT       troca e vai para estado 70
+    PLUS      troca e vai para estado 71
+    PARSEINT  troca e vai para estado 40
+    ID        troca e vai para estado 73
+    INTLIT    troca e vai para estado 74
+    REALLIT   troca e vai para estado 75
+
+    MethodInvocation  vai para estado 76
+    Assignment        vai para estado 77
+    ParseArgs         vai para estado 78
+    Expr              vai para estado 147
+
+
+Estado 113
+
+   59 Expr: Expr MINUS • Expr
+
+    BOOLLIT   troca e vai para estado 67
+    LPAR      troca e vai para estado 68
+    MINUS     troca e vai para estado 69
+    NOT       troca e vai para estado 70
+    PLUS      troca e vai para estado 71
+    PARSEINT  troca e vai para estado 40
+    ID        troca e vai para estado 73
+    INTLIT    troca e vai para estado 74
+    REALLIT   troca e vai para estado 75
+
+    MethodInvocation  vai para estado 76
+    Assignment        vai para estado 77
+    ParseArgs         vai para estado 78
+    Expr              vai para estado 148
+
+
+Estado 114
+
+   62 Expr: Expr MOD • Expr
+
+    BOOLLIT   troca e vai para estado 67
+    LPAR      troca e vai para estado 68
+    MINUS     troca e vai para estado 69
+    NOT       troca e vai para estado 70
+    PLUS      troca e vai para estado 71
+    PARSEINT  troca e vai para estado 40
+    ID        troca e vai para estado 73
+    INTLIT    troca e vai para estado 74
+    REALLIT   troca e vai para estado 75
+
+    MethodInvocation  vai para estado 76
+    Assignment        vai para estado 77
+    ParseArgs         vai para estado 78
+    Expr              vai para estado 149
+
+
+Estado 115
+
+   73 Expr: Expr NE • Expr
+
+    BOOLLIT   troca e vai para estado 67
+    LPAR      troca e vai para estado 68
+    MINUS     troca e vai para estado 69
+    NOT       troca e vai para estado 70
+    PLUS      troca e vai para estado 71
+    PARSEINT  troca e vai para estado 40
+    ID        troca e vai para estado 73
+    INTLIT    troca e vai para estado 74
+    REALLIT   troca e vai para estado 75
+
+    MethodInvocation  vai para estado 76
+    Assignment        vai para estado 77
+    ParseArgs         vai para estado 78
+    Expr              vai para estado 150
+
+
+Estado 116
+
+   64 Expr: Expr OR • Expr
+
+    BOOLLIT   troca e vai para estado 67
+    LPAR      troca e vai para estado 68
+    MINUS     troca e vai para estado 69
+    NOT       troca e vai para estado 70
+    PLUS      troca e vai para estado 71
+    PARSEINT  troca e vai para estado 40
+    ID        troca e vai para estado 73
+    INTLIT    troca e vai para estado 74
+    REALLIT   troca e vai para estado 75
+
+    MethodInvocation  vai para estado 76
+    Assignment        vai para estado 77
+    ParseArgs         vai para estado 78
+    Expr              vai para estado 151
+
+
+Estado 117
+
+   58 Expr: Expr PLUS • Expr
+
+    BOOLLIT   troca e vai para estado 67
+    LPAR      troca e vai para estado 68
+    MINUS     troca e vai para estado 69
+    NOT       troca e vai para estado 70
+    PLUS      troca e vai para estado 71
+    PARSEINT  troca e vai para estado 40
+    ID        troca e vai para estado 73
+    INTLIT    troca e vai para estado 74
+    REALLIT   troca e vai para estado 75
+
+    MethodInvocation  vai para estado 76
+    Assignment        vai para estado 77
+    ParseArgs         vai para estado 78
+    Expr              vai para estado 152
+
+
+Estado 118
+
+   40 Statement: RETURN Expr SEMICOLON •
+
+    $default  redução com regra 40 (Statement)
+
+
+Estado 119
+
+   66 Expr: Expr LSHIFT • Expr
+
+    BOOLLIT   troca e vai para estado 67
+    LPAR      troca e vai para estado 68
+    MINUS     troca e vai para estado 69
+    NOT       troca e vai para estado 70
+    PLUS      troca e vai para estado 71
+    PARSEINT  troca e vai para estado 40
+    ID        troca e vai para estado 73
+    INTLIT    troca e vai para estado 74
+    REALLIT   troca e vai para estado 75
+
+    MethodInvocation  vai para estado 76
+    Assignment        vai para estado 77
+    ParseArgs         vai para estado 78
+    Expr              vai para estado 153
+
+
+Estado 120
+
+   67 Expr: Expr RSHIFT • Expr
+
+    BOOLLIT   troca e vai para estado 67
+    LPAR      troca e vai para estado 68
+    MINUS     troca e vai para estado 69
+    NOT       troca e vai para estado 70
+    PLUS      troca e vai para estado 71
+    PARSEINT  troca e vai para estado 40
+    ID        troca e vai para estado 73
+    INTLIT    troca e vai para estado 74
+    REALLIT   troca e vai para estado 75
+
+    MethodInvocation  vai para estado 76
+    Assignment        vai para estado 77
+    ParseArgs         vai para estado 78
+    Expr              vai para estado 154
+
+
+Estado 121
+
+   65 Expr: Expr XOR • Expr
+
+    BOOLLIT   troca e vai para estado 67
+    LPAR      troca e vai para estado 68
+    MINUS     troca e vai para estado 69
+    NOT       troca e vai para estado 70
+    PLUS      troca e vai para estado 71
+    PARSEINT  troca e vai para estado 40
+    ID        troca e vai para estado 73
+    INTLIT    troca e vai para estado 74
+    REALLIT   troca e vai para estado 75
+
+    MethodInvocation  vai para estado 76
+    Assignment        vai para estado 77
+    ParseArgs         vai para estado 78
+    Expr              vai para estado 155
+
+
+Estado 122
+
+   39 Statement: WHILE LPAR Expr • RPAR Statement
+   58 Expr: Expr • PLUS Expr
+   59     | Expr • MINUS Expr
+   60     | Expr • STAR Expr
+   61     | Expr • DIV Expr
+   62     | Expr • MOD Expr
+   63     | Expr • AND Expr
+   64     | Expr • OR Expr
+   65     | Expr • XOR Expr
+   66     | Expr • LSHIFT Expr
+   67     | Expr • RSHIFT Expr
+   68     | Expr • EQ Expr
+   69     | Expr • GE Expr
+   70     | Expr • GT Expr
+   71     | Expr • LE Expr
+   72     | Expr • LT Expr
+   73     | Expr • NE Expr
+
+    AND     troca e vai para estado 105
+    STAR    troca e vai para estado 106
+    DIV     troca e vai para estado 107
+    EQ      troca e vai para estado 108
+    GE      troca e vai para estado 109
+    GT      troca e vai para estado 110
+    LE      troca e vai para estado 111
+    LT      troca e vai para estado 112
+    MINUS   troca e vai para estado 113
+    MOD     troca e vai para estado 114
+    NE      troca e vai para estado 115
+    OR      troca e vai para estado 116
+    PLUS    troca e vai para estado 117
+    RPAR    troca e vai para estado 156
+    LSHIFT  troca e vai para estado 119
+    RSHIFT  troca e vai para estado 120
+    XOR     troca e vai para estado 121
+
+
+Estado 123
+
+   55 Assignment: ID ASSIGN Expr •
+   58 Expr: Expr • PLUS Expr
+   59     | Expr • MINUS Expr
+   60     | Expr • STAR Expr
+   61     | Expr • DIV Expr
+   62     | Expr • MOD Expr
+   63     | Expr • AND Expr
+   64     | Expr • OR Expr
+   65     | Expr • XOR Expr
+   66     | Expr • LSHIFT Expr
+   67     | Expr • RSHIFT Expr
+   68     | Expr • EQ Expr
+   69     | Expr • GE Expr
+   70     | Expr • GT Expr
+   71     | Expr • LE Expr
+   72     | Expr • LT Expr
+   73     | Expr • NE Expr
+
+    AND     troca e vai para estado 105
+    STAR    troca e vai para estado 106
+    DIV     troca e vai para estado 107
+    EQ      troca e vai para estado 108
+    GE      troca e vai para estado 109
+    GT      troca e vai para estado 110
+    LE      troca e vai para estado 111
+    LT      troca e vai para estado 112
+    MINUS   troca e vai para estado 113
+    MOD     troca e vai para estado 114
+    NE      troca e vai para estado 115
+    OR      troca e vai para estado 116
+    PLUS    troca e vai para estado 117
+    LSHIFT  troca e vai para estado 119
+    RSHIFT  troca e vai para estado 120
+    XOR     troca e vai para estado 121
+
+    $default  redução com regra 55 (Assignment)
+
+
+Estado 124
+
+   52 MethodInvocation: ID LPAR error • RPAR
+
+    RPAR  troca e vai para estado 157
+
+
+Estado 125
+
+   51 MethodInvocation: ID LPAR RPAR •
+
+    $default  redução com regra 51 (MethodInvocation)
+
+
+Estado 126
+
+   50 MethodInvocation: ID LPAR CommaExpr • RPAR
+   54 CommaExpr: CommaExpr • COMMA Expr
+
+    COMMA  troca e vai para estado 158
+    RPAR   troca e vai para estado 159
+
+
+Estado 127
+
+   53 CommaExpr: Expr •
+   58 Expr: Expr • PLUS Expr
+   59     | Expr • MINUS Expr
+   60     | Expr • STAR Expr
+   61     | Expr • DIV Expr
+   62     | Expr • MOD Expr
+   63     | Expr • AND Expr
+   64     | Expr • OR Expr
+   65     | Expr • XOR Expr
+   66     | Expr • LSHIFT Expr
+   67     | Expr • RSHIFT Expr
+   68     | Expr • EQ Expr
+   69     | Expr • GE Expr
+   70     | Expr • GT Expr
+   71     | Expr • LE Expr
+   72     | Expr • LT Expr
+   73     | Expr • NE Expr
+
+    AND     troca e vai para estado 105
+    STAR    troca e vai para estado 106
+    DIV     troca e vai para estado 107
+    EQ      troca e vai para estado 108
+    GE      troca e vai para estado 109
+    GT      troca e vai para estado 110
+    LE      troca e vai para estado 111
+    LT      troca e vai para estado 112
+    MINUS   troca e vai para estado 113
+    MOD     troca e vai para estado 114
+    NE      troca e vai para estado 115
+    OR      troca e vai para estado 116
+    PLUS    troca e vai para estado 117
+    LSHIFT  troca e vai para estado 119
+    RSHIFT  troca e vai para estado 120
+    XOR     troca e vai para estado 121
+
+    $default  redução com regra 53 (CommaExpr)
+
+
+Estado 128
+
+   34 VarDecl: Type ID SEMICOLON •
+
+    $default  redução com regra 34 (VarDecl)
+
+
+Estado 129
+
+   14 Variaveis: Variaveis • COMMA ID
+   33 VarDecl: Type ID Variaveis • SEMICOLON
+
+    COMMA      troca e vai para estado 59
+    SEMICOLON  troca e vai para estado 160
+
+
+Estado 130
+
+   24 FormalParams: STRING LSQ RSQ • ID
+
+    ID  troca e vai para estado 161
+
+
+Estado 131
+
+   25 Parametros: COMMA • Type ID
+
+    BOOL    troca e vai para estado 19
+    DOUBLE  troca e vai para estado 20
+    INT     troca e vai para estado 21
+
+    Type  vai para estado 162
+
+
+Estado 132
+
+   22 FormalParams: Type ID Parametros •
+   26 Parametros: Parametros • COMMA Type ID
+
+    COMMA  troca e vai para estado 163
+
+    $default  redução com regra 22 (FormalParams)
+
+
+Estado 133
+
+   37 Statement: IF LPAR Expr RPAR • Statement ELSE Statement
+   38          | IF LPAR Expr RPAR • Statement
+
+    error      troca e vai para estado 34
+    LBRACE     troca e vai para estado 35
+    SEMICOLON  troca e vai para estado 37
+    IF         troca e vai para estado 38
+    PRINT      troca e vai para estado 39
+    PARSEINT   troca e vai para estado 40
+    RETURN     troca e vai para estado 41
+    WHILE      troca e vai para estado 42
+    ID         troca e vai para estado 43
+
+    Statement         vai para estado 164
+    Gramatica         vai para estado 48
+    MethodInvocation  vai para estado 49
+    Assignment        vai para estado 50
+    ParseArgs         vai para estado 51
+
+
+Estado 134
+
+   45 Statement: PRINT LPAR STRLIT RPAR • SEMICOLON
+
+    SEMICOLON  troca e vai para estado 165
+
+
+Estado 135
+
+   44 Statement: PRINT LPAR Expr RPAR • SEMICOLON
+
+    SEMICOLON  troca e vai para estado 166
+
+
+Estado 136
+
+   57 ParseArgs: PARSEINT LPAR error RPAR •
+
+    $default  redução com regra 57 (ParseArgs)
+
+
+Estado 137
+
+   56 ParseArgs: PARSEINT LPAR ID LSQ • Expr RSQ RPAR
+
+    BOOLLIT   troca e vai para estado 67
+    LPAR      troca e vai para estado 68
+    MINUS     troca e vai para estado 69
+    NOT       troca e vai para estado 70
+    PLUS      troca e vai para estado 71
+    PARSEINT  troca e vai para estado 40
+    ID        troca e vai para estado 73
+    INTLIT    troca e vai para estado 74
+    REALLIT   troca e vai para estado 75
+
+    MethodInvocation  vai para estado 76
+    Assignment        vai para estado 77
+    ParseArgs         vai para estado 78
+    Expr              vai para estado 167
+
+
+Estado 138
+
+   86 Expr: LPAR error RPAR •
+
+    $default  redução com regra 86 (Expr)
+
+
+Estado 139
+
+   77 Expr: LPAR Expr RPAR •
+
+    $default  redução com regra 77 (Expr)
+
+
+Estado 140
+
+   58 Expr: Expr • PLUS Expr
+   59     | Expr • MINUS Expr
+   60     | Expr • STAR Expr
+   61     | Expr • DIV Expr
+   62     | Expr • MOD Expr
+   63     | Expr • AND Expr
+   63     | Expr AND Expr •
+   64     | Expr • OR Expr
+   65     | Expr • XOR Expr
+   66     | Expr • LSHIFT Expr
+   67     | Expr • RSHIFT Expr
+   68     | Expr • EQ Expr
+   69     | Expr • GE Expr
+   70     | Expr • GT Expr
+   71     | Expr • LE Expr
+   72     | Expr • LT Expr
+   73     | Expr • NE Expr
+
+    STAR    troca e vai para estado 106
+    DIV     troca e vai para estado 107
+    EQ      troca e vai para estado 108
+    GE      troca e vai para estado 109
+    GT      troca e vai para estado 110
+    LE      troca e vai para estado 111
+    LT      troca e vai para estado 112
+    MINUS   troca e vai para estado 113
+    MOD     troca e vai para estado 114
+    NE      troca e vai para estado 115
+    PLUS    troca e vai para estado 117
+    LSHIFT  troca e vai para estado 119
+    RSHIFT  troca e vai para estado 120
+    XOR     troca e vai para estado 121
+
+    $default  redução com regra 63 (Expr)
+
+
+Estado 141
+
+   58 Expr: Expr • PLUS Expr
+   59     | Expr • MINUS Expr
+   60     | Expr • STAR Expr
+   60     | Expr STAR Expr •
+   61     | Expr • DIV Expr
+   62     | Expr • MOD Expr
+   63     | Expr • AND Expr
+   64     | Expr • OR Expr
+   65     | Expr • XOR Expr
+   66     | Expr • LSHIFT Expr
+   67     | Expr • RSHIFT Expr
+   68     | Expr • EQ Expr
+   69     | Expr • GE Expr
+   70     | Expr • GT Expr
+   71     | Expr • LE Expr
+   72     | Expr • LT Expr
+   73     | Expr • NE Expr
+
+    $default  redução com regra 60 (Expr)
+
+
+Estado 142
+
+   58 Expr: Expr • PLUS Expr
+   59     | Expr • MINUS Expr
+   60     | Expr • STAR Expr
+   61     | Expr • DIV Expr
+   61     | Expr DIV Expr •
+   62     | Expr • MOD Expr
+   63     | Expr • AND Expr
+   64     | Expr • OR Expr
+   65     | Expr • XOR Expr
+   66     | Expr • LSHIFT Expr
+   67     | Expr • RSHIFT Expr
+   68     | Expr • EQ Expr
+   69     | Expr • GE Expr
+   70     | Expr • GT Expr
+   71     | Expr • LE Expr
+   72     | Expr • LT Expr
+   73     | Expr • NE Expr
+
+    $default  redução com regra 61 (Expr)
+
+
+Estado 143
+
+   58 Expr: Expr • PLUS Expr
+   59     | Expr • MINUS Expr
+   60     | Expr • STAR Expr
+   61     | Expr • DIV Expr
+   62     | Expr • MOD Expr
+   63     | Expr • AND Expr
+   64     | Expr • OR Expr
+   65     | Expr • XOR Expr
+   66     | Expr • LSHIFT Expr
+   67     | Expr • RSHIFT Expr
+   68     | Expr • EQ Expr
+   68     | Expr EQ Expr •
+   69     | Expr • GE Expr
+   70     | Expr • GT Expr
+   71     | Expr • LE Expr
+   72     | Expr • LT Expr
+   73     | Expr • NE Expr
+
+    STAR    troca e vai para estado 106
+    DIV     troca e vai para estado 107
+    GE      troca e vai para estado 109
+    GT      troca e vai para estado 110
+    LE      troca e vai para estado 111
+    LT      troca e vai para estado 112
+    MINUS   troca e vai para estado 113
+    MOD     troca e vai para estado 114
+    PLUS    troca e vai para estado 117
+    LSHIFT  troca e vai para estado 119
+    RSHIFT  troca e vai para estado 120
+
+    $default  redução com regra 68 (Expr)
+
+
+Estado 144
+
+   58 Expr: Expr • PLUS Expr
+   59     | Expr • MINUS Expr
+   60     | Expr • STAR Expr
+   61     | Expr • DIV Expr
+   62     | Expr • MOD Expr
+   63     | Expr • AND Expr
+   64     | Expr • OR Expr
+   65     | Expr • XOR Expr
+   66     | Expr • LSHIFT Expr
+   67     | Expr • RSHIFT Expr
+   68     | Expr • EQ Expr
+   69     | Expr • GE Expr
+   69     | Expr GE Expr •
+   70     | Expr • GT Expr
+   71     | Expr • LE Expr
+   72     | Expr • LT Expr
+   73     | Expr • NE Expr
+
+    STAR    troca e vai para estado 106
+    DIV     troca e vai para estado 107
+    MINUS   troca e vai para estado 113
+    MOD     troca e vai para estado 114
+    PLUS    troca e vai para estado 117
+    LSHIFT  troca e vai para estado 119
+    RSHIFT  troca e vai para estado 120
+
+    $default  redução com regra 69 (Expr)
+
+
+Estado 145
+
+   58 Expr: Expr • PLUS Expr
+   59     | Expr • MINUS Expr
+   60     | Expr • STAR Expr
+   61     | Expr • DIV Expr
+   62     | Expr • MOD Expr
+   63     | Expr • AND Expr
+   64     | Expr • OR Expr
+   65     | Expr • XOR Expr
+   66     | Expr • LSHIFT Expr
+   67     | Expr • RSHIFT Expr
+   68     | Expr • EQ Expr
+   69     | Expr • GE Expr
+   70     | Expr • GT Expr
+   70     | Expr GT Expr •
+   71     | Expr • LE Expr
+   72     | Expr • LT Expr
+   73     | Expr • NE Expr
+
+    STAR    troca e vai para estado 106
+    DIV     troca e vai para estado 107
+    MINUS   troca e vai para estado 113
+    MOD     troca e vai para estado 114
+    PLUS    troca e vai para estado 117
+    LSHIFT  troca e vai para estado 119
+    RSHIFT  troca e vai para estado 120
+
+    $default  redução com regra 70 (Expr)
+
+
+Estado 146
+
+   58 Expr: Expr • PLUS Expr
+   59     | Expr • MINUS Expr
+   60     | Expr • STAR Expr
+   61     | Expr • DIV Expr
+   62     | Expr • MOD Expr
+   63     | Expr • AND Expr
+   64     | Expr • OR Expr
+   65     | Expr • XOR Expr
+   66     | Expr • LSHIFT Expr
+   67     | Expr • RSHIFT Expr
+   68     | Expr • EQ Expr
+   69     | Expr • GE Expr
+   70     | Expr • GT Expr
+   71     | Expr • LE Expr
+   71     | Expr LE Expr •
+   72     | Expr • LT Expr
+   73     | Expr • NE Expr
+
+    STAR    troca e vai para estado 106
+    DIV     troca e vai para estado 107
+    MINUS   troca e vai para estado 113
+    MOD     troca e vai para estado 114
+    PLUS    troca e vai para estado 117
+    LSHIFT  troca e vai para estado 119
+    RSHIFT  troca e vai para estado 120
+
+    $default  redução com regra 71 (Expr)
+
+
+Estado 147
+
+   58 Expr: Expr • PLUS Expr
+   59     | Expr • MINUS Expr
+   60     | Expr • STAR Expr
+   61     | Expr • DIV Expr
+   62     | Expr • MOD Expr
+   63     | Expr • AND Expr
+   64     | Expr • OR Expr
+   65     | Expr • XOR Expr
+   66     | Expr • LSHIFT Expr
+   67     | Expr • RSHIFT Expr
+   68     | Expr • EQ Expr
+   69     | Expr • GE Expr
+   70     | Expr • GT Expr
+   71     | Expr • LE Expr
+   72     | Expr • LT Expr
+   72     | Expr LT Expr •
+   73     | Expr • NE Expr
+
+    STAR    troca e vai para estado 106
+    DIV     troca e vai para estado 107
+    MINUS   troca e vai para estado 113
+    MOD     troca e vai para estado 114
+    PLUS    troca e vai para estado 117
+    LSHIFT  troca e vai para estado 119
+    RSHIFT  troca e vai para estado 120
+
+    $default  redução com regra 72 (Expr)
+
+
+Estado 148
+
+   58 Expr: Expr • PLUS Expr
+   59     | Expr • MINUS Expr
+   59     | Expr MINUS Expr •
+   60     | Expr • STAR Expr
+   61     | Expr • DIV Expr
+   62     | Expr • MOD Expr
+   63     | Expr • AND Expr
+   64     | Expr • OR Expr
+   65     | Expr • XOR Expr
+   66     | Expr • LSHIFT Expr
+   67     | Expr • RSHIFT Expr
+   68     | Expr • EQ Expr
+   69     | Expr • GE Expr
+   70     | Expr • GT Expr
+   71     | Expr • LE Expr
+   72     | Expr • LT Expr
+   73     | Expr • NE Expr
+
+    STAR  troca e vai para estado 106
+    DIV   troca e vai para estado 107
+    MOD   troca e vai para estado 114
+
+    $default  redução com regra 59 (Expr)
+
+
+Estado 149
+
+   58 Expr: Expr • PLUS Expr
+   59     | Expr • MINUS Expr
+   60     | Expr • STAR Expr
+   61     | Expr • DIV Expr
+   62     | Expr • MOD Expr
+   62     | Expr MOD Expr •
+   63     | Expr • AND Expr
+   64     | Expr • OR Expr
+   65     | Expr • XOR Expr
+   66     | Expr • LSHIFT Expr
+   67     | Expr • RSHIFT Expr
+   68     | Expr • EQ Expr
+   69     | Expr • GE Expr
+   70     | Expr • GT Expr
+   71     | Expr • LE Expr
+   72     | Expr • LT Expr
+   73     | Expr • NE Expr
+
+    $default  redução com regra 62 (Expr)
+
+
+Estado 150
+
+   58 Expr: Expr • PLUS Expr
+   59     | Expr • MINUS Expr
+   60     | Expr • STAR Expr
+   61     | Expr • DIV Expr
+   62     | Expr • MOD Expr
+   63     | Expr • AND Expr
+   64     | Expr • OR Expr
+   65     | Expr • XOR Expr
+   66     | Expr • LSHIFT Expr
+   67     | Expr • RSHIFT Expr
+   68     | Expr • EQ Expr
+   69     | Expr • GE Expr
+   70     | Expr • GT Expr
+   71     | Expr • LE Expr
+   72     | Expr • LT Expr
+   73     | Expr • NE Expr
+   73     | Expr NE Expr •
+
+    STAR    troca e vai para estado 106
+    DIV     troca e vai para estado 107
+    GE      troca e vai para estado 109
+    GT      troca e vai para estado 110
+    LE      troca e vai para estado 111
+    LT      troca e vai para estado 112
+    MINUS   troca e vai para estado 113
+    MOD     troca e vai para estado 114
+    PLUS    troca e vai para estado 117
+    LSHIFT  troca e vai para estado 119
+    RSHIFT  troca e vai para estado 120
+
+    $default  redução com regra 73 (Expr)
+
+
+Estado 151
+
+   58 Expr: Expr • PLUS Expr
+   59     | Expr • MINUS Expr
+   60     | Expr • STAR Expr
+   61     | Expr • DIV Expr
+   62     | Expr • MOD Expr
+   63     | Expr • AND Expr
+   64     | Expr • OR Expr
+   64     | Expr OR Expr •
+   65     | Expr • XOR Expr
+   66     | Expr • LSHIFT Expr
+   67     | Expr • RSHIFT Expr
+   68     | Expr • EQ Expr
+   69     | Expr • GE Expr
+   70     | Expr • GT Expr
+   71     | Expr • LE Expr
+   72     | Expr • LT Expr
+   73     | Expr • NE Expr
+
+    AND     troca e vai para estado 105
+    STAR    troca e vai para estado 106
+    DIV     troca e vai para estado 107
+    EQ      troca e vai para estado 108
+    GE      troca e vai para estado 109
+    GT      troca e vai para estado 110
+    LE      troca e vai para estado 111
+    LT      troca e vai para estado 112
+    MINUS   troca e vai para estado 113
+    MOD     troca e vai para estado 114
+    NE      troca e vai para estado 115
+    PLUS    troca e vai para estado 117
+    LSHIFT  troca e vai para estado 119
+    RSHIFT  troca e vai para estado 120
+    XOR     troca e vai para estado 121
+
+    $default  redução com regra 64 (Expr)
+
+
+Estado 152
+
+   58 Expr: Expr • PLUS Expr
+   58     | Expr PLUS Expr •
+   59     | Expr • MINUS Expr
+   60     | Expr • STAR Expr
+   61     | Expr • DIV Expr
+   62     | Expr • MOD Expr
+   63     | Expr • AND Expr
+   64     | Expr • OR Expr
+   65     | Expr • XOR Expr
+   66     | Expr • LSHIFT Expr
+   67     | Expr • RSHIFT Expr
+   68     | Expr • EQ Expr
+   69     | Expr • GE Expr
+   70     | Expr • GT Expr
+   71     | Expr • LE Expr
+   72     | Expr • LT Expr
+   73     | Expr • NE Expr
+
+    STAR  troca e vai para estado 106
+    DIV   troca e vai para estado 107
+    MOD   troca e vai para estado 114
+
+    $default  redução com regra 58 (Expr)
+
+
+Estado 153
+
+   58 Expr: Expr • PLUS Expr
+   59     | Expr • MINUS Expr
+   60     | Expr • STAR Expr
+   61     | Expr • DIV Expr
+   62     | Expr • MOD Expr
+   63     | Expr • AND Expr
+   64     | Expr • OR Expr
+   65     | Expr • XOR Expr
+   66     | Expr • LSHIFT Expr
+   66     | Expr LSHIFT Expr •
+   67     | Expr • RSHIFT Expr
+   68     | Expr • EQ Expr
+   69     | Expr • GE Expr
+   70     | Expr • GT Expr
+   71     | Expr • LE Expr
+   72     | Expr • LT Expr
+   73     | Expr • NE Expr
+
+    STAR   troca e vai para estado 106
+    DIV    troca e vai para estado 107
+    MINUS  troca e vai para estado 113
+    MOD    troca e vai para estado 114
+    PLUS   troca e vai para estado 117
+
+    $default  redução com regra 66 (Expr)
+
+
+Estado 154
+
+   58 Expr: Expr • PLUS Expr
+   59     | Expr • MINUS Expr
+   60     | Expr • STAR Expr
+   61     | Expr • DIV Expr
+   62     | Expr • MOD Expr
+   63     | Expr • AND Expr
+   64     | Expr • OR Expr
+   65     | Expr • XOR Expr
+   66     | Expr • LSHIFT Expr
+   67     | Expr • RSHIFT Expr
+   67     | Expr RSHIFT Expr •
+   68     | Expr • EQ Expr
+   69     | Expr • GE Expr
+   70     | Expr • GT Expr
+   71     | Expr • LE Expr
+   72     | Expr • LT Expr
+   73     | Expr • NE Expr
+
+    STAR   troca e vai para estado 106
+    DIV    troca e vai para estado 107
+    MINUS  troca e vai para estado 113
+    MOD    troca e vai para estado 114
+    PLUS   troca e vai para estado 117
+
+    $default  redução com regra 67 (Expr)
+
+
+Estado 155
+
+   58 Expr: Expr • PLUS Expr
+   59     | Expr • MINUS Expr
+   60     | Expr • STAR Expr
+   61     | Expr • DIV Expr
+   62     | Expr • MOD Expr
+   63     | Expr • AND Expr
+   64     | Expr • OR Expr
+   65     | Expr • XOR Expr
+   65     | Expr XOR Expr •
+   66     | Expr • LSHIFT Expr
+   67     | Expr • RSHIFT Expr
+   68     | Expr • EQ Expr
+   69     | Expr • GE Expr
+   70     | Expr • GT Expr
+   71     | Expr • LE Expr
+   72     | Expr • LT Expr
+   73     | Expr • NE Expr
+
+    STAR    troca e vai para estado 106
+    DIV     troca e vai para estado 107
+    EQ      troca e vai para estado 108
+    GE      troca e vai para estado 109
+    GT      troca e vai para estado 110
+    LE      troca e vai para estado 111
+    LT      troca e vai para estado 112
+    MINUS   troca e vai para estado 113
+    MOD     troca e vai para estado 114
+    NE      troca e vai para estado 115
+    PLUS    troca e vai para estado 117
+    LSHIFT  troca e vai para estado 119
+    RSHIFT  troca e vai para estado 120
+
+    $default  redução com regra 65 (Expr)
+
+
+Estado 156
+
+   39 Statement: WHILE LPAR Expr RPAR • Statement
+
+    error      troca e vai para estado 34
+    LBRACE     troca e vai para estado 35
+    SEMICOLON  troca e vai para estado 37
+    IF         troca e vai para estado 38
+    PRINT      troca e vai para estado 39
+    PARSEINT   troca e vai para estado 40
+    RETURN     troca e vai para estado 41
+    WHILE      troca e vai para estado 42
+    ID         troca e vai para estado 43
+
+    Statement         vai para estado 168
+    Gramatica         vai para estado 48
+    MethodInvocation  vai para estado 49
+    Assignment        vai para estado 50
+    ParseArgs         vai para estado 51
+
+
+Estado 157
+
+   52 MethodInvocation: ID LPAR error RPAR •
+
+    $default  redução com regra 52 (MethodInvocation)
+
+
+Estado 158
+
+   54 CommaExpr: CommaExpr COMMA • Expr
+
+    BOOLLIT   troca e vai para estado 67
+    LPAR      troca e vai para estado 68
+    MINUS     troca e vai para estado 69
+    NOT       troca e vai para estado 70
+    PLUS      troca e vai para estado 71
+    PARSEINT  troca e vai para estado 40
+    ID        troca e vai para estado 73
+    INTLIT    troca e vai para estado 74
+    REALLIT   troca e vai para estado 75
+
+    MethodInvocation  vai para estado 76
+    Assignment        vai para estado 77
+    ParseArgs         vai para estado 78
+    Expr              vai para estado 169
+
+
+Estado 159
+
+   50 MethodInvocation: ID LPAR CommaExpr RPAR •
+
+    $default  redução com regra 50 (MethodInvocation)
+
+
+Estado 160
+
+   33 VarDecl: Type ID Variaveis SEMICOLON •
+
+    $default  redução com regra 33 (VarDecl)
+
+
+Estado 161
+
+   24 FormalParams: STRING LSQ RSQ ID •
+
+    $default  redução com regra 24 (FormalParams)
+
+
+Estado 162
+
+   25 Parametros: COMMA Type • ID
+
+    ID  troca e vai para estado 170
+
+
+Estado 163
+
+   26 Parametros: Parametros COMMA • Type ID
+
+    BOOL    troca e vai para estado 19
+    DOUBLE  troca e vai para estado 20
+    INT     troca e vai para estado 21
+
+    Type  vai para estado 171
+
+
+Estado 164
+
+   37 Statement: IF LPAR Expr RPAR Statement • ELSE Statement
+   38          | IF LPAR Expr RPAR Statement •
+
+    ELSE  troca e vai para estado 172
+
+    $default  redução com regra 38 (Statement)
+
+
+Estado 165
+
+   45 Statement: PRINT LPAR STRLIT RPAR SEMICOLON •
+
+    $default  redução com regra 45 (Statement)
+
+
+Estado 166
+
+   44 Statement: PRINT LPAR Expr RPAR SEMICOLON •
+
+    $default  redução com regra 44 (Statement)
+
+
+Estado 167
+
+   56 ParseArgs: PARSEINT LPAR ID LSQ Expr • RSQ RPAR
+   58 Expr: Expr • PLUS Expr
+   59     | Expr • MINUS Expr
+   60     | Expr • STAR Expr
+   61     | Expr • DIV Expr
+   62     | Expr • MOD Expr
+   63     | Expr • AND Expr
+   64     | Expr • OR Expr
+   65     | Expr • XOR Expr
+   66     | Expr • LSHIFT Expr
+   67     | Expr • RSHIFT Expr
+   68     | Expr • EQ Expr
+   69     | Expr • GE Expr
+   70     | Expr • GT Expr
+   71     | Expr • LE Expr
+   72     | Expr • LT Expr
+   73     | Expr • NE Expr
+
+    AND     troca e vai para estado 105
+    STAR    troca e vai para estado 106
+    DIV     troca e vai para estado 107
+    EQ      troca e vai para estado 108
+    GE      troca e vai para estado 109
+    GT      troca e vai para estado 110
+    LE      troca e vai para estado 111
+    LT      troca e vai para estado 112
+    MINUS   troca e vai para estado 113
+    MOD     troca e vai para estado 114
+    NE      troca e vai para estado 115
+    OR      troca e vai para estado 116
+    PLUS    troca e vai para estado 117
+    RSQ     troca e vai para estado 173
+    LSHIFT  troca e vai para estado 119
+    RSHIFT  troca e vai para estado 120
+    XOR     troca e vai para estado 121
+
+
+Estado 168
+
+   39 Statement: WHILE LPAR Expr RPAR Statement •
+
+    $default  redução com regra 39 (Statement)
+
+
+Estado 169
+
+   54 CommaExpr: CommaExpr COMMA Expr •
+   58 Expr: Expr • PLUS Expr
+   59     | Expr • MINUS Expr
+   60     | Expr • STAR Expr
+   61     | Expr • DIV Expr
+   62     | Expr • MOD Expr
+   63     | Expr • AND Expr
+   64     | Expr • OR Expr
+   65     | Expr • XOR Expr
+   66     | Expr • LSHIFT Expr
+   67     | Expr • RSHIFT Expr
+   68     | Expr • EQ Expr
+   69     | Expr • GE Expr
+   70     | Expr • GT Expr
+   71     | Expr • LE Expr
+   72     | Expr • LT Expr
+   73     | Expr • NE Expr
+
+    AND     troca e vai para estado 105
+    STAR    troca e vai para estado 106
+    DIV     troca e vai para estado 107
+    EQ      troca e vai para estado 108
+    GE      troca e vai para estado 109
+    GT      troca e vai para estado 110
+    LE      troca e vai para estado 111
+    LT      troca e vai para estado 112
+    MINUS   troca e vai para estado 113
+    MOD     troca e vai para estado 114
+    NE      troca e vai para estado 115
+    OR      troca e vai para estado 116
+    PLUS    troca e vai para estado 117
+    LSHIFT  troca e vai para estado 119
+    RSHIFT  troca e vai para estado 120
+    XOR     troca e vai para estado 121
+
+    $default  redução com regra 54 (CommaExpr)
+
+
+Estado 170
+
+   25 Parametros: COMMA Type ID •
+
+    $default  redução com regra 25 (Parametros)
+
+
+Estado 171
+
+   26 Parametros: Parametros COMMA Type • ID
+
+    ID  troca e vai para estado 174
+
+
+Estado 172
+
+   37 Statement: IF LPAR Expr RPAR Statement ELSE • Statement
+
+    error      troca e vai para estado 34
+    LBRACE     troca e vai para estado 35
+    SEMICOLON  troca e vai para estado 37
+    IF         troca e vai para estado 38
+    PRINT      troca e vai para estado 39
+    PARSEINT   troca e vai para estado 40
+    RETURN     troca e vai para estado 41
+    WHILE      troca e vai para estado 42
+    ID         troca e vai para estado 43
+
+    Statement         vai para estado 175
+    Gramatica         vai para estado 48
+    MethodInvocation  vai para estado 49
+    Assignment        vai para estado 50
+    ParseArgs         vai para estado 51
+
+
+Estado 173
+
+   56 ParseArgs: PARSEINT LPAR ID LSQ Expr RSQ • RPAR
+
+    RPAR  troca e vai para estado 176
+
+
+Estado 174
+
+   26 Parametros: Parametros COMMA Type ID •
+
+    $default  redução com regra 26 (Parametros)
+
+
+Estado 175
+
+   37 Statement: IF LPAR Expr RPAR Statement ELSE Statement •
+
+    $default  redução com regra 37 (Statement)
+
+
+Estado 176
+
+   56 ParseArgs: PARSEINT LPAR ID LSQ Expr RSQ RPAR •
+
+    $default  redução com regra 56 (ParseArgs)
