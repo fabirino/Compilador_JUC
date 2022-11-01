@@ -10,7 +10,7 @@
     int contador_colunas = 1;
     int flag = 0;
     int escape = 1;
-    char buf[1000];
+    char buf[1024];
     char *s;
     int col_string =1;
     int col_comment = 1;
@@ -188,7 +188,7 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    yyparse();
+    yylex();
     return 0;
 }
 

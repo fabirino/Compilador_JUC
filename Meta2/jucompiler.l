@@ -111,7 +111,9 @@ REALLIT                 {REALLIT1}|{REALLIT2}|{REALLIT3}
 
 "//"                          {contador_colunas++; BEGIN COMMENT2;}                  
 <COMMENT2>{novalinha}         {contador_colunas = 1;contador_linhas++; BEGIN 0;}
+<COMMENT2><<EOF>>              {printf("Line %d, col %d: unterminated comment\n", contador_linhas, contador_colunas);exit(0);}
 <COMMENT2>.                   {contador_colunas+=yyleng;}
+
 
 {novalinha}                   {contador_colunas=1; contador_linhas++;}
 
