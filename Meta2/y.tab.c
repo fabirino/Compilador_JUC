@@ -74,11 +74,13 @@
                         Fabio Santos       2020212310
     ====================================================================================== */
     #include <stdio.h>
+    #include "tree.h"
     
     int yylex(void);
     void yyerror (const char *s);
+    int erroSintatico = 0;
 
-#line 82 "y.tab.c"
+#line 84 "y.tab.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -701,15 +703,15 @@ static const yytype_int8 yytranslate[] =
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    33,    33,    34,    37,    38,    39,    40,    41,    42,
-      45,    47,    48,    49,    52,    53,    56,    57,    58,    61,
-      62,    63,    64,    67,    68,    69,    72,    73,    76,    77,
-      80,    81,    82,    83,    86,    87,    90,    91,    92,    93,
-      94,    95,    96,    97,    98,    99,   100,   101,   104,   105,
-     106,   109,   110,   111,   114,   115,   118,   121,   122,   125,
-     126,   127,   128,   129,   130,   131,   132,   133,   134,   135,
-     136,   137,   138,   139,   140,   141,   142,   143,   144,   145,
-     146,   147,   148,   149,   150,   151,   152,   153
+       0,    35,    35,    36,    39,    40,    41,    42,    43,    44,
+      47,    49,    50,    51,    54,    55,    58,    59,    60,    63,
+      64,    65,    66,    69,    70,    71,    74,    75,    78,    79,
+      82,    83,    84,    85,    88,    89,    92,    93,    94,    95,
+      96,    97,    98,    99,   100,   101,   102,   103,   106,   107,
+     108,   111,   112,   113,   116,   117,   120,   123,   124,   127,
+     128,   129,   130,   131,   132,   133,   134,   135,   136,   137,
+     138,   139,   140,   141,   142,   143,   144,   145,   146,   147,
+     148,   149,   150,   151,   152,   153,   154,   155
 };
 #endif
 
@@ -1455,8 +1457,176 @@ yyreduce:
   YY_REDUCE_PRINT (yyn);
   switch (yyn)
     {
+  case 2: /* Program: CLASS ID LBRACE Declarations RBRACE  */
+#line 35 "jucompiler.y"
+                                                                            {yyval = newNode("Program"); yyval->child=yyvsp[-1]; if(printTree && erroSintatico){printTree(yyval,0);} else {freeTree(yyval);}}
+#line 1464 "y.tab.c"
+    break;
 
-#line 1460 "y.tab.c"
+  case 3: /* Program: CLASS ID LBRACE RBRACE  */
+#line 36 "jucompiler.y"
+                                                                            {yyval = newNode("Program");}
+#line 1470 "y.tab.c"
+    break;
+
+  case 4: /* Declarations: MethodDecl  */
+#line 39 "jucompiler.y"
+                                                                            {yyval = yyvsp[0];}
+#line 1476 "y.tab.c"
+    break;
+
+  case 5: /* Declarations: FieldDecl  */
+#line 40 "jucompiler.y"
+                                                                            {yyval = yyvsp[0];}
+#line 1482 "y.tab.c"
+    break;
+
+  case 6: /* Declarations: SEMICOLON  */
+#line 41 "jucompiler.y"
+                                                                            {yyval = yyvsp[0];}
+#line 1488 "y.tab.c"
+    break;
+
+  case 7: /* Declarations: Declarations MethodDecl  */
+#line 42 "jucompiler.y"
+                                                                            {yyval = yyvsp[-1]; addBrother(yyval, yyvsp[0]);}
+#line 1494 "y.tab.c"
+    break;
+
+  case 8: /* Declarations: Declarations FieldDecl  */
+#line 43 "jucompiler.y"
+                                                                            {yyval = yyvsp[-1]; addBrother(yyval, yyvsp[0]);}
+#line 1500 "y.tab.c"
+    break;
+
+  case 9: /* Declarations: Declarations SEMICOLON  */
+#line 44 "jucompiler.y"
+                                                                            {yyval = yyvsp[-1]; addBrother(yyval, yyvsp[0]);}
+#line 1506 "y.tab.c"
+    break;
+
+  case 10: /* MethodDecl: PUBLIC STATIC MethodHeader MethodBody  */
+#line 47 "jucompiler.y"
+                                                                            {yyval = newNode("MethodDecl"); yyval->child = yyvsp[-2]; addBrother(yyvsp[-2],yyvsp[-1]);}
+#line 1512 "y.tab.c"
+    break;
+
+  case 11: /* FieldDecl: PUBLIC STATIC Type ID SEMICOLON  */
+#line 49 "jucompiler.y"
+                                                                            {yyval = newNode("FieldDecl"); yyval->child = yyvsp[-2];}
+#line 1518 "y.tab.c"
+    break;
+
+  case 12: /* FieldDecl: PUBLIC STATIC Type ID Variaveis SEMICOLON  */
+#line 50 "jucompiler.y"
+                                                                            {yyval = newNode("FieldDecl"); yyval->child = yyvsp[-3]; addBrother(yyvsp[-3],yyvsp[-1])}
+#line 1524 "y.tab.c"
+    break;
+
+  case 13: /* FieldDecl: error SEMICOLON  */
+#line 51 "jucompiler.y"
+                                                                            {yyval = newNode(NULL); erroSintatico=1;}
+#line 1530 "y.tab.c"
+    break;
+
+  case 14: /* Variaveis: COMMA ID  */
+#line 54 "jucompiler.y"
+                                                                            {}
+#line 1536 "y.tab.c"
+    break;
+
+  case 15: /* Variaveis: Variaveis COMMA ID  */
+#line 55 "jucompiler.y"
+                                                                            {}
+#line 1542 "y.tab.c"
+    break;
+
+  case 16: /* Type: BOOL  */
+#line 58 "jucompiler.y"
+                                                                            {yyval = newNode("Bool");}
+#line 1548 "y.tab.c"
+    break;
+
+  case 17: /* Type: INT  */
+#line 59 "jucompiler.y"
+                                                                            {yyval = newNode("Int");}
+#line 1554 "y.tab.c"
+    break;
+
+  case 18: /* Type: DOUBLE  */
+#line 60 "jucompiler.y"
+                                                                            {yyval = newNode("Double");}
+#line 1560 "y.tab.c"
+    break;
+
+  case 19: /* MethodHeader: Type ID LPAR FormalParams RPAR  */
+#line 63 "jucompiler.y"
+                                                                            {yyval = newNode("MethodHeader"); yyval->child = yyvsp[-4]; addBrother(yyvsp[-4], yyvsp[-1])}
+#line 1566 "y.tab.c"
+    break;
+
+  case 20: /* MethodHeader: VOID ID LPAR FormalParams RPAR  */
+#line 64 "jucompiler.y"
+                                                                            {yyval = newNode("MethodHeader"); yyval->child = yyvsp[-1]}
+#line 1572 "y.tab.c"
+    break;
+
+  case 21: /* MethodHeader: Type ID LPAR RPAR  */
+#line 65 "jucompiler.y"
+                                                                            {yyval = newNode("MethodHeader"); yyval->child = yyvsp[-3]}
+#line 1578 "y.tab.c"
+    break;
+
+  case 22: /* MethodHeader: VOID ID LPAR RPAR  */
+#line 66 "jucompiler.y"
+                                                                            {yyval = newNode("MethodHeader");}
+#line 1584 "y.tab.c"
+    break;
+
+  case 23: /* FormalParams: Type ID Parametros  */
+#line 69 "jucompiler.y"
+                                                                            {yyval = yyvsp[-2];}
+#line 1590 "y.tab.c"
+    break;
+
+  case 24: /* FormalParams: Type ID  */
+#line 70 "jucompiler.y"
+                                                                            {yyval = yyvsp[-1];}
+#line 1596 "y.tab.c"
+    break;
+
+  case 25: /* FormalParams: STRING LSQ RSQ ID  */
+#line 71 "jucompiler.y"
+                                                                            {yyval = NULL;}
+#line 1602 "y.tab.c"
+    break;
+
+  case 26: /* Parametros: COMMA Type ID  */
+#line 74 "jucompiler.y"
+                                                                            {yyval = yyvsp[-1];}
+#line 1608 "y.tab.c"
+    break;
+
+  case 27: /* Parametros: Parametros COMMA Type ID  */
+#line 75 "jucompiler.y"
+                                                                            {yyval = yyvsp[-3]; addBrother(yyval, yyvsp[-1]);}
+#line 1614 "y.tab.c"
+    break;
+
+  case 28: /* MethodBody: LBRACE Expressao RBRACE  */
+#line 78 "jucompiler.y"
+                                                                            {yyval = newNode("MethodBody"); yyval->child = yyvsp[-1];}
+#line 1620 "y.tab.c"
+    break;
+
+  case 29: /* MethodBody: LBRACE RBRACE  */
+#line 79 "jucompiler.y"
+                                                                            {yyval = newNode("MethodBody");}
+#line 1626 "y.tab.c"
+    break;
+
+
+#line 1630 "y.tab.c"
 
       default: break;
     }
@@ -1649,5 +1819,5 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 156 "jucompiler.y"
+#line 158 "jucompiler.y"
 

@@ -9,9 +9,6 @@
     int contador_linhas = 1;
     int contador_colunas = 1;
     int flag = 0;
-    int escape = 1;
-    char buf[1024];
-    char *s;
     int col_string =1;
     int col_comment = 1;
     int line_comment = 1;
@@ -21,8 +18,9 @@ ID                      ([a-z]|[A-Z]|"_"|"$")([a-z]|[A-Z]|"_"|"$"|[0-9])*
 naturais                [1-9]
 inteiros                [0-9]
 sinal                   "-"|"+"
-SeqEscInv               "\\"[^("r|"f"|"n"|"t"|\")]
+SeqEscInv               "\\"[^rfnt\\\"]
 novalinha               (\r?\n)|(\r\n?)
+SCAPES                  \\[rfnt\\\"]
 
 BOOLLIT                 "true"|"false" 
 AND                     "&&"
@@ -77,27 +75,36 @@ REALLIT2                (("_"*{inteiros}+))+"."(("_"*{inteiros}+)+(("e"|"E"){sin
 REALLIT3                "."("_"*{inteiros}+)+(("e"|"E"){sinal}?("_"*{inteiros}+)+)?   
 REALLIT                 {REALLIT1}|{REALLIT2}|{REALLIT3}
 
-%X COMMENT STRING  COMMENT2  
+STRLIT                  ({SCAPES}|[^\r\n\"\\])*
+
+
+%X COMMENT STRING1 STRINGERROR COMMENT2  
 %% 
 
-\"                            { BEGIN STRING; s = buf; escape = 1;col_string = contador_colunas;contador_colunas+=yyleng;}
-<STRING>{novalinha}           {*s = 0;BEGIN 0;printf("Line %d, col %d: unterminated string literal\n", contador_linhas, col_string);contador_colunas=1; contador_linhas++;}
-<STRING>\\\"                  { *s++ = '\\';*s++ = '\"'; contador_colunas+=yyleng;}
-<STRING>\\\\                  { *s++ = '\\';*s++ = '\\'; contador_colunas+=yyleng;}
-<STRING>\"                    { 
-                                *s = 0;
-                                BEGIN 0;
-                                if ((flag) && (escape)) printf("STRLIT(\"%s\")\n",buf);
-                                contador_colunas+=yyleng;
-                              }
-<STRING>"\\\n"|"\\\r"|"\\\r\n"  {printf("Line %d, col %d: invalid escape sequence (\\)\n", contador_linhas, contador_colunas);*s = 0;
+\"                               {BEGIN STRING1;  col_string = contador_colunas;contador_colunas+=yyleng;}
+<STRING1>{novalinha}              {printf("Line %d, col %d: unterminated string literal\n", contador_linhas, col_string);contador_colunas=1; contador_linhas++;BEGIN 0;}
+<STRING1>{STRLIT}\"              {if (flag) printf("STRLIT(\"%s)\n",yytext); contador_colunas+=yyleng; BEGIN 0;}      
+<STRING1>"\\\n"|"\\\r"|"\\\r\n"  {printf("Line %d, col %d: invalid escape sequence (\\)\n", contador_linhas, contador_colunas);
+                                    BEGIN 0; {printf("Line %d, col %d: unterminated string literal\n", contador_linhas, col_string);}
+                                    contador_colunas=1; contador_linhas++;
+                                 }
+<STRING1>{SeqEscInv}|\\[\(|\)]   {printf("Line %d, col %d: invalid escape sequence (%s)\n", contador_linhas, contador_colunas,yytext);contador_colunas+=yyleng;BEGIN STRINGERROR;}      
+<STRING1><<EOF>>                 {printf("Line %d, col %d: unterminated string literal\n", contador_linhas, col_string);exit(0);}
+<STRING1>{SCAPES}            { contador_colunas+=yyleng;BEGIN STRINGERROR;}
+<STRING1>.                       { contador_colunas+=yyleng;BEGIN STRINGERROR;}
+
+
+<STRINGERROR>"\\\n"|"\\\r"|"\\\r\n"  {printf("Line %d, col %d: invalid escape sequence (\\)\n", contador_linhas, contador_colunas);
                                     BEGIN 0;printf("Line %d, col %d: unterminated string literal\n", contador_linhas, col_string);
                                     contador_colunas=1; contador_linhas++;
-                                }
-<STRING>{SeqEscInv}|\\[\(|\)]   {printf("Line %d, col %d: invalid escape sequence (%s)\n", contador_linhas, contador_colunas,yytext);escape =0;contador_colunas+=yyleng;}      
-<STRING><<EOF>>                 {printf("Line %d, col %d: unterminated string literal\n", contador_linhas, col_string);exit(0);}
-<STRING>.                       { *s++ = *yytext; contador_colunas+=yyleng;}
-
+                                    } 
+<STRINGERROR>{novalinha}            {BEGIN 0;printf("Line %d, col %d: unterminated string literal\n", contador_linhas, col_string);contador_colunas=1; contador_linhas++;}
+<STRINGERROR>{SeqEscInv}|\\[\(|\)]  {printf("Line %d, col %d: invalid escape sequence (%s)\n", contador_linhas, contador_colunas,yytext);contador_colunas+=yyleng;}      
+<STRINGERROR><<EOF>>                {printf("Line %d, col %d: unterminated string literal\n", contador_linhas, col_string);exit(0);}
+<STRINGERROR>\"                     {  BEGIN 0; contador_colunas+=yyleng;} 
+<STRINGERROR>{SCAPES}               { contador_colunas+=yyleng;}
+<STRINGERROR>.                      { contador_colunas+=yyleng;}
+    
 \/\*                          {col_comment = contador_colunas + yyleng;line_comment =contador_linhas;  BEGIN COMMENT;}
 <COMMENT>"*/"                 {contador_colunas = col_comment + yyleng; contador_linhas =  line_comment;  BEGIN 0;}
 <COMMENT>{novalinha}          {col_comment=1; line_comment++;}
