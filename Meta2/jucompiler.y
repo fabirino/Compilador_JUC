@@ -4,9 +4,11 @@
                         Fabio Santos       2020212310
     ====================================================================================== */
     #include <stdio.h>
+    #include "tree.h"
     
     int yylex(void);
     void yyerror (const char *s);
+    int erroSintatico = 0;
 %}
 
 %token BOOLLIT AND ASSIGN STAR COMMA DIV EQ GE GT LBRACE LE LPAR LSQ LT MINUS MOD NE NOT OR PLUS RBRACE RPAR RSQ SEMICOLON LSHIFT RSHIFT XOR BOOL CLASS DOTLENGTH DOUBLE ELSE IF INT PRINT PARSEINT PUBLIC RETURN STATIC STRING VOID WHILE ID INTLIT REALLIT STRLIT
@@ -30,51 +32,51 @@
 
 %%
 
-Program         :       CLASS ID LBRACE Declarations RBRACE 
-                |       CLASS ID LBRACE RBRACE
+Program         :       CLASS ID LBRACE Declarations RBRACE                 {$$ = newNode("Program"); $$->child=$4; if(printTree && erroSintatico){printTree($$,0);} else {freeTree($$);}}
+                |       CLASS ID LBRACE RBRACE                              {$$ = newNode("Program");}
                 ;
 
-Declarations    :       MethodDecl
-                |       FieldDecl
-                |       SEMICOLON
-                |       Declarations MethodDecl
-                |       Declarations FieldDecl
-                |       Declarations SEMICOLON
+Declarations    :       MethodDecl                                          {$$ = $1;}
+                |       FieldDecl                                           {$$ = $1;}
+                |       SEMICOLON                                           {$$ = $1;}
+                |       Declarations MethodDecl                             {$$ = $1; addBrother($$, $2);}
+                |       Declarations FieldDecl                              {$$ = $1; addBrother($$, $2);}
+                |       Declarations SEMICOLON                              {$$ = $1; addBrother($$, $2);}
                 ;
 
-MethodDecl      :       PUBLIC STATIC MethodHeader MethodBody
+MethodDecl      :       PUBLIC STATIC MethodHeader MethodBody               {$$ = newNode("MethodDecl"); $$->child = $2; addBrother($2,$3);}
 
-FieldDecl       :       PUBLIC STATIC Type ID SEMICOLON
-                |       PUBLIC STATIC Type ID Variaveis SEMICOLON
-                |       error SEMICOLON
+FieldDecl       :       PUBLIC STATIC Type ID SEMICOLON                     {$$ = newNode("FieldDecl"); $$->child = $3;}
+                |       PUBLIC STATIC Type ID Variaveis SEMICOLON           {$$ = newNode("FieldDecl"); $$->child = $3; addBrother($3,$5)}
+                |       error SEMICOLON                                     {$$ = newNode(NULL); erroSintatico=1;}
                 ;
 
-Variaveis       :       COMMA ID
-                |       Variaveis COMMA ID
+Variaveis       :       COMMA ID                                            {} //FIXME: genuinamente nao sei o que por aqui
+                |       Variaveis COMMA ID                                  {}
                 ;
 
-Type            :       BOOL
-                |       INT 
-                |       DOUBLE
+Type            :       BOOL                                                {$$ = newNode("Bool");}
+                |       INT                                                 {$$ = newNode("Int");}
+                |       DOUBLE                                              {$$ = newNode("Double");}
                 ;
 
-MethodHeader    :       Type ID LPAR FormalParams RPAR
-                |       VOID ID LPAR FormalParams RPAR
-                |       Type ID LPAR RPAR
-                |       VOID ID LPAR RPAR
+MethodHeader    :       Type ID LPAR FormalParams RPAR                      {$$ = newNode("MethodHeader"); $$->child = $1; addBrother($1, $4)}
+                |       VOID ID LPAR FormalParams RPAR                      {$$ = newNode("MethodHeader"); $$->child = $4}
+                |       Type ID LPAR RPAR                                   {$$ = newNode("MethodHeader"); $$->child = $1}
+                |       VOID ID LPAR RPAR                                   {$$ = newNode("MethodHeader");}
                 ;
 
-FormalParams    :       Type ID Parametros
-                |       Type ID 
-                |       STRING LSQ RSQ ID
+FormalParams    :       Type ID Parametros                                  {$$ = $1;}      //FIXME: tambem podera estar mal, nao tinha meio de comparacao
+                |       Type ID                                             {$$ = $1;}
+                |       STRING LSQ RSQ ID                                   {$$ = NULL;}
                 ;
 
-Parametros      :       COMMA Type ID
-                |       Parametros COMMA Type ID
+Parametros      :       COMMA Type ID                                       {$$ = $2;}
+                |       Parametros COMMA Type ID                            {$$ = $1; addBrother($$, $3);}  //TODO: verificar se e child ou brother
                 ;
 
-MethodBody      :       LBRACE Expressao RBRACE
-                |       LBRACE RBRACE
+MethodBody      :       LBRACE Expressao RBRACE                             {$$ = newNode("MethodBody"); $$->child = $2;}
+                |       LBRACE RBRACE                                       {$$ = newNode("MethodBody");}
                 ;
                 
 Expressao       :       Statement

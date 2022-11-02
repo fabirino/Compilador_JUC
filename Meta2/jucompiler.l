@@ -26,6 +26,7 @@ inteiros                [0-9]
 sinal                   "-"|"+"
 SeqEscInv               "\\"[^("r|"f"|"n"|"t"|\")]
 novalinha               (\r?\n)|(\r\n?)
+SCAPES            ("\\"("n"|"r"|"t"|"f"|"\""|"\\"))
 
 BOOLLIT                 "true"|"false" 
 AND                     "&&"
@@ -80,28 +81,35 @@ REALLIT2                (("_"*{inteiros}+))+"."(("_"*{inteiros}+)+(("e"|"E"){sin
 REALLIT3                "."("_"*{inteiros}+)+(("e"|"E"){sinal}?("_"*{inteiros}+)+)?   
 REALLIT                 {REALLIT1}|{REALLIT2}|{REALLIT3}
 
-%X COMMENT STRING1  COMMENT2  
+STRLIT                  ([^\\\r\n\"]|{SCAPES})*
+
+
+%X COMMENT STRING STRINGERROR COMMENT2  
 %% 
 
-\"                             {BEGIN STRING1; s = buf; escape = 1;col_string = contador_colunas;contador_colunas+=yyleng;}
-<STRING1>{novalinha}           {*s = 0;BEGIN 0;printf("Line %d, col %d: unterminated string literal\n", contador_linhas, col_string);contador_colunas=1; contador_linhas++;}
-<STRING1>\\\"                  { *s++ = '\\';*s++ = '\"'; contador_colunas+=yyleng;}
-<STRING1>\\\\                  { *s++ = '\\';*s++ = '\\'; contador_colunas+=yyleng;}
-<STRING1>\"                    { 
-                                *s = 0;
-                                BEGIN 0;
-                                if ((flagLexx) && (escape)) printf("STRLIT(\"%s\")\n",buf);
-                                contador_colunas+=yyleng;
-                                if((flagYacc) && (escape)) {strcpy(STRLIT,buf);return STRLIT;}//FIXME: pode dar erro aqui
-                              }
-<STRING1>"\\\n"|"\\\r"|"\\\r\n"  {printf("Line %d, col %d: invalid escape sequence (\\)\n", contador_linhas, contador_colunas);*s = 0;
+\"                             {BEGIN STRING;  col_string = contador_colunas;contador_colunas+=yyleng;}
+<STRING>{STRLIT}\"             { BEGIN 0; printf("STRLIT(\"%s\")\n",yytext); contador_colunas+=yyleng; }      
+<STRING>"\\\n"|"\\\r"|"\\\r\n"  {printf("Line %d, col %d: invalid escape sequence (\\)\n", contador_linhas, contador_colunas);
+                                    BEGIN 0;if (flagLexx) {printf("Line %d, col %d: unterminated string literal\n", contador_linhas, col_string);}
+                                    if(flagYacc) {return STRLIT;}
+                                    contador_colunas=1; contador_linhas++;
+                                }
+<STRING>{SeqEscInv}|\\[\(|\)]   {printf("Line %d, col %d: invalid escape sequence (%s)\n", contador_linhas, contador_colunas,yytext);contador_colunas+=yyleng;BEGIN STRINGERROR;}      
+<STRING>{novalinha}             {BEGIN 0;printf("Line %d, col %d: unterminated string literal\n", contador_linhas, col_string);contador_colunas=1; contador_linhas++;BEGIN STRINGERROR;}
+<STRING><<EOF>>                 {printf("Line %d, col %d: unterminated string literal\n", contador_linhas, col_string);exit(0);}
+<STRING>.                       {  contador_colunas+=yyleng;BEGIN STRINGERROR;}
+
+
+<STRINGERROR>"\\\n"|"\\\r"|"\\\r\n"  {printf("Line %d, col %d: invalid escape sequence (\\)\n", contador_linhas, contador_colunas);
                                     BEGIN 0;printf("Line %d, col %d: unterminated string literal\n", contador_linhas, col_string);
                                     contador_colunas=1; contador_linhas++;
                                 }
-<STRING1>{SeqEscInv}|\\[\(|\)]   {printf("Line %d, col %d: invalid escape sequence (%s)\n", contador_linhas, contador_colunas,yytext);escape =0;contador_colunas+=yyleng;}      
-<STRING1><<EOF>>                 {printf("Line %d, col %d: unterminated string literal\n", contador_linhas, col_string);exit(0);}
-<STRING1>.                       { *s++ = *yytext; contador_colunas+=yyleng;}
-
+<STRINGERROR>{SeqEscInv}|\\[\(|\)]   {printf("Line %d, col %d: invalid escape sequence (%s)\n", contador_linhas, contador_colunas,yytext);contador_colunas+=yyleng;}      
+<STRINGERROR>{novalinha}             {BEGIN 0;printf("Line %d, col %d: unterminated string literal\n", contador_linhas, col_string);contador_colunas=1; contador_linhas++;}
+<STRINGERROR><<EOF>>                 {printf("Line %d, col %d: unterminated string literal\n", contador_linhas, col_string);exit(0);}
+<STRINGERROR>\"                     {  BEGIN 0; contador_colunas+=yyleng;} 
+<STRINGERROR>{SCAPES}                       { contador_colunas+=yyleng;}
+ 
 
 \/\*                          {col_comment = contador_colunas + yyleng;line_comment =contador_linhas;  BEGIN COMMENT;}
 <COMMENT>"*/"                 {contador_colunas = col_comment + yyleng; contador_linhas =  line_comment;  BEGIN 0;}
@@ -111,7 +119,7 @@ REALLIT                 {REALLIT1}|{REALLIT2}|{REALLIT3}
 
 "//"                          {contador_colunas++; BEGIN COMMENT2;}                  
 <COMMENT2>{novalinha}         {contador_colunas = 1;contador_linhas++; BEGIN 0;}
-<COMMENT2><<EOF>>              {printf("Line %d, col %d: unterminated comment\n", contador_linhas, contador_colunas);exit(0);}
+<COMMENT2><<EOF>>             {printf("Line %d, col %d: unterminated comment\n", contador_linhas, contador_colunas);exit(0);}
 <COMMENT2>.                   {contador_colunas+=yyleng;}
 
 
@@ -214,7 +222,7 @@ int yywrap() {
     return 1;
 }
 
-void yyerror ( const char *s) {
+void yyerror (const char *s) {
     switch(strlen(yytext)){
         case 0:
             printf("Line %d, col %d: %s: %s\n", contador_linhas,contador_colunas,s, yytext);
@@ -223,5 +231,4 @@ void yyerror ( const char *s) {
             printf("Line %d, col %d: %s: %s\n", contador_linhas,(int)(contador_colunas-yyleng),s, yytext);
             break;
     }
-
 }
