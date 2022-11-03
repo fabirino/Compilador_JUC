@@ -112,113 +112,113 @@ Terminais, com regras onde aparecem
 
     $end (0) 0
     error (256) 12 46 52 57 86
-    BOOLLIT (258) 85
-    AND (259) 63
-    ASSIGN (260) 55
-    STAR (261) 60
-    COMMA (262) 13 14 25 26 54
-    DIV (263) 61
-    EQ (264) 68
-    GE (265) 69
-    GT (266) 70
-    LBRACE (267) 1 2 27 28 35 36
-    LE (268) 71
-    LPAR (269) 18 19 20 21 37 38 39 44 45 50 51 52 56 57 77 86
-    LSQ (270) 24 56
-    LT (271) 72
-    MINUS (272) 59 74
-    MOD (273) 62
-    NE (274) 73
-    NOT (275) 75
-    OR (276) 64
-    PLUS (277) 58 76
-    RBRACE (278) 1 2 27 28 35 36
-    RPAR (279) 18 19 20 21 37 38 39 44 45 50 51 52 56 57 77 86
-    RSQ (280) 24 56
-    SEMICOLON (281) 5 8 10 11 12 33 34 40 41 42 43 44 45 46
-    LSHIFT (282) 66
-    RSHIFT (283) 67
-    XOR (284) 65
-    BOOL (285) 15
-    CLASS (286) 1 2
-    DOTLENGTH (287) 81
-    DOUBLE (288) 17
-    ELSE (289) 37
-    IF (290) 37 38
-    INT (291) 16
-    PRINT (292) 44 45
-    PARSEINT (293) 56 57
-    PUBLIC (294) 9 10 11
-    RETURN (295) 40 41
-    STATIC (296) 9 10 11
-    STRING (297) 24
-    VOID (298) 19 21
-    WHILE (299) 39
-    ID (300) 1 2 10 11 13 14 18 19 20 21 22 23 24 25 26 33 34 50 51 52 55 56 81 82
-    INTLIT (301) 83
-    REALLIT (302) 84
-    STRLIT (303) 45
+    AND (258) 63
+    ASSIGN (259) 55
+    STAR (260) 60
+    COMMA (261) 13 14 25 26 54
+    DIV (262) 61
+    EQ (263) 68
+    GE (264) 69
+    GT (265) 70
+    LBRACE (266) 1 2 27 28 35 36
+    LE (267) 71
+    LPAR (268) 18 19 20 21 37 38 39 44 45 50 51 52 56 57 77 86
+    LSQ (269) 24 56
+    LT (270) 72
+    MINUS (271) 59 74
+    MOD (272) 62
+    NE (273) 73
+    NOT (274) 75
+    OR (275) 64
+    PLUS (276) 58 76
+    RBRACE (277) 1 2 27 28 35 36
+    RPAR (278) 18 19 20 21 37 38 39 44 45 50 51 52 56 57 77 86
+    RSQ (279) 24 56
+    SEMICOLON (280) 5 8 10 11 12 33 34 40 41 42 43 44 45 46
+    LSHIFT (281) 66
+    RSHIFT (282) 67
+    XOR (283) 65
+    BOOL (284) 15
+    CLASS (285) 1 2
+    DOUBLE (286) 17
+    ELSE (287) 37
+    IF (288) 37 38
+    INT (289) 16
+    PRINT (290) 44 45
+    PARSEINT (291) 56 57
+    PUBLIC (292) 9 10 11
+    RETURN (293) 40 41
+    STATIC (294) 9 10 11
+    VOID (295) 19 21
+    WHILE (296) 39
+    ID <id> (297) 1 2 10 11 13 14 18 19 20 21 22 23 24 25 26 33 34 50 51 52 55 56 81 82
+    STRLIT <id> (298) 45
+    REALLIT <id> (299) 84
+    INTLIT <id> (300) 83
+    BOOLLIT <id> (301) 85
+    DOTLENGTH <id> (302) 81
+    STRING <id> (303) 24
 
 
 Não terminais, com regras onde aparecem
 
     $accept (49)
         à esquerda: 0
-    Program (50)
+    Program <node> (50)
         à esquerda: 1 2
         à direita: 0
-    Declarations (51)
+    Declarations <node> (51)
         à esquerda: 3 4 5 6 7 8
         à direita: 1 6 7 8
-    MethodDecl (52)
+    MethodDecl <node> (52)
         à esquerda: 9
         à direita: 3 6
-    FieldDecl (53)
+    FieldDecl <node> (53)
         à esquerda: 10 11 12
         à direita: 4 7
-    Variaveis (54)
+    Variaveis <node> (54)
         à esquerda: 13 14
         à direita: 11 14 33
-    Type (55)
+    Type <node> (55)
         à esquerda: 15 16 17
         à direita: 10 11 18 20 22 23 25 26 33 34
-    MethodHeader (56)
+    MethodHeader <node> (56)
         à esquerda: 18 19 20 21
         à direita: 9
-    FormalParams (57)
+    FormalParams <node> (57)
         à esquerda: 22 23 24
         à direita: 18 19
-    Parametros (58)
+    Parametros <node> (58)
         à esquerda: 25 26
         à direita: 22 26
-    MethodBody (59)
+    MethodBody <node> (59)
         à esquerda: 27 28
         à direita: 9
-    Expressao (60)
+    Expressao <node> (60)
         à esquerda: 29 30 31 32
         à direita: 27 31 32
-    VarDecl (61)
+    VarDecl <node> (61)
         à esquerda: 33 34
         à direita: 30 32
-    Statement (62)
+    Statement <node> (62)
         à esquerda: 35 36 37 38 39 40 41 42 43 44 45 46
         à direita: 29 31 35 37 38 39
-    Gramatica (63)
+    Gramatica <node> (63)
         à esquerda: 47 48 49
         à direita: 42
-    MethodInvocation (64)
+    MethodInvocation <node> (64)
         à esquerda: 50 51 52
         à direita: 47 78
-    CommaExpr (65)
+    CommaExpr <node> (65)
         à esquerda: 53 54
         à direita: 50 54
-    Assignment (66)
+    Assignment <node> (66)
         à esquerda: 55
         à direita: 48 79
-    ParseArgs (67)
+    ParseArgs <node> (67)
         à esquerda: 56 57
         à direita: 49 80
-    Expr (68)
+    Expr <node> (68)
         à esquerda: 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84 85 86
         à direita: 37 38 39 40 44 53 54 55 56 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77
 
@@ -619,16 +619,16 @@ Estado 41
    40 Statement: RETURN • Expr SEMICOLON
    41          | RETURN • SEMICOLON
 
-    BOOLLIT    troca e vai para estado 67
-    LPAR       troca e vai para estado 68
-    MINUS      troca e vai para estado 69
-    NOT        troca e vai para estado 70
-    PLUS       troca e vai para estado 71
-    SEMICOLON  troca e vai para estado 72
+    LPAR       troca e vai para estado 67
+    MINUS      troca e vai para estado 68
+    NOT        troca e vai para estado 69
+    PLUS       troca e vai para estado 70
+    SEMICOLON  troca e vai para estado 71
     PARSEINT   troca e vai para estado 40
-    ID         troca e vai para estado 73
+    ID         troca e vai para estado 72
+    REALLIT    troca e vai para estado 73
     INTLIT     troca e vai para estado 74
-    REALLIT    troca e vai para estado 75
+    BOOLLIT    troca e vai para estado 75
 
     MethodInvocation  vai para estado 76
     Assignment        vai para estado 77
@@ -823,15 +823,15 @@ Estado 64
    37 Statement: IF LPAR • Expr RPAR Statement ELSE Statement
    38          | IF LPAR • Expr RPAR Statement
 
-    BOOLLIT   troca e vai para estado 67
-    LPAR      troca e vai para estado 68
-    MINUS     troca e vai para estado 69
-    NOT       troca e vai para estado 70
-    PLUS      troca e vai para estado 71
+    LPAR      troca e vai para estado 67
+    MINUS     troca e vai para estado 68
+    NOT       troca e vai para estado 69
+    PLUS      troca e vai para estado 70
     PARSEINT  troca e vai para estado 40
-    ID        troca e vai para estado 73
+    ID        troca e vai para estado 72
+    REALLIT   troca e vai para estado 73
     INTLIT    troca e vai para estado 74
-    REALLIT   troca e vai para estado 75
+    BOOLLIT   troca e vai para estado 75
 
     MethodInvocation  vai para estado 76
     Assignment        vai para estado 77
@@ -844,16 +844,16 @@ Estado 65
    44 Statement: PRINT LPAR • Expr RPAR SEMICOLON
    45          | PRINT LPAR • STRLIT RPAR SEMICOLON
 
-    BOOLLIT   troca e vai para estado 67
-    LPAR      troca e vai para estado 68
-    MINUS     troca e vai para estado 69
-    NOT       troca e vai para estado 70
-    PLUS      troca e vai para estado 71
+    LPAR      troca e vai para estado 67
+    MINUS     troca e vai para estado 68
+    NOT       troca e vai para estado 69
+    PLUS      troca e vai para estado 70
     PARSEINT  troca e vai para estado 40
-    ID        troca e vai para estado 73
-    INTLIT    troca e vai para estado 74
-    REALLIT   troca e vai para estado 75
+    ID        troca e vai para estado 72
     STRLIT    troca e vai para estado 95
+    REALLIT   troca e vai para estado 73
+    INTLIT    troca e vai para estado 74
+    BOOLLIT   troca e vai para estado 75
 
     MethodInvocation  vai para estado 76
     Assignment        vai para estado 77
@@ -872,26 +872,19 @@ Estado 66
 
 Estado 67
 
-   85 Expr: BOOLLIT •
-
-    $default  redução com regra 85 (Expr)
-
-
-Estado 68
-
    77 Expr: LPAR • Expr RPAR
    86     | LPAR • error RPAR
 
     error     troca e vai para estado 99
-    BOOLLIT   troca e vai para estado 67
-    LPAR      troca e vai para estado 68
-    MINUS     troca e vai para estado 69
-    NOT       troca e vai para estado 70
-    PLUS      troca e vai para estado 71
+    LPAR      troca e vai para estado 67
+    MINUS     troca e vai para estado 68
+    NOT       troca e vai para estado 69
+    PLUS      troca e vai para estado 70
     PARSEINT  troca e vai para estado 40
-    ID        troca e vai para estado 73
+    ID        troca e vai para estado 72
+    REALLIT   troca e vai para estado 73
     INTLIT    troca e vai para estado 74
-    REALLIT   troca e vai para estado 75
+    BOOLLIT   troca e vai para estado 75
 
     MethodInvocation  vai para estado 76
     Assignment        vai para estado 77
@@ -899,19 +892,19 @@ Estado 68
     Expr              vai para estado 100
 
 
-Estado 69
+Estado 68
 
    74 Expr: MINUS • Expr
 
-    BOOLLIT   troca e vai para estado 67
-    LPAR      troca e vai para estado 68
-    MINUS     troca e vai para estado 69
-    NOT       troca e vai para estado 70
-    PLUS      troca e vai para estado 71
+    LPAR      troca e vai para estado 67
+    MINUS     troca e vai para estado 68
+    NOT       troca e vai para estado 69
+    PLUS      troca e vai para estado 70
     PARSEINT  troca e vai para estado 40
-    ID        troca e vai para estado 73
+    ID        troca e vai para estado 72
+    REALLIT   troca e vai para estado 73
     INTLIT    troca e vai para estado 74
-    REALLIT   troca e vai para estado 75
+    BOOLLIT   troca e vai para estado 75
 
     MethodInvocation  vai para estado 76
     Assignment        vai para estado 77
@@ -919,19 +912,19 @@ Estado 69
     Expr              vai para estado 101
 
 
-Estado 70
+Estado 69
 
    75 Expr: NOT • Expr
 
-    BOOLLIT   troca e vai para estado 67
-    LPAR      troca e vai para estado 68
-    MINUS     troca e vai para estado 69
-    NOT       troca e vai para estado 70
-    PLUS      troca e vai para estado 71
+    LPAR      troca e vai para estado 67
+    MINUS     troca e vai para estado 68
+    NOT       troca e vai para estado 69
+    PLUS      troca e vai para estado 70
     PARSEINT  troca e vai para estado 40
-    ID        troca e vai para estado 73
+    ID        troca e vai para estado 72
+    REALLIT   troca e vai para estado 73
     INTLIT    troca e vai para estado 74
-    REALLIT   troca e vai para estado 75
+    BOOLLIT   troca e vai para estado 75
 
     MethodInvocation  vai para estado 76
     Assignment        vai para estado 77
@@ -939,19 +932,19 @@ Estado 70
     Expr              vai para estado 102
 
 
-Estado 71
+Estado 70
 
    76 Expr: PLUS • Expr
 
-    BOOLLIT   troca e vai para estado 67
-    LPAR      troca e vai para estado 68
-    MINUS     troca e vai para estado 69
-    NOT       troca e vai para estado 70
-    PLUS      troca e vai para estado 71
+    LPAR      troca e vai para estado 67
+    MINUS     troca e vai para estado 68
+    NOT       troca e vai para estado 69
+    PLUS      troca e vai para estado 70
     PARSEINT  troca e vai para estado 40
-    ID        troca e vai para estado 73
+    ID        troca e vai para estado 72
+    REALLIT   troca e vai para estado 73
     INTLIT    troca e vai para estado 74
-    REALLIT   troca e vai para estado 75
+    BOOLLIT   troca e vai para estado 75
 
     MethodInvocation  vai para estado 76
     Assignment        vai para estado 77
@@ -959,14 +952,14 @@ Estado 71
     Expr              vai para estado 103
 
 
-Estado 72
+Estado 71
 
    41 Statement: RETURN SEMICOLON •
 
     $default  redução com regra 41 (Statement)
 
 
-Estado 73
+Estado 72
 
    50 MethodInvocation: ID • LPAR CommaExpr RPAR
    51                 | ID • LPAR RPAR
@@ -982,6 +975,13 @@ Estado 73
     $default  redução com regra 82 (Expr)
 
 
+Estado 73
+
+   84 Expr: REALLIT •
+
+    $default  redução com regra 84 (Expr)
+
+
 Estado 74
 
    83 Expr: INTLIT •
@@ -991,9 +991,9 @@ Estado 74
 
 Estado 75
 
-   84 Expr: REALLIT •
+   85 Expr: BOOLLIT •
 
-    $default  redução com regra 84 (Expr)
+    $default  redução com regra 85 (Expr)
 
 
 Estado 76
@@ -1060,15 +1060,15 @@ Estado 80
 
    39 Statement: WHILE LPAR • Expr RPAR Statement
 
-    BOOLLIT   troca e vai para estado 67
-    LPAR      troca e vai para estado 68
-    MINUS     troca e vai para estado 69
-    NOT       troca e vai para estado 70
-    PLUS      troca e vai para estado 71
+    LPAR      troca e vai para estado 67
+    MINUS     troca e vai para estado 68
+    NOT       troca e vai para estado 69
+    PLUS      troca e vai para estado 70
     PARSEINT  troca e vai para estado 40
-    ID        troca e vai para estado 73
+    ID        troca e vai para estado 72
+    REALLIT   troca e vai para estado 73
     INTLIT    troca e vai para estado 74
-    REALLIT   troca e vai para estado 75
+    BOOLLIT   troca e vai para estado 75
 
     MethodInvocation  vai para estado 76
     Assignment        vai para estado 77
@@ -1080,15 +1080,15 @@ Estado 81
 
    55 Assignment: ID ASSIGN • Expr
 
-    BOOLLIT   troca e vai para estado 67
-    LPAR      troca e vai para estado 68
-    MINUS     troca e vai para estado 69
-    NOT       troca e vai para estado 70
-    PLUS      troca e vai para estado 71
+    LPAR      troca e vai para estado 67
+    MINUS     troca e vai para estado 68
+    NOT       troca e vai para estado 69
+    PLUS      troca e vai para estado 70
     PARSEINT  troca e vai para estado 40
-    ID        troca e vai para estado 73
+    ID        troca e vai para estado 72
+    REALLIT   troca e vai para estado 73
     INTLIT    troca e vai para estado 74
-    REALLIT   troca e vai para estado 75
+    BOOLLIT   troca e vai para estado 75
 
     MethodInvocation  vai para estado 76
     Assignment        vai para estado 77
@@ -1103,16 +1103,16 @@ Estado 82
    52                 | ID LPAR • error RPAR
 
     error     troca e vai para estado 124
-    BOOLLIT   troca e vai para estado 67
-    LPAR      troca e vai para estado 68
-    MINUS     troca e vai para estado 69
-    NOT       troca e vai para estado 70
-    PLUS      troca e vai para estado 71
+    LPAR      troca e vai para estado 67
+    MINUS     troca e vai para estado 68
+    NOT       troca e vai para estado 69
+    PLUS      troca e vai para estado 70
     RPAR      troca e vai para estado 125
     PARSEINT  troca e vai para estado 40
-    ID        troca e vai para estado 73
+    ID        troca e vai para estado 72
+    REALLIT   troca e vai para estado 73
     INTLIT    troca e vai para estado 74
-    REALLIT   troca e vai para estado 75
+    BOOLLIT   troca e vai para estado 75
 
     MethodInvocation  vai para estado 76
     CommaExpr         vai para estado 126
@@ -1441,15 +1441,15 @@ Estado 105
 
    63 Expr: Expr AND • Expr
 
-    BOOLLIT   troca e vai para estado 67
-    LPAR      troca e vai para estado 68
-    MINUS     troca e vai para estado 69
-    NOT       troca e vai para estado 70
-    PLUS      troca e vai para estado 71
+    LPAR      troca e vai para estado 67
+    MINUS     troca e vai para estado 68
+    NOT       troca e vai para estado 69
+    PLUS      troca e vai para estado 70
     PARSEINT  troca e vai para estado 40
-    ID        troca e vai para estado 73
+    ID        troca e vai para estado 72
+    REALLIT   troca e vai para estado 73
     INTLIT    troca e vai para estado 74
-    REALLIT   troca e vai para estado 75
+    BOOLLIT   troca e vai para estado 75
 
     MethodInvocation  vai para estado 76
     Assignment        vai para estado 77
@@ -1461,15 +1461,15 @@ Estado 106
 
    60 Expr: Expr STAR • Expr
 
-    BOOLLIT   troca e vai para estado 67
-    LPAR      troca e vai para estado 68
-    MINUS     troca e vai para estado 69
-    NOT       troca e vai para estado 70
-    PLUS      troca e vai para estado 71
+    LPAR      troca e vai para estado 67
+    MINUS     troca e vai para estado 68
+    NOT       troca e vai para estado 69
+    PLUS      troca e vai para estado 70
     PARSEINT  troca e vai para estado 40
-    ID        troca e vai para estado 73
+    ID        troca e vai para estado 72
+    REALLIT   troca e vai para estado 73
     INTLIT    troca e vai para estado 74
-    REALLIT   troca e vai para estado 75
+    BOOLLIT   troca e vai para estado 75
 
     MethodInvocation  vai para estado 76
     Assignment        vai para estado 77
@@ -1481,15 +1481,15 @@ Estado 107
 
    61 Expr: Expr DIV • Expr
 
-    BOOLLIT   troca e vai para estado 67
-    LPAR      troca e vai para estado 68
-    MINUS     troca e vai para estado 69
-    NOT       troca e vai para estado 70
-    PLUS      troca e vai para estado 71
+    LPAR      troca e vai para estado 67
+    MINUS     troca e vai para estado 68
+    NOT       troca e vai para estado 69
+    PLUS      troca e vai para estado 70
     PARSEINT  troca e vai para estado 40
-    ID        troca e vai para estado 73
+    ID        troca e vai para estado 72
+    REALLIT   troca e vai para estado 73
     INTLIT    troca e vai para estado 74
-    REALLIT   troca e vai para estado 75
+    BOOLLIT   troca e vai para estado 75
 
     MethodInvocation  vai para estado 76
     Assignment        vai para estado 77
@@ -1501,15 +1501,15 @@ Estado 108
 
    68 Expr: Expr EQ • Expr
 
-    BOOLLIT   troca e vai para estado 67
-    LPAR      troca e vai para estado 68
-    MINUS     troca e vai para estado 69
-    NOT       troca e vai para estado 70
-    PLUS      troca e vai para estado 71
+    LPAR      troca e vai para estado 67
+    MINUS     troca e vai para estado 68
+    NOT       troca e vai para estado 69
+    PLUS      troca e vai para estado 70
     PARSEINT  troca e vai para estado 40
-    ID        troca e vai para estado 73
+    ID        troca e vai para estado 72
+    REALLIT   troca e vai para estado 73
     INTLIT    troca e vai para estado 74
-    REALLIT   troca e vai para estado 75
+    BOOLLIT   troca e vai para estado 75
 
     MethodInvocation  vai para estado 76
     Assignment        vai para estado 77
@@ -1521,15 +1521,15 @@ Estado 109
 
    69 Expr: Expr GE • Expr
 
-    BOOLLIT   troca e vai para estado 67
-    LPAR      troca e vai para estado 68
-    MINUS     troca e vai para estado 69
-    NOT       troca e vai para estado 70
-    PLUS      troca e vai para estado 71
+    LPAR      troca e vai para estado 67
+    MINUS     troca e vai para estado 68
+    NOT       troca e vai para estado 69
+    PLUS      troca e vai para estado 70
     PARSEINT  troca e vai para estado 40
-    ID        troca e vai para estado 73
+    ID        troca e vai para estado 72
+    REALLIT   troca e vai para estado 73
     INTLIT    troca e vai para estado 74
-    REALLIT   troca e vai para estado 75
+    BOOLLIT   troca e vai para estado 75
 
     MethodInvocation  vai para estado 76
     Assignment        vai para estado 77
@@ -1541,15 +1541,15 @@ Estado 110
 
    70 Expr: Expr GT • Expr
 
-    BOOLLIT   troca e vai para estado 67
-    LPAR      troca e vai para estado 68
-    MINUS     troca e vai para estado 69
-    NOT       troca e vai para estado 70
-    PLUS      troca e vai para estado 71
+    LPAR      troca e vai para estado 67
+    MINUS     troca e vai para estado 68
+    NOT       troca e vai para estado 69
+    PLUS      troca e vai para estado 70
     PARSEINT  troca e vai para estado 40
-    ID        troca e vai para estado 73
+    ID        troca e vai para estado 72
+    REALLIT   troca e vai para estado 73
     INTLIT    troca e vai para estado 74
-    REALLIT   troca e vai para estado 75
+    BOOLLIT   troca e vai para estado 75
 
     MethodInvocation  vai para estado 76
     Assignment        vai para estado 77
@@ -1561,15 +1561,15 @@ Estado 111
 
    71 Expr: Expr LE • Expr
 
-    BOOLLIT   troca e vai para estado 67
-    LPAR      troca e vai para estado 68
-    MINUS     troca e vai para estado 69
-    NOT       troca e vai para estado 70
-    PLUS      troca e vai para estado 71
+    LPAR      troca e vai para estado 67
+    MINUS     troca e vai para estado 68
+    NOT       troca e vai para estado 69
+    PLUS      troca e vai para estado 70
     PARSEINT  troca e vai para estado 40
-    ID        troca e vai para estado 73
+    ID        troca e vai para estado 72
+    REALLIT   troca e vai para estado 73
     INTLIT    troca e vai para estado 74
-    REALLIT   troca e vai para estado 75
+    BOOLLIT   troca e vai para estado 75
 
     MethodInvocation  vai para estado 76
     Assignment        vai para estado 77
@@ -1581,15 +1581,15 @@ Estado 112
 
    72 Expr: Expr LT • Expr
 
-    BOOLLIT   troca e vai para estado 67
-    LPAR      troca e vai para estado 68
-    MINUS     troca e vai para estado 69
-    NOT       troca e vai para estado 70
-    PLUS      troca e vai para estado 71
+    LPAR      troca e vai para estado 67
+    MINUS     troca e vai para estado 68
+    NOT       troca e vai para estado 69
+    PLUS      troca e vai para estado 70
     PARSEINT  troca e vai para estado 40
-    ID        troca e vai para estado 73
+    ID        troca e vai para estado 72
+    REALLIT   troca e vai para estado 73
     INTLIT    troca e vai para estado 74
-    REALLIT   troca e vai para estado 75
+    BOOLLIT   troca e vai para estado 75
 
     MethodInvocation  vai para estado 76
     Assignment        vai para estado 77
@@ -1601,15 +1601,15 @@ Estado 113
 
    59 Expr: Expr MINUS • Expr
 
-    BOOLLIT   troca e vai para estado 67
-    LPAR      troca e vai para estado 68
-    MINUS     troca e vai para estado 69
-    NOT       troca e vai para estado 70
-    PLUS      troca e vai para estado 71
+    LPAR      troca e vai para estado 67
+    MINUS     troca e vai para estado 68
+    NOT       troca e vai para estado 69
+    PLUS      troca e vai para estado 70
     PARSEINT  troca e vai para estado 40
-    ID        troca e vai para estado 73
+    ID        troca e vai para estado 72
+    REALLIT   troca e vai para estado 73
     INTLIT    troca e vai para estado 74
-    REALLIT   troca e vai para estado 75
+    BOOLLIT   troca e vai para estado 75
 
     MethodInvocation  vai para estado 76
     Assignment        vai para estado 77
@@ -1621,15 +1621,15 @@ Estado 114
 
    62 Expr: Expr MOD • Expr
 
-    BOOLLIT   troca e vai para estado 67
-    LPAR      troca e vai para estado 68
-    MINUS     troca e vai para estado 69
-    NOT       troca e vai para estado 70
-    PLUS      troca e vai para estado 71
+    LPAR      troca e vai para estado 67
+    MINUS     troca e vai para estado 68
+    NOT       troca e vai para estado 69
+    PLUS      troca e vai para estado 70
     PARSEINT  troca e vai para estado 40
-    ID        troca e vai para estado 73
+    ID        troca e vai para estado 72
+    REALLIT   troca e vai para estado 73
     INTLIT    troca e vai para estado 74
-    REALLIT   troca e vai para estado 75
+    BOOLLIT   troca e vai para estado 75
 
     MethodInvocation  vai para estado 76
     Assignment        vai para estado 77
@@ -1641,15 +1641,15 @@ Estado 115
 
    73 Expr: Expr NE • Expr
 
-    BOOLLIT   troca e vai para estado 67
-    LPAR      troca e vai para estado 68
-    MINUS     troca e vai para estado 69
-    NOT       troca e vai para estado 70
-    PLUS      troca e vai para estado 71
+    LPAR      troca e vai para estado 67
+    MINUS     troca e vai para estado 68
+    NOT       troca e vai para estado 69
+    PLUS      troca e vai para estado 70
     PARSEINT  troca e vai para estado 40
-    ID        troca e vai para estado 73
+    ID        troca e vai para estado 72
+    REALLIT   troca e vai para estado 73
     INTLIT    troca e vai para estado 74
-    REALLIT   troca e vai para estado 75
+    BOOLLIT   troca e vai para estado 75
 
     MethodInvocation  vai para estado 76
     Assignment        vai para estado 77
@@ -1661,15 +1661,15 @@ Estado 116
 
    64 Expr: Expr OR • Expr
 
-    BOOLLIT   troca e vai para estado 67
-    LPAR      troca e vai para estado 68
-    MINUS     troca e vai para estado 69
-    NOT       troca e vai para estado 70
-    PLUS      troca e vai para estado 71
+    LPAR      troca e vai para estado 67
+    MINUS     troca e vai para estado 68
+    NOT       troca e vai para estado 69
+    PLUS      troca e vai para estado 70
     PARSEINT  troca e vai para estado 40
-    ID        troca e vai para estado 73
+    ID        troca e vai para estado 72
+    REALLIT   troca e vai para estado 73
     INTLIT    troca e vai para estado 74
-    REALLIT   troca e vai para estado 75
+    BOOLLIT   troca e vai para estado 75
 
     MethodInvocation  vai para estado 76
     Assignment        vai para estado 77
@@ -1681,15 +1681,15 @@ Estado 117
 
    58 Expr: Expr PLUS • Expr
 
-    BOOLLIT   troca e vai para estado 67
-    LPAR      troca e vai para estado 68
-    MINUS     troca e vai para estado 69
-    NOT       troca e vai para estado 70
-    PLUS      troca e vai para estado 71
+    LPAR      troca e vai para estado 67
+    MINUS     troca e vai para estado 68
+    NOT       troca e vai para estado 69
+    PLUS      troca e vai para estado 70
     PARSEINT  troca e vai para estado 40
-    ID        troca e vai para estado 73
+    ID        troca e vai para estado 72
+    REALLIT   troca e vai para estado 73
     INTLIT    troca e vai para estado 74
-    REALLIT   troca e vai para estado 75
+    BOOLLIT   troca e vai para estado 75
 
     MethodInvocation  vai para estado 76
     Assignment        vai para estado 77
@@ -1708,15 +1708,15 @@ Estado 119
 
    66 Expr: Expr LSHIFT • Expr
 
-    BOOLLIT   troca e vai para estado 67
-    LPAR      troca e vai para estado 68
-    MINUS     troca e vai para estado 69
-    NOT       troca e vai para estado 70
-    PLUS      troca e vai para estado 71
+    LPAR      troca e vai para estado 67
+    MINUS     troca e vai para estado 68
+    NOT       troca e vai para estado 69
+    PLUS      troca e vai para estado 70
     PARSEINT  troca e vai para estado 40
-    ID        troca e vai para estado 73
+    ID        troca e vai para estado 72
+    REALLIT   troca e vai para estado 73
     INTLIT    troca e vai para estado 74
-    REALLIT   troca e vai para estado 75
+    BOOLLIT   troca e vai para estado 75
 
     MethodInvocation  vai para estado 76
     Assignment        vai para estado 77
@@ -1728,15 +1728,15 @@ Estado 120
 
    67 Expr: Expr RSHIFT • Expr
 
-    BOOLLIT   troca e vai para estado 67
-    LPAR      troca e vai para estado 68
-    MINUS     troca e vai para estado 69
-    NOT       troca e vai para estado 70
-    PLUS      troca e vai para estado 71
+    LPAR      troca e vai para estado 67
+    MINUS     troca e vai para estado 68
+    NOT       troca e vai para estado 69
+    PLUS      troca e vai para estado 70
     PARSEINT  troca e vai para estado 40
-    ID        troca e vai para estado 73
+    ID        troca e vai para estado 72
+    REALLIT   troca e vai para estado 73
     INTLIT    troca e vai para estado 74
-    REALLIT   troca e vai para estado 75
+    BOOLLIT   troca e vai para estado 75
 
     MethodInvocation  vai para estado 76
     Assignment        vai para estado 77
@@ -1748,15 +1748,15 @@ Estado 121
 
    65 Expr: Expr XOR • Expr
 
-    BOOLLIT   troca e vai para estado 67
-    LPAR      troca e vai para estado 68
-    MINUS     troca e vai para estado 69
-    NOT       troca e vai para estado 70
-    PLUS      troca e vai para estado 71
+    LPAR      troca e vai para estado 67
+    MINUS     troca e vai para estado 68
+    NOT       troca e vai para estado 69
+    PLUS      troca e vai para estado 70
     PARSEINT  troca e vai para estado 40
-    ID        troca e vai para estado 73
+    ID        troca e vai para estado 72
+    REALLIT   troca e vai para estado 73
     INTLIT    troca e vai para estado 74
-    REALLIT   troca e vai para estado 75
+    BOOLLIT   troca e vai para estado 75
 
     MethodInvocation  vai para estado 76
     Assignment        vai para estado 77
@@ -1997,15 +1997,15 @@ Estado 137
 
    56 ParseArgs: PARSEINT LPAR ID LSQ • Expr RSQ RPAR
 
-    BOOLLIT   troca e vai para estado 67
-    LPAR      troca e vai para estado 68
-    MINUS     troca e vai para estado 69
-    NOT       troca e vai para estado 70
-    PLUS      troca e vai para estado 71
+    LPAR      troca e vai para estado 67
+    MINUS     troca e vai para estado 68
+    NOT       troca e vai para estado 69
+    PLUS      troca e vai para estado 70
     PARSEINT  troca e vai para estado 40
-    ID        troca e vai para estado 73
+    ID        troca e vai para estado 72
+    REALLIT   troca e vai para estado 73
     INTLIT    troca e vai para estado 74
-    REALLIT   troca e vai para estado 75
+    BOOLLIT   troca e vai para estado 75
 
     MethodInvocation  vai para estado 76
     Assignment        vai para estado 77
@@ -2548,15 +2548,15 @@ Estado 158
 
    54 CommaExpr: CommaExpr COMMA • Expr
 
-    BOOLLIT   troca e vai para estado 67
-    LPAR      troca e vai para estado 68
-    MINUS     troca e vai para estado 69
-    NOT       troca e vai para estado 70
-    PLUS      troca e vai para estado 71
+    LPAR      troca e vai para estado 67
+    MINUS     troca e vai para estado 68
+    NOT       troca e vai para estado 69
+    PLUS      troca e vai para estado 70
     PARSEINT  troca e vai para estado 40
-    ID        troca e vai para estado 73
+    ID        troca e vai para estado 72
+    REALLIT   troca e vai para estado 73
     INTLIT    troca e vai para estado 74
-    REALLIT   troca e vai para estado 75
+    BOOLLIT   troca e vai para estado 75
 
     MethodInvocation  vai para estado 76
     Assignment        vai para estado 77
