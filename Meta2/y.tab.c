@@ -1689,13 +1689,13 @@ yyreduce:
 
   case 38: /* Statement: IF LPAR Expr RPAR Statement ELSE Statement  */
 #line 131 "jucompiler.y"
-                                                                            {(yyval.node) = (yyvsp[-4].node); addBrother((yyvsp[-4].node), (yyvsp[-2].node)); addBrother((yyvsp[-2].node), (yyvsp[0].node));printf("Statement3\n");}
+                                                                            {(yyval.node) = newNode("If"); (yyval.node)->child=(yyvsp[-4].node); addBrother((yyvsp[-4].node),(yyvsp[-2].node));addBrother((yyvsp[-2].node),newNode("Block"));  addBrother((yyvsp[-2].node),(yyvsp[0].node));}
 #line 1694 "y.tab.c"
     break;
 
   case 39: /* Statement: IF LPAR Expr RPAR Statement  */
 #line 132 "jucompiler.y"
-                                                                            {(yyval.node) = (yyvsp[-2].node); addBrother((yyvsp[-2].node), (yyvsp[0].node));printf("Statement4\n");/*$$ = newNode("If"); $$->child=$3; if(!$5){$5=newNode("Null");} addBrother($3,$5); addBrother($5,newNode("Null"));*/}
+                                                                            {(yyval.node) = newNode("If"); (yyval.node)->child=(yyvsp[-2].node); addBrother((yyvsp[-2].node),(yyvsp[0].node));addBrother((yyvsp[0].node),newNode("Block"));}
 #line 1700 "y.tab.c"
     break;
 
@@ -1767,13 +1767,13 @@ yyreduce:
 
   case 51: /* MethodInvocation: ID LPAR CommaExpr RPAR  */
 #line 148 "jucompiler.y"
-                                                                            {sprintf(message,"Id(%s)",(yyvsp[-3].id)); (yyval.node) = newNode(strdup(message)); addBrother((yyval.node),(yyvsp[-1].node));printf("MethodInvocation1\n");}
+                                                                            {(yyval.node) = newNode("Call");sprintf(message,"Id(%s)",(yyvsp[-3].id)); (yyval.node)->child = newNode(strdup(message)); addBrother((yyval.node)->child,(yyvsp[-1].node));printf("MethodInvocation1\n");}
 #line 1772 "y.tab.c"
     break;
 
   case 52: /* MethodInvocation: ID LPAR RPAR  */
 #line 149 "jucompiler.y"
-                                                                            {sprintf(message,"Id(%s)",(yyvsp[-2].id)); (yyval.node) = newNode(strdup(message));printf("MethodInvocation2\n");}
+                                                                            {(yyval.node) = newNode("Call");sprintf(message,"Id(%s)",(yyvsp[-2].id)); (yyval.node)->child = newNode(strdup(message));printf("MethodInvocation2\n");}
 #line 1778 "y.tab.c"
     break;
 

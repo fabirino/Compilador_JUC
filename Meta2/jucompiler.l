@@ -195,7 +195,6 @@ int main(int argc, char *argv[]) {
         }else if (!strcmp(argv[1], "-t")){
             mostraTree=1;
             flagYacc=1;
-            
             yyparse();
         //erros do yyac
         }else if(!strcmp(argv[1], "-e2")){

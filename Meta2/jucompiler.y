@@ -110,7 +110,7 @@ FormalParams    :       Type ID Parametros                                  {$$ 
 
 Parametros      :       COMMA Type ID                                       {$$ = $2; sprintf(message,"Id(%s)",$3); addBrother($2, newNode(strdup(message)));printf("Parametros1\n");}
                 |       Parametros COMMA Type ID                            {$$ = $1; addBrother($1,$3); sprintf(message,"Id(%s)",$4); addBrother($3,newNode(strdup(message)));printf("Parametros2\n");}
-                ;
+                ;                                                           //TODO: ver esta mrd melhor !!
 
 MethodBody      :       LBRACE Expressao RBRACE                             {$$ = newNode("MethodBody"); $$->child = $2;printf("MethodBody1\n");}
                 |       LBRACE RBRACE                                       {$$ = newNode("MethodBody");printf("MethodBody2\n");}
@@ -128,8 +128,8 @@ VarDecl         :       Type ID Variaveis SEMICOLON                         {$$ 
 
 Statement       :       LBRACE Statement RBRACE                             {$$ = $2;printf("Statement1\n");}
                 |       LBRACE RBRACE                                       {;printf("Statement2\n");}
-                |       IF LPAR Expr RPAR Statement ELSE Statement          {$$ = $3; addBrother($3, $5); addBrother($5, $7);printf("Statement3\n");}/*$$ = newNode("If"); $$->child=$3; if(!$5){$5=newNode("Null");} if(!$7){$7=newNode("Null");} addBrother($3,$5);addBrother($5,$7);*/
-                |       IF LPAR Expr RPAR Statement                         {$$ = $3; addBrother($3, $5);printf("Statement4\n");/*$$ = newNode("If"); $$->child=$3; if(!$5){$5=newNode("Null");} addBrother($3,$5); addBrother($5,newNode("Null"));*/}
+                |       IF LPAR Expr RPAR Statement ELSE Statement          {$$ = newNode("If"); $$->child=$3; addBrother($3,$5);addBrother($5,newNode("Block"));  addBrother($5,$7);}
+                |       IF LPAR Expr RPAR Statement                         {$$ = newNode("If"); $$->child=$3; addBrother($3,$5);addBrother($5,newNode("Block"));}
                 |       WHILE LPAR Expr RPAR Statement                      {$$ = $3; addBrother($3, $5);printf("Statement5\n");}
                 |       RETURN Expr SEMICOLON                               {$$ = newNode("Return"); $$->child = $2;printf("Statement6\n");} // TODO: verificar se e $$ ou $1 e se e brother ou child
                 |       RETURN SEMICOLON                                    {$$ = newNode("Return"); $$->child = NULL;printf("Statement7\n");}
@@ -144,9 +144,9 @@ Gramatica       :       MethodInvocation                                    {$$ 
                 |       Assignment                                          {$$ = $1;printf("Gramatica2\n");}
                 |       ParseArgs                                           {$$ = $1;printf("Gramatica3\n");}
                 ;
-
-MethodInvocation:       ID LPAR CommaExpr RPAR                              {sprintf(message,"Id(%s)",$1); $$ = newNode(strdup(message)); addBrother($$,$3);printf("MethodInvocation1\n");}
-                |       ID LPAR RPAR                                        {sprintf(message,"Id(%s)",$1); $$ = newNode(strdup(message));printf("MethodInvocation2\n");}
+                                                                            
+MethodInvocation:       ID LPAR CommaExpr RPAR                              {$$ = newNode("Call");sprintf(message,"Id(%s)",$1); $$->child = newNode(strdup(message)); addBrother($$->child,$3);printf("MethodInvocation1\n");}
+                |       ID LPAR RPAR                                        {$$ = newNode("Call");sprintf(message,"Id(%s)",$1); $$->child = newNode(strdup(message));printf("MethodInvocation2\n");}
                 |       ID LPAR error RPAR                                  {$$ = newNode(NULL); erroSintatico=1;printf("MethodInvocationError\n");}
                 ;
 
