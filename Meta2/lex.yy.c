@@ -1013,7 +1013,7 @@ YY_RULE_SETUP
 case 3:
 YY_RULE_SETUP
 #line 92 "jucompiler.l"
-{if (flagLexx) printf("STRLIT(\"%s)\n",yytext); contador_colunas+=yyleng; if(flagYacc)return STRLIT; BEGIN 0;}      
+{if (flagLexx) printf("STRLIT(\"%s)\n",yytext); contador_colunas+=yyleng; if(flagYacc){ yylval.id = strdup(yytext);return STRLIT;} BEGIN 0;}      
 	YY_BREAK
 case 4:
 /* rule 4 can match eol */
@@ -2405,6 +2405,7 @@ int main(int argc, char *argv[]) {
         }else if (!strcmp(argv[1], "-t")){
             mostraTree=1;
             flagYacc=1;
+            
             yyparse();
         //erros do yyac
         }else if(!strcmp(argv[1], "-e2")){
