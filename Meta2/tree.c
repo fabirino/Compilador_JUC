@@ -2,7 +2,7 @@
 
 Node *newNode(char *mensagem) {
     Node *aux = (Node *)malloc(sizeof(Node));
-    strcpy(aux->texto, mensagem);
+    aux->texto = mensagem;
     aux->child = NULL;
     aux->brother = NULL;
 

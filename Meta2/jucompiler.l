@@ -4,9 +4,12 @@
                  -  Fabio Santos       2020212310
     ====================================================================================== */
     #include "y.tab.h"
+    #include "tree.h"
     #include <stdio.h>
     #include <string.h>
-    
+
+    int yyparse(void);
+
     int contador_linhas = 1;
     int contador_colunas = 1;
     int flagLexx = 0;
@@ -14,7 +17,7 @@
     int col_string =1;
     int col_comment = 1;
     int line_comment = 1;
-    int printTree = 0;
+    int mostraTree = 0;
 %}
 
 ID                      ([a-z]|[A-Z]|"_"|"$")([a-z]|[A-Z]|"_"|"$"|[0-9])*
@@ -123,7 +126,7 @@ STRLIT                  ({SCAPES}|[^\r\n\"\\])*
 
 {novalinha}                   {contador_colunas=1; contador_linhas++;}
 
-{BOOLLIT}                     {if (flagLexx) printf("BOOLLIT(%s)\n",yytext);contador_colunas+=yyleng; if(flagYacc) {return BOOLLIT;}}
+{BOOLLIT}                     {if (flagLexx) printf("BOOLLIT(%s)\n",yytext);contador_colunas+=yyleng; if(flagYacc) {yylval.id = strdup(yytext);return BOOLLIT;}}
 {AND}                         {if (flagLexx) printf("AND\n");contador_colunas+=yyleng;                if(flagYacc) {return AND;}}
 {ASSIGN}                      {if (flagLexx) printf("ASSIGN\n");contador_colunas+=yyleng;             if(flagYacc) {return ASSIGN;}}
 {STAR}                        {if (flagLexx) printf("STAR\n");contador_colunas+=yyleng;               if(flagYacc) {return STAR;}}
@@ -170,11 +173,11 @@ STRLIT                  ({SCAPES}|[^\r\n\"\\])*
 
 {RESERVED}                    {if (flagLexx) printf("RESERVED(%s)\n",yytext);contador_colunas+=yyleng;}
 
-{ID}                          {if (flagLexx) printf("ID(%s)\n", yytext);contador_colunas+=yyleng;     if(flagYacc) {return ID;}}
+{ID}                          {if (flagLexx) printf("ID(%s)\n", yytext);contador_colunas+=yyleng;     if(flagYacc) {yylval.id = strdup(yytext); return ID;}}
 
-{INTLIT}                      {if (flagLexx) printf("INTLIT(%s)\n",yytext);contador_colunas+=yyleng;  if(flagYacc) {return INTLIT;}}
+{INTLIT}                      {if (flagLexx) printf("INTLIT(%s)\n",yytext);contador_colunas+=yyleng;  if(flagYacc) {yylval.id = strdup(yytext); return INTLIT;}}
 
-{REALLIT}                     {if (flagLexx) printf("REALLIT(%s)\n",yytext);contador_colunas+=yyleng; if(flagYacc) {return REALLIT;}}
+{REALLIT}                     {if (flagLexx) printf("REALLIT(%s)\n",yytext);contador_colunas+=yyleng; if(flagYacc) {yylval.id = strdup(yytext); return REALLIT;}}
 
 .                             {printf("Line %d, col %d: illegal character (%s)\n", contador_linhas, contador_colunas,yytext);contador_colunas+=yyleng;}  
 
@@ -186,15 +189,15 @@ int main(int argc, char *argv[]) {
         if(!strcmp(argv[1], "-l")){
             flagLexx = 1;
             yylex();
-        }else if(strcmp(argv[1], "-e1")!=0){
+        }else if(!strcmp(argv[1], "-e1")){
             printf("Flag nao existe");
             yylex();
-        }else if (strcmp(argv[1], "-t") == 0){
-            printTree=1;
+        }else if (!strcmp(argv[1], "-t")){
+            mostraTree=1;
             flagYacc=1;
             yyparse();
         //erros do yyac
-        }else if(strcmp(argv[1], "-e2") == 0){
+        }else if(!strcmp(argv[1], "-e2")){
             flagYacc=1;
             yyparse();
         } 

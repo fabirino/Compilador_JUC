@@ -159,10 +159,10 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 16 "jucompiler.y"
+#line 17 "jucompiler.y"
 
     char *id;
-    Node *node;
+    struct node *node;
 
 #line 168 "y.tab.h"
 
