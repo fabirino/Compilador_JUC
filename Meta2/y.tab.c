@@ -81,7 +81,7 @@
     int erroSintatico = 0;
     extern int mostraTree;
     char message[256];
-    int debug = 0;
+    int debug = 0; //DEBUG: variavel apenas para debug!!!
 
 #line 87 "y.tab.c"
 
@@ -1576,25 +1576,25 @@ yyreduce:
 
   case 19: /* MethodHeader: Type ID LPAR FormalParams RPAR  */
 #line 101 "jucompiler.y"
-                                                                            {(yyval.node) = newNode("MethodHeader");  sprintf(message,"Id(%s)",(yyvsp[-3].id)); (yyval.node)->child = newNode(strdup(message));if(debug)printf("MethodHeader1\n");}
+                                                                            {(yyval.node) = newNode("MethodHeader"); (yyval.node)->child = (yyvsp[-4].node); sprintf(message,"Id(%s)",(yyvsp[-3].id)); Node *aux = newNode(strdup(message));addBrother((yyvsp[-4].node),aux);addBrother(aux,(yyvsp[-1].node));if(debug)printf("MethodHeader1\n");}
 #line 1581 "y.tab.c"
     break;
 
   case 20: /* MethodHeader: VOID ID LPAR FormalParams RPAR  */
 #line 102 "jucompiler.y"
-                                                                            {(yyval.node) = newNode("MethodHeader");  sprintf(message,"Id(%s)",(yyvsp[-3].id)); (yyval.node)->child = newNode(strdup(message));if(debug)printf("MethodHeader2\n");}
+                                                                            {(yyval.node) = newNode("MethodHeader"); (yyval.node)->child = newNode("Void"); sprintf(message,"Id(%s)",(yyvsp[-3].id)); Node *aux = newNode(strdup(message));addBrother((yyval.node)->child,aux);addBrother(aux,(yyvsp[-1].node));if(debug)printf("MethodHeader2\n");}
 #line 1587 "y.tab.c"
     break;
 
   case 21: /* MethodHeader: Type ID LPAR RPAR  */
 #line 103 "jucompiler.y"
-                                                                            {(yyval.node) = newNode("MethodHeader"); (yyval.node)->child = (yyvsp[-3].node);if(debug)printf("MethodHeader3\n");}
+                                                                            {(yyval.node) = newNode("MethodHeader"); (yyval.node)->child = (yyvsp[-3].node); sprintf(message,"Id(%s)",(yyvsp[-2].id));addBrother((yyvsp[-3].node),newNode(strdup(message))); if(debug)printf("MethodHeader3\n");}
 #line 1593 "y.tab.c"
     break;
 
   case 22: /* MethodHeader: VOID ID LPAR RPAR  */
 #line 104 "jucompiler.y"
-                                                                            {(yyval.node) = newNode("MethodHeader");if(debug)printf("MethodHeader4\n");}
+                                                                            {(yyval.node) = newNode("MethodHeader"); (yyval.node)->child = newNode("Void"); sprintf(message,"Id(%s)",(yyvsp[-2].id)); addBrother((yyval.node)->child,newNode(strdup(message))); if(debug)printf("MethodHeader4\n");}
 #line 1599 "y.tab.c"
     break;
 

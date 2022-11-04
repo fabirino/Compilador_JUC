@@ -11,7 +11,7 @@
     int erroSintatico = 0;
     extern int mostraTree;
     char message[256];
-    int debug = 1; //DEBUG: variavel apenas para debug!!!
+    int debug = 0; //DEBUG: variavel apenas para debug!!!
 %}
 
 %union{
@@ -98,10 +98,10 @@ Type            :       BOOL                                                {$$ 
                 |       DOUBLE                                              {$$ = newNode("Double");if(debug)printf("Type3\n");}
                 ;
 
-MethodHeader    :       Type ID LPAR FormalParams RPAR                      {$$ = newNode("MethodHeader");  sprintf(message,"Id(%s)",$2); $$->child = newNode(strdup(message));if(debug)printf("MethodHeader1\n");}
-                |       VOID ID LPAR FormalParams RPAR                      {$$ = newNode("MethodHeader");  sprintf(message,"Id(%s)",$2); $$->child = newNode(strdup(message));if(debug)printf("MethodHeader2\n");}
-                |       Type ID LPAR RPAR                                   {$$ = newNode("MethodHeader"); $$->child = $1;if(debug)printf("MethodHeader3\n");}
-                |       VOID ID LPAR RPAR                                   {$$ = newNode("MethodHeader");if(debug)printf("MethodHeader4\n");}
+MethodHeader    :       Type ID LPAR FormalParams RPAR                      {$$ = newNode("MethodHeader"); $$->child = $1; sprintf(message,"Id(%s)",$2); Node *aux = newNode(strdup(message));addBrother($1,aux);addBrother(aux,$4);if(debug)printf("MethodHeader1\n");}
+                |       VOID ID LPAR FormalParams RPAR                      {$$ = newNode("MethodHeader"); $$->child = newNode("Void"); sprintf(message,"Id(%s)",$2); Node *aux = newNode(strdup(message));addBrother($$->child,aux);addBrother(aux,$4);if(debug)printf("MethodHeader2\n");}
+                |       Type ID LPAR RPAR                                   {$$ = newNode("MethodHeader"); $$->child = $1; sprintf(message,"Id(%s)",$2);addBrother($1,newNode(strdup(message))); if(debug)printf("MethodHeader3\n");}
+                |       VOID ID LPAR RPAR                                   {$$ = newNode("MethodHeader"); $$->child = newNode("Void"); sprintf(message,"Id(%s)",$2); addBrother($$->child,newNode(strdup(message))); if(debug)printf("MethodHeader4\n");}
                 ;
 
 FormalParams    :       Type ID Parametros                                  {$$ = $1; sprintf(message,"Id(%s)",$2); Node *temp = newNode(strdup(message)); addBrother($1,temp); addBrother(temp,$3);if(debug)printf("FormalParams1\n");}

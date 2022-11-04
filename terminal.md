@@ -12,4 +12,6 @@ diff ficheiro1 ficheiro2
 - yacc -y -d -t -v jucompiler.y
 - clang-14 -o jucompiler y.tab.c lex.yy.c tree.c
 
+`lex jucompiler.l && yacc -y -d -t -v jucompiler.y && clang-14 -o jucompiler y.tab.c lex.yy.c tree.c`
+
 - ./jucompiler -t <../Comp2022.git/meta2/simples.java >teste.out
