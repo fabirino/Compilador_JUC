@@ -9,4 +9,14 @@
 - `Accepted: 33 / 33`
 
 # Meta 2
-`- Falta return da string que n percebi como se faria!!`
+### Ficheiros Com Sucesso
+- essencial.java
+- Factorial_corrompido.java
+- FactorialErros.java
+- field_decl.java
+- MethodFieldError.java
+- MethodFieldError2.java
+- various.java
+
+### Ficheiros Quase com sucesso
+- FielddandMethod1.java (ns se e suposto ou nao mas e no VarDecl!)

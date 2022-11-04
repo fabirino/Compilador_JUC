@@ -10,7 +10,7 @@
     void yyerror (const char *s);
     extern int mostraTree;
     char message[256];
-    int debug = 1; //DEBUG: variavel apenas para debug!!!
+    int debug = 0; //DEBUG: variavel apenas para debug!!!
 %}
 
 %union{
@@ -69,7 +69,7 @@
 // O IF esta nos 'token' mas vai ser um no, mas nao pertence ao lado esquerdo da gramatica
 //QUESTION: Vai ser token ou token <node> ??
 
-Program         :       CLASS ID LBRACE Declarations RBRACE                 {$$ = newNode("Program"); sprintf(message,"Id(%s)",$2); $$->child = newNode(strdup(message));  addBrother($$->child, $4);if(debug){printf("Program1\n Valor do mostraTree: %d\n\n\n", mostraTree);} if(mostraTree ){printTree($$,0);} else {freeTree($$);}}
+Program         :       CLASS ID LBRACE Declarations RBRACE                 {$$ = newNode("Program"); sprintf(message,"Id(%s)",$2); $$->child = newNode(strdup(message));  addBrother($$->child, $4);if(debug){printf("Program1\n MostraTree: %d\n\n", mostraTree);} if(mostraTree ){printTree($$,0);} else {freeTree($$);}}
                 |       CLASS ID LBRACE RBRACE                              {$$ = newNode("Program"); sprintf(message,"Id(%s)",$2); $$->child = newNode(strdup(message)); if(mostraTree){printTree($$,0);} else {freeTree($$);}if(debug)printf("Program2\n");}
                 ;
 
@@ -82,9 +82,9 @@ Declarations    :       MethodDecl                                          {$$ 
                 ;
 
 MethodDecl      :       PUBLIC STATIC MethodHeader MethodBody               {$$ = newNode("MethodDecl"); $$->child = $3; addBrother($3,$4);if(debug)printf("MethodDecl1\n");}
-
-FieldDecl       :       PUBLIC STATIC Type ID SEMICOLON                     {$$ = newNode("FieldDecl"); sprintf(message,"Id(%s)",$4); $$->child = $3; addBrother($3, newNode(strdup(message)));if(debug)printf("FieldDecl1\n");}
-                |       PUBLIC STATIC Type ID Variaveis SEMICOLON           {$$ = newNode("FieldDecl"); sprintf(message,"Id(%s)",$4); $$->child = $3; Node *temp = newNode(strdup(message)); addBrother($3,temp); addBrother(temp,$5);if(debug)printf("FieldDecl2\n");}
+                                                                            //TODO: RECURSIVA A FIELDDecl line 3-17 TypesFieldVar.java
+FieldDecl       :       PUBLIC STATIC Type ID SEMICOLON                     {$$ = newNode("FieldDecl"); $$->child = $3; sprintf(message,"Id(%s)",$4);  addBrother($3, newNode(strdup(message)));if(debug)printf("FieldDecl1\n");}
+                |       PUBLIC STATIC Type ID Variaveis SEMICOLON           {$$ = newNode("FieldDecl"); $$->child = $3; sprintf(message,"Id(%s)",$4); Node *temp = newNode(strdup(message)); addBrother($3,temp); addBrother(temp,$5);if(debug)printf("FieldDecl2\n");}
                 |       error SEMICOLON                                     {$$ = newNode(NULL); mostraTree=0;if(debug)printf("FieldDeclerror\n");}
                 ;
 
@@ -99,14 +99,14 @@ Type            :       BOOL                                                {$$ 
 
 MethodHeader    :       Type ID LPAR FormalParams RPAR                      {$$ = newNode("MethodHeader"); $$->child = $1; sprintf(message,"Id(%s)",$2); Node *aux = newNode(strdup(message));addBrother($1,aux);addBrother(aux,$4);if(debug)printf("MethodHeader1\n");}
                 |       VOID ID LPAR FormalParams RPAR                      {$$ = newNode("MethodHeader"); $$->child = newNode("Void"); sprintf(message,"Id(%s)",$2); Node *aux = newNode(strdup(message));addBrother($$->child,aux);addBrother(aux,$4);if(debug)printf("MethodHeader2\n");}
-                |       Type ID LPAR RPAR                                   {$$ = newNode("MethodHeader"); $$->child = $1; sprintf(message,"Id(%s)",$2);addBrother($1,newNode(strdup(message))); if(debug)printf("MethodHeader3\n");}
-                |       VOID ID LPAR RPAR                                   {$$ = newNode("MethodHeader"); $$->child = newNode("Void"); sprintf(message,"Id(%s)",$2); addBrother($$->child,newNode(strdup(message))); if(debug)printf("MethodHeader4\n");}
+                |       Type ID LPAR RPAR                                   {$$ = newNode("MethodHeader"); $$->child = $1; sprintf(message,"Id(%s)",$2); Node *aux = newNode(strdup(message)); addBrother($1,aux); addBrother(aux,newNode("MethodParams")); if(debug)printf("MethodHeader3\n");}
+                |       VOID ID LPAR RPAR                                   {$$ = newNode("MethodHeader"); $$->child = newNode("Void"); sprintf(message,"Id(%s)",$2); Node *aux = newNode(strdup(message)); addBrother($$->child,aux); addBrother(aux,newNode("MethodParams")); if(debug)printf("MethodHeader4\n");}
                 ;
-
-FormalParams    :       Type ID Parametros                                  {$$ = $1; sprintf(message,"Id(%s)",$2); Node *temp = newNode(strdup(message)); addBrother($1,temp); addBrother(temp,$3);if(debug)printf("FormalParams1\n");}
-                |       Type ID                                             {$$ = $1; sprintf(message,"Id(%s)",$2); Node *temp = newNode(strdup(message)); addBrother($1,temp);if(debug)printf("FormalParams2\n");}
-                |       STRING LSQ RSQ ID                                   {$$ = newNode("StringArray"); sprintf(message,"Id(%s)",$4);addBrother($$,newNode(strdup(message)));if(debug)printf("FormalParams3\n");}
-                ;
+                                                                            //$1 vai ser filho!!
+FormalParams    :       Type ID Parametros                                  {$$ = newNode("MethodParams");  Node *Param = newNode("ParamDecl"); $$->child = Param;  Param->child = $1; sprintf(message,"Id(%s)",$2); Node *temp = newNode(strdup(message)); addBrother($1,temp); addBrother(temp,$3);if(debug)printf("FormalParams1\n");}
+                |       Type ID                                             {$$ = newNode("MethodParams");  Node *Param = newNode("ParamDecl"); $$->child = Param;  Param->child = $1; sprintf(message,"Id(%s)",$2); Node *temp = newNode(strdup(message)); addBrother($1,temp);if(debug)printf("FormalParams2\n");}
+                |       STRING LSQ RSQ ID                                   {$$ = newNode("MethodParams");  Node *Param = newNode("ParamDecl"); $$->child = Param; Node * String = newNode("StringArray"); Param->child = String; sprintf(message,"Id(%s)",$4);addBrother(String,newNode(strdup(message)));if(debug)printf("FormalParams3\n");}
+                ;                                                           //TODO: Melhorar isto aqui de acordo a ficar com a linha 11-22; FieldandMethod2.java
 
 Parametros      :       COMMA Type ID                                       {$$ = $2; sprintf(message,"Id(%s)",$3); addBrother($2, newNode(strdup(message)));if(debug)printf("Parametros1\n");}
                 |       Parametros COMMA Type ID                            {$$ = $1; addBrother($1,$3); sprintf(message,"Id(%s)",$4); addBrother($3,newNode(strdup(message)));if(debug)printf("Parametros2\n");}
@@ -121,9 +121,9 @@ Expressao       :       Statement                                           {$$ 
                 |       Expressao Statement                                 {$$ = $1; addBrother($1,$2);if(debug)printf("Expressao3\n");}
                 |       Expressao VarDecl                                   {$$ = $1; addBrother($1,$2);if(debug)printf("Expressao4\n");}
                 ;
-
-VarDecl         :       Type ID Variaveis SEMICOLON                         {$$ = $1; sprintf(message,"Id(%s)",$2); Node *temp = newNode(strdup(message)); addBrother($1, temp); addBrother(temp, $3);if(debug)printf("VarDecl1\n");}
-                |       Type ID SEMICOLON                                   {$$ = $1; sprintf(message,"Id(%s)",$2); addBrother($1, newNode(strdup(message)));if(debug)printf("VarDecl2\n");}
+                                                                            //TODO: Melhorar isto aqui de acordo a ficar com a linha 33-38; FieldandMethod2.java recursividade!!
+VarDecl         :       Type ID Variaveis SEMICOLON                         {$$ = newNode("VarDecl");$$->child = $1; sprintf(message,"Id(%s)",$2); Node *temp = newNode(strdup(message)); addBrother($1, temp); addBrother(temp, $3);if(debug)printf("VarDecl1\n");}
+                |       Type ID SEMICOLON                                   {$$ = newNode("VarDecl");$$->child = $1; $$ = $1; sprintf(message,"Id(%s)",$2); addBrother($1, newNode(strdup(message)));if(debug)printf("VarDecl2\n");}
                 ;
 
 Statement       :       LBRACE Statement RBRACE                             {$$ = $2;if(debug)printf("Statement1\n");}

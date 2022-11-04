@@ -80,7 +80,7 @@
     void yyerror (const char *s);
     extern int mostraTree;
     char message[256];
-    int debug = 1; //DEBUG: variavel apenas para debug!!!
+    int debug = 0; //DEBUG: variavel apenas para debug!!!
 
 #line 86 "y.tab.c"
 
@@ -1473,7 +1473,7 @@ yyreduce:
     {
   case 2: /* Program: CLASS ID LBRACE Declarations RBRACE  */
 #line 72 "jucompiler.y"
-                                                                            {(yyval.node) = newNode("Program"); sprintf(message,"Id(%s)",(yyvsp[-3].id)); (yyval.node)->child = newNode(strdup(message));  addBrother((yyval.node)->child, (yyvsp[-1].node));if(debug){printf("Program1\n Valor do mostraTree: %d\n\n\n", mostraTree);} if(mostraTree ){printTree((yyval.node),0);} else {freeTree((yyval.node));}}
+                                                                            {(yyval.node) = newNode("Program"); sprintf(message,"Id(%s)",(yyvsp[-3].id)); (yyval.node)->child = newNode(strdup(message));  addBrother((yyval.node)->child, (yyvsp[-1].node));if(debug){printf("Program1\n MostraTree: %d\n\n", mostraTree);} if(mostraTree ){printTree((yyval.node),0);} else {freeTree((yyval.node));}}
 #line 1478 "y.tab.c"
     break;
 
@@ -1527,13 +1527,13 @@ yyreduce:
 
   case 11: /* FieldDecl: PUBLIC STATIC Type ID SEMICOLON  */
 #line 86 "jucompiler.y"
-                                                                            {(yyval.node) = newNode("FieldDecl"); sprintf(message,"Id(%s)",(yyvsp[-1].id)); (yyval.node)->child = (yyvsp[-2].node); addBrother((yyvsp[-2].node), newNode(strdup(message)));if(debug)printf("FieldDecl1\n");}
+                                                                            {(yyval.node) = newNode("FieldDecl"); (yyval.node)->child = (yyvsp[-2].node); sprintf(message,"Id(%s)",(yyvsp[-1].id));  addBrother((yyvsp[-2].node), newNode(strdup(message)));if(debug)printf("FieldDecl1\n");}
 #line 1532 "y.tab.c"
     break;
 
   case 12: /* FieldDecl: PUBLIC STATIC Type ID Variaveis SEMICOLON  */
 #line 87 "jucompiler.y"
-                                                                            {(yyval.node) = newNode("FieldDecl"); sprintf(message,"Id(%s)",(yyvsp[-2].id)); (yyval.node)->child = (yyvsp[-3].node); Node *temp = newNode(strdup(message)); addBrother((yyvsp[-3].node),temp); addBrother(temp,(yyvsp[-1].node));if(debug)printf("FieldDecl2\n");}
+                                                                            {(yyval.node) = newNode("FieldDecl"); (yyval.node)->child = (yyvsp[-3].node); sprintf(message,"Id(%s)",(yyvsp[-2].id)); Node *temp = newNode(strdup(message)); addBrother((yyvsp[-3].node),temp); addBrother(temp,(yyvsp[-1].node));if(debug)printf("FieldDecl2\n");}
 #line 1538 "y.tab.c"
     break;
 
@@ -1587,31 +1587,31 @@ yyreduce:
 
   case 21: /* MethodHeader: Type ID LPAR RPAR  */
 #line 102 "jucompiler.y"
-                                                                            {(yyval.node) = newNode("MethodHeader"); (yyval.node)->child = (yyvsp[-3].node); sprintf(message,"Id(%s)",(yyvsp[-2].id));addBrother((yyvsp[-3].node),newNode(strdup(message))); if(debug)printf("MethodHeader3\n");}
+                                                                            {(yyval.node) = newNode("MethodHeader"); (yyval.node)->child = (yyvsp[-3].node); sprintf(message,"Id(%s)",(yyvsp[-2].id)); Node *aux = newNode(strdup(message)); addBrother((yyvsp[-3].node),aux); addBrother(aux,newNode("MethodParams")); if(debug)printf("MethodHeader3\n");}
 #line 1592 "y.tab.c"
     break;
 
   case 22: /* MethodHeader: VOID ID LPAR RPAR  */
 #line 103 "jucompiler.y"
-                                                                            {(yyval.node) = newNode("MethodHeader"); (yyval.node)->child = newNode("Void"); sprintf(message,"Id(%s)",(yyvsp[-2].id)); addBrother((yyval.node)->child,newNode(strdup(message))); if(debug)printf("MethodHeader4\n");}
+                                                                            {(yyval.node) = newNode("MethodHeader"); (yyval.node)->child = newNode("Void"); sprintf(message,"Id(%s)",(yyvsp[-2].id)); Node *aux = newNode(strdup(message)); addBrother((yyval.node)->child,aux); addBrother(aux,newNode("MethodParams")); if(debug)printf("MethodHeader4\n");}
 #line 1598 "y.tab.c"
     break;
 
   case 23: /* FormalParams: Type ID Parametros  */
 #line 106 "jucompiler.y"
-                                                                            {(yyval.node) = (yyvsp[-2].node); sprintf(message,"Id(%s)",(yyvsp[-1].id)); Node *temp = newNode(strdup(message)); addBrother((yyvsp[-2].node),temp); addBrother(temp,(yyvsp[0].node));if(debug)printf("FormalParams1\n");}
+                                                                            {(yyval.node) = newNode("MethodParams");  Node *Param = newNode("ParamDecl"); (yyval.node)->child = Param;  Param->child = (yyvsp[-2].node); sprintf(message,"Id(%s)",(yyvsp[-1].id)); Node *temp = newNode(strdup(message)); addBrother((yyvsp[-2].node),temp); addBrother(temp,(yyvsp[0].node));if(debug)printf("FormalParams1\n");}
 #line 1604 "y.tab.c"
     break;
 
   case 24: /* FormalParams: Type ID  */
 #line 107 "jucompiler.y"
-                                                                            {(yyval.node) = (yyvsp[-1].node); sprintf(message,"Id(%s)",(yyvsp[0].id)); Node *temp = newNode(strdup(message)); addBrother((yyvsp[-1].node),temp);if(debug)printf("FormalParams2\n");}
+                                                                            {(yyval.node) = newNode("MethodParams");  Node *Param = newNode("ParamDecl"); (yyval.node)->child = Param;  Param->child = (yyvsp[-1].node); sprintf(message,"Id(%s)",(yyvsp[0].id)); Node *temp = newNode(strdup(message)); addBrother((yyvsp[-1].node),temp);if(debug)printf("FormalParams2\n");}
 #line 1610 "y.tab.c"
     break;
 
   case 25: /* FormalParams: STRING LSQ RSQ ID  */
 #line 108 "jucompiler.y"
-                                                                            {(yyval.node) = newNode("StringArray"); sprintf(message,"Id(%s)",(yyvsp[0].id));addBrother((yyval.node),newNode(strdup(message)));if(debug)printf("FormalParams3\n");}
+                                                                            {(yyval.node) = newNode("MethodParams");  Node *Param = newNode("ParamDecl"); (yyval.node)->child = Param; Node * String = newNode("StringArray"); Param->child = String; sprintf(message,"Id(%s)",(yyvsp[0].id));addBrother(String,newNode(strdup(message)));if(debug)printf("FormalParams3\n");}
 #line 1616 "y.tab.c"
     break;
 
@@ -1665,13 +1665,13 @@ yyreduce:
 
   case 34: /* VarDecl: Type ID Variaveis SEMICOLON  */
 #line 125 "jucompiler.y"
-                                                                            {(yyval.node) = (yyvsp[-3].node); sprintf(message,"Id(%s)",(yyvsp[-2].id)); Node *temp = newNode(strdup(message)); addBrother((yyvsp[-3].node), temp); addBrother(temp, (yyvsp[-1].node));if(debug)printf("VarDecl1\n");}
+                                                                            {(yyval.node) = newNode("VarDecl");(yyval.node)->child = (yyvsp[-3].node); sprintf(message,"Id(%s)",(yyvsp[-2].id)); Node *temp = newNode(strdup(message)); addBrother((yyvsp[-3].node), temp); addBrother(temp, (yyvsp[-1].node));if(debug)printf("VarDecl1\n");}
 #line 1670 "y.tab.c"
     break;
 
   case 35: /* VarDecl: Type ID SEMICOLON  */
 #line 126 "jucompiler.y"
-                                                                            {(yyval.node) = (yyvsp[-2].node); sprintf(message,"Id(%s)",(yyvsp[-1].id)); addBrother((yyvsp[-2].node), newNode(strdup(message)));if(debug)printf("VarDecl2\n");}
+                                                                            {(yyval.node) = newNode("VarDecl");(yyval.node)->child = (yyvsp[-2].node); (yyval.node) = (yyvsp[-2].node); sprintf(message,"Id(%s)",(yyvsp[-1].id)); addBrother((yyvsp[-2].node), newNode(strdup(message)));if(debug)printf("VarDecl2\n");}
 #line 1676 "y.tab.c"
     break;
 
