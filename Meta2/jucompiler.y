@@ -8,10 +8,9 @@
     
     int yylex(void);
     void yyerror (const char *s);
-    int erroSintatico = 0;
     extern int mostraTree;
     char message[256];
-    int debug = 0; //DEBUG: variavel apenas para debug!!!
+    int debug = 1; //DEBUG: variavel apenas para debug!!!
 %}
 
 %union{
@@ -71,7 +70,7 @@
 //QUESTION: Vai ser token ou token <node> ??
 
 Program         :       CLASS ID LBRACE Declarations RBRACE                 {$$ = newNode("Program"); sprintf(message,"Id(%s)",$2); $$->child = newNode(strdup(message));  addBrother($$->child, $4);if(debug){printf("Program1\n Valor do mostraTree: %d\n\n\n", mostraTree);} if(mostraTree ){printTree($$,0);} else {freeTree($$);}}
-                |       CLASS ID LBRACE RBRACE                              {$$ = newNode("Program"); sprintf(message,"Id(%s)",$2); $$->child = newNode(strdup(message)); if(mostraTree && erroSintatico){printTree($$,0);} else {freeTree($$);}if(debug)printf("Program2\n");}
+                |       CLASS ID LBRACE RBRACE                              {$$ = newNode("Program"); sprintf(message,"Id(%s)",$2); $$->child = newNode(strdup(message)); if(mostraTree){printTree($$,0);} else {freeTree($$);}if(debug)printf("Program2\n");}
                 ;
 
 Declarations    :       MethodDecl                                          {$$ = $1;if(debug)printf("Declarations1\n");}
@@ -86,7 +85,7 @@ MethodDecl      :       PUBLIC STATIC MethodHeader MethodBody               {$$ 
 
 FieldDecl       :       PUBLIC STATIC Type ID SEMICOLON                     {$$ = newNode("FieldDecl"); sprintf(message,"Id(%s)",$4); $$->child = $3; addBrother($3, newNode(strdup(message)));if(debug)printf("FieldDecl1\n");}
                 |       PUBLIC STATIC Type ID Variaveis SEMICOLON           {$$ = newNode("FieldDecl"); sprintf(message,"Id(%s)",$4); $$->child = $3; Node *temp = newNode(strdup(message)); addBrother($3,temp); addBrother(temp,$5);if(debug)printf("FieldDecl2\n");}
-                |       error SEMICOLON                                     {$$ = newNode(NULL); erroSintatico=1;if(debug)printf("FieldDeclerror\n");}
+                |       error SEMICOLON                                     {$$ = newNode(NULL); mostraTree=0;if(debug)printf("FieldDeclerror\n");}
                 ;
 
 Variaveis       :       COMMA ID                                            {sprintf(message,"Id(%s)",$2); $$ = newNode(strdup(message)); if(debug)printf("Variaveis1\n");}
@@ -128,7 +127,7 @@ VarDecl         :       Type ID Variaveis SEMICOLON                         {$$ 
                 ;
 
 Statement       :       LBRACE Statement RBRACE                             {$$ = $2;if(debug)printf("Statement1\n");}
-                |       LBRACE RBRACE                                       {;if(debug)printf("Statement2\n");}
+                |       LBRACE RBRACE                                       {if(debug)printf("Statement2\n");}
                 |       IF LPAR Expr RPAR Statement ELSE Statement          {$$ = newNode("If"); $$->child=$3; addBrother($3,$5);addBrother($5,newNode("Block"));  addBrother($5,$7);if(debug)printf("Statement3\n");}
                 |       IF LPAR Expr RPAR Statement                         {$$ = newNode("If"); $$->child=$3; addBrother($3,$5);addBrother($5,newNode("Block"));if(debug)printf("Statement4\n");}
                 |       WHILE LPAR Expr RPAR Statement                      {$$ = $3; addBrother($3, $5);if(debug)printf("Statement5\n");}
@@ -138,7 +137,7 @@ Statement       :       LBRACE Statement RBRACE                             {$$ 
                 |       SEMICOLON                                           {;if(debug)printf("Statement9\n");}
                 |       PRINT LPAR Expr RPAR SEMICOLON                      {$$ = newNode("Print"); $$->child = $3;if(debug)printf("Statement10\n");}
                 |       PRINT LPAR STRLIT RPAR SEMICOLON                    {$$ = newNode("Print"); sprintf(message,"StrLit(%s)",$3); $$->child = newNode(strdup(message));if(debug)printf("Statement11\n");}
-                |       error SEMICOLON                                     {$$ = newNode(NULL); erroSintatico=1;if(debug)printf("StatementError\n");}
+                |       error SEMICOLON                                     {$$ = newNode(NULL); mostraTree=0;if(debug)printf("StatementError\n");}
                 ;
 
 Gramatica       :       MethodInvocation                                    {$$ = $1;if(debug)printf("Gramatica1\n");}
@@ -148,18 +147,18 @@ Gramatica       :       MethodInvocation                                    {$$ 
                                                                             
 MethodInvocation:       ID LPAR CommaExpr RPAR                              {$$ = newNode("Call");sprintf(message,"Id(%s)",$1); $$->child = newNode(strdup(message)); addBrother($$->child,$3);if(debug)printf("MethodInvocation1\n");}
                 |       ID LPAR RPAR                                        {$$ = newNode("Call");sprintf(message,"Id(%s)",$1); $$->child = newNode(strdup(message));if(debug)printf("MethodInvocation2\n");}
-                |       ID LPAR error RPAR                                  {$$ = newNode(NULL); erroSintatico=1;if(debug)printf("MethodInvocationError\n");}
+                |       ID LPAR error RPAR                                  {$$ = newNode(NULL); mostraTree=0;if(debug)printf("MethodInvocationError\n");}
                 ;
 
 CommaExpr       :       Expr                                                {$$ = $1;if(debug)printf("CommaExpr1\n");}
                 |       CommaExpr COMMA Expr                                {$$ = $1;addBrother($1,$3);if(debug)printf("CommaExpr2\n");}
                 ;
 
-Assignment      :       ID ASSIGN Expr                                      {sprintf(message,"Id(%s)",$1);$$ = newNode(strdup(message));addBrother($$,$3);if(debug)printf("Assignment1\n");}
+Assignment      :       ID ASSIGN Expr                                      {$$ = newNode("Assign"); sprintf(message,"Id(%s)",$1);$$->child = newNode(strdup(message));addBrother($$->child,$3);if(debug)printf("Assignment1\n");}
                 ;
 
 ParseArgs       :       PARSEINT LPAR ID LSQ Expr RSQ RPAR                  {sprintf(message,"Id(%s)",$3);$$ = newNode(strdup(message));addBrother($$,$5);if(debug)printf("ParseArgs1\n");}
-                |       PARSEINT LPAR error RPAR                            {$$ = newNode(NULL); erroSintatico=1;if(debug)printf("ParseArgsError\n");}    
+                |       PARSEINT LPAR error RPAR                            {$$ = newNode(NULL); mostraTree=0;if(debug)printf("ParseArgsError\n");}    
                 ;
 
 Expr            :       Expr PLUS Expr                                      {$$ = newNode("Add"); $$->child=$1; addBrother($1,$3);if(debug)printf("Expr1\n");}
@@ -190,7 +189,7 @@ Expr            :       Expr PLUS Expr                                      {$$ 
                 |       INTLIT                                              {sprintf(message, "DecLit(%s)", $1);$$ = newNode(strdup(message));if(debug)printf("Expr26\n");}
                 |       REALLIT                                             {sprintf(message, "RealLit(%s)", $1);$$ = newNode(strdup(message));if(debug)printf("Expr27\n");}
                 |       BOOLLIT                                             {sprintf(message, "BoolLit(%s)", $1);$$ = newNode(strdup(message));if(debug)printf("Expr28\n");}
-                |       LPAR error RPAR                                     {$$ = newNode(NULL); erroSintatico=1;if(debug)printf("ExprError\n");}
+                |       LPAR error RPAR                                     {$$ = newNode(NULL); mostraTree=0;if(debug)printf("ExprError\n");}
                 ;
 
 %%
