@@ -1,7 +1,7 @@
 %{
     /* ===================================================================================
 	Compiladores -  Eduardo Figueiredo 2020213717
-                 -  Fabio Santos       2020212310
+                 -  Fábio Santos       2020212310
     ====================================================================================== */
     #include "y.tab.h"
     #include "tree.h"
@@ -18,6 +18,8 @@
     int col_comment = 1;
     int line_comment = 1;
     int mostraTree = 0;
+    extern Node * raiz;
+    extern int erro; 
     char aux[1024];
 %}
 
@@ -90,7 +92,7 @@ STRLIT                  ({SCAPES}|[^\r\n\"\\])*
 
 \"                               {BEGIN STRING1;  col_string = contador_colunas;contador_colunas+=yyleng;}
 <STRING1>{novalinha}             {printf("Line %d, col %d: unterminated string literal\n", contador_linhas, col_string);contador_colunas=1; contador_linhas++;BEGIN 0;}
-<STRING1>{STRLIT}\"              {if (flagLexx) {memset(aux,0,1024);strcpy(aux,"\"");strcat(aux,yytext);printf("STRLIT(%s)\n",aux);} contador_colunas+=yyleng; if(flagYacc){ yylval.id = strdup(aux);return STRLIT;} BEGIN 0;}      
+<STRING1>{STRLIT}\"              {if (flagLexx) contador_colunas+=yyleng; if(flagYacc){ yylval.id = strdup(yytext);return STRLIT;} BEGIN 0;}      
 <STRING1>"\\\n"|"\\\r"|"\\\r\n"  {printf("Line %d, col %d: invalid escape sequence (\\)\n", contador_linhas, contador_colunas);
                                     BEGIN 0; {printf("Line %d, col %d: unterminated string literal\n", contador_linhas, col_string);}
                                     contador_colunas=1; contador_linhas++;
@@ -214,6 +216,13 @@ int main(int argc, char *argv[]) {
                 printf("Flag nao existe");
                 return 0;
             }
+        }
+    }
+    if(mostraTree == 1){
+        if(erro == 0 ){
+            printTree(raiz,0);
+        }else{
+            freeTree(raiz);
         }
     }
 

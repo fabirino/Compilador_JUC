@@ -19,7 +19,7 @@ void addBrother(Node *node1, Node *newNode) {
     aux->brother = newNode;
 }
 
-void printTree(Node *node, int level) {
+void printTree(Node *no, int level) {
     char identation[level * 2];
 
     for (int i = 0; i < level * 2; i++) {
@@ -27,12 +27,12 @@ void printTree(Node *node, int level) {
     }
     identation[level * 2] = '\0';
 
-    printf("%s%s\n", identation, node->texto);
+    printf("%s%s\n", identation, no->texto);
 
-    if (node->child)    printTree(node->child, level+1);
-    if (node->brother)  printTree(node->brother, level);
+    if (no->child)    printTree(no->child, level+1);
+    if (no->brother)  printTree(no->brother, level);
 
-    free(node);
+    free(no);
 }
 
 void freeTree(Node *node){
