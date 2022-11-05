@@ -150,16 +150,16 @@ Statement       :       LBRACE recursaoS RBRACE                             {$$ 
 
 
 recursaoS       :       Statement                                           {$$ = $1; if(debug)printf("recursaoS1\n");}
-                |       Statement recursaoS                                  {$$ = $1; addBrother($1,$2);if(debug)printf("recursaoS2\n");}
+                |       Statement recursaoS                                 {$$ = $1; addBrother($1,$2);if(debug)printf("recursaoS2\n");}
                 ; 
                                                                             
-MethodInvocation:       ID LPAR Expr CommaExpr RPAR                         {$$ = newNode("Call");sprintf(message,"Id(%s)",$1); $$->child = newNode(strdup(message)); if($4!=NULL){addBrother($$->child,$3);} if(debug)printf("MethodInvocation1\n");}
+MethodInvocation:       ID LPAR CommaExpr RPAR                              {$$ = newNode("Call");sprintf(message,"Id(%s)",$1); $$->child = newNode(strdup(message)); addBrother($$->child,$3);if(debug)printf("MethodInvocation1\n");}
                 |       ID LPAR RPAR                                        {$$ = newNode("Call");sprintf(message,"Id(%s)",$1); $$->child = newNode(strdup(message));if(debug)printf("MethodInvocation2\n");}
                 |       ID LPAR error RPAR                                  {$$ = newNode(NULL); erro = 1;if(debug)printf("MethodInvocationError\n");}
                 ;
 
-CommaExpr       :       COMMA Expr CommaExpr                                {$$ = $2; if($3!=NULL){addBrother($2,$3);} if(debug)printf("CommaExpr1\n");}
-                |                                                           {if(debug)printf("CommaExpr2\n");}
+CommaExpr       :       Expr                                                {$$ = $1;if(debug)printf("CommaExpr1\n");}
+                |       CommaExpr COMMA Expr                                {$$ = $1;addBrother($1,$3);if(debug)printf("CommaExpr2\n");}
                 ;
 
 Assignment      :       ID ASSIGN Expr                                      {$$ = newNode("Assign"); sprintf(message,"Id(%s)",$1);$$->child = newNode(strdup(message));addBrother($$->child,$3);if(debug)printf("Assignment1\n");}
