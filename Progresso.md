@@ -11,6 +11,7 @@
 # Meta 2
 ### Ficheiros Com Sucesso
 - essencial.java
+- FieldandMethod2.java
 - Factorial_corrompido.java
 - FactorialErros.java
 - field_decl.java
@@ -19,4 +20,4 @@
 - various.java
 
 ### Ficheiros Quase com sucesso
-- FielddandMethod1.java (ns se e suposto ou nao mas e no VarDecl!)
+- FieldandMethod1.java (ns se e suposto ou nao mas e no VarDecl!)

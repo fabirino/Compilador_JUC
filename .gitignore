@@ -1,8 +1,19 @@
 #lex
+enunciado_projeto_2022_v1.0.pdf
 enunciado_projeto_2022_v2.0.pdf
+lex.yy.c
 
+#yacc
+y.tab.c
+y.tab.h
+y.output
+
+#Meta2
+Meta2/testex.out
 
 Comp2022.git
+Factorial.out
+
 
 # Compiled class file
 *.class
