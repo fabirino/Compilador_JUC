@@ -23,3 +23,9 @@
 
 ### Ficheiros Quase com sucesso
 - FieldandMethod1.java (ns se e suposto ou nao mas e no VarDecl!)
+
+### Ficheiros Sem sucesso
+- blocks2.java (corre infinitamente)
+- blocksAndMethods.java  (SegFault)
+- ErrorsAndAST.java (SegFault)
+- 
