@@ -69,7 +69,7 @@
 
 %%
                                                                                                                                                                                                                                                                                       
-Program         :       CLASS ID LBRACE Declarations RBRACE                 {$$ = newNode("Program"); raiz = $$;sprintf(message,"Id(%s)",$2); $$->child = newNode(strdup(message)); addBrother($$->child , $4);printSTree(raiz,0);}
+Program         :       CLASS ID LBRACE Declarations RBRACE                 {$$ = newNode("Program"); raiz = $$;sprintf(message,"Id(%s)",$2); $$->child = newNode(strdup(message)); addBrother($$->child , $4);if(erro == 0){printSTree(raiz,0);}}
                 ;
 
 Declarations    :       MethodDecl Declarations                             {$$ = $1;addBrother($$,$2);}
@@ -78,7 +78,7 @@ Declarations    :       MethodDecl Declarations                             {$$ 
                 |                                                           {$$ = NULL;}
                 ;
 
-MethodDecl      :       PUBLIC STATIC MethodHeader MethodBody               {$$ = newNode("MethodDecl");}
+MethodDecl      :       PUBLIC STATIC MethodHeader MethodBody               {$$ = newNode("MethodDecl");$$->child = $3;addBrother($$->child,$4);}
                                                                             
 FieldDecl       :       PUBLIC STATIC Type ID Variaveis SEMICOLON           {$$ = newNode("FieldDecl"); $$->child = $3; sprintf(message,"Id(%s)",$4);node * id = newNode(strdup(message)); addBrother($$->child,id); addBrother($$,$5);}
                 |       error SEMICOLON                                     {$$ = NULL;erro = 1;}
@@ -93,26 +93,26 @@ Type            :       BOOL                                                {$$ 
                 |       DOUBLE                                              {$$ = newNode("Double");memset(lastType,0,64);strcpy(lastType,"Double");}
                 ;
 
-MethodHeader    :       Type ID LPAR FormalParams RPAR                      {;}
-                |       VOID ID LPAR FormalParams RPAR                      {;}
-                |       Type ID LPAR RPAR                                   {;}
-                |       VOID ID LPAR RPAR                                   {;}
+MethodHeader    :       Type ID LPAR FormalParams RPAR                      {$$ = newNode("MethodHeader"); $$->child = $1;sprintf(message,"Id(%s)",$2); node * id = newNode(strdup(message));addBrother($$->child,id);addBrother(id,$4);}
+                |       VOID ID LPAR FormalParams RPAR                      {$$ = newNode("MethodHeader");$$->child = newNode("Void");sprintf(message,"Id(%s)",$2); node * id = newNode(strdup(message));addBrother($$->child,id);addBrother(id,$4);}
+                |       Type ID LPAR RPAR                                   {$$ = newNode("MethodHeader");$$->child = $1;sprintf(message,"Id(%s)",$2); node * id = newNode(strdup(message));addBrother($$->child,id); addBrother(id,newNode("MethodParams"));}
+                |       VOID ID LPAR RPAR                                   {$$ = newNode("MethodHeader");$$->child = newNode("Void");sprintf(message,"Id(%s)",$2); node * id = newNode(strdup(message));addBrother($$->child,id); addBrother(id,newNode("MethodParams"));}
                 ;
                                                                             
-FormalParams    :       Type ID Parametros                                  {;}
-                |       STRING LSQ RSQ ID                                   {;}
+FormalParams    :       Type ID Parametros                                  {$$ = newNode("MethodParams");node * param = newNode("ParamDecl"); param->child = $1; sprintf(message,"Id(%s)",$2); node * id = newNode(strdup(message)); addBrother(param->child,id); $$->child = param;addBrother($$->child,$3);}
+                |       STRING LSQ RSQ ID                                   {$$ = newNode("MethodParams");node * param = newNode("ParamDecl"); node * array = newNode("StringArray"); param->child = array;sprintf(message,"Id(%s)",$4); node * id = newNode(strdup(message)); addBrother(param->child,id);$$->child = param;}
                 ;
 
-Parametros      :       COMMA Type ID Parametros                            {;}
-                |                                                           {;}
+Parametros      :       COMMA Type ID Parametros                            {$$ = newNode("ParamDecl");$$->child = $2;sprintf(message,"Id(%s)",$3); node * id = newNode(strdup(message));addBrother($$->child,id);addBrother($$,$4);}
+                |                                                           {$$ = NULL;}
                 ;                                                           
 
-MethodBody      :       LBRACE Expressao RBRACE                             {;}
+MethodBody      :       LBRACE Expressao RBRACE                             {$$ = newNode("MethodBody");}
                 ;
 
 Expressao       :       Statement Expressao                                 {;}
                 |       VarDecl Expressao                                   {;}
-                |                                                           {;}
+                |                                                           {$$ = NULL;}
                 ;
                                                                             
 VarDecl         :       Type ID VariaveisVar SEMICOLON                      {;}
@@ -134,7 +134,7 @@ Statement       :       LBRACE recursaoS RBRACE                             {;}
                 |       Assignment SEMICOLON                                {;}
                 |       ParseArgs SEMICOLON                                 {;}
                 |       SEMICOLON                                           {;}
-                |       error SEMICOLON                                     {;}
+                |       error SEMICOLON                                     {erro = 1;}
                 ;
 
 recursaoS       :       Statement recursaoS                                 {;}
@@ -144,7 +144,7 @@ recursaoS       :       Statement recursaoS                                 {;}
 MethodInvocation:       ID LPAR Expr CommaExpr RPAR                         {;}
                 |       ID LPAR Expr RPAR                                   {;}
                 |       ID LPAR RPAR                                        {;}
-                |       ID LPAR error RPAR                                  {;}
+                |       ID LPAR error RPAR                                  {erro = 1;}
                 ;
 
 CommaExpr       :       COMMA Expr                                          {;}
@@ -155,7 +155,7 @@ Assignment      :       ID ASSIGN Expr                                      {;}
                 ;
 
 ParseArgs       :       PARSEINT LPAR ID LSQ Expr RSQ RPAR                  {;}
-                |       PARSEINT LPAR error RPAR                            {;}    
+                |       PARSEINT LPAR error RPAR                            {erro = 1;}    
                 ;
 
 Expr            :       Expr PLUS Expr                                      {;}
@@ -186,7 +186,7 @@ Expr            :       Expr PLUS Expr                                      {;}
                 |       INTLIT                                              {;}
                 |       REALLIT                                             {;}
                 |       BOOLLIT                                             {;}
-                |       LPAR error RPAR                                     {;}
+                |       LPAR error RPAR                                     {erro = 1;}
                 ;
 
 %%

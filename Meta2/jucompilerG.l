@@ -207,11 +207,6 @@ int main(int argc, char *argv[]) {
             }
         }
     }
-    if(mostraTree && erro == 0){
-        printSTree(raiz,0);  
-    }else if (mostraTree && erro == 1){
-        freeSTree(raiz);
-    }
     printf("\n%d | %d\n",mostraTree,erro);
     return 0;
 }
