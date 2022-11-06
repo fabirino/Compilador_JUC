@@ -107,19 +107,19 @@ Parametros      :       COMMA Type ID Parametros                            {$$ 
                 |                                                           {$$ = NULL;}
                 ;                                                           
 
-MethodBody      :       LBRACE Expressao RBRACE                             {$$ = newNode("MethodBody");}
+MethodBody      :       LBRACE Expressao RBRACE                             {$$ = newNode("MethodBody");$$->child = $2;}
                 ;
 
-Expressao       :       Statement Expressao                                 {;}
-                |       VarDecl Expressao                                   {;}
+Expressao       :       Statement Expressao                                 {$$ = NULL;}//$$ = $1;TODO:!!!
+                |       VarDecl Expressao                                   {$$ = $1;addBrother($$,$2);}
                 |                                                           {$$ = NULL;}
                 ;
                                                                             
-VarDecl         :       Type ID VariaveisVar SEMICOLON                      {;}
+VarDecl         :       Type ID VariaveisVar SEMICOLON                      {$$ = newNode("VarDecl"); $$->child = $1;sprintf(message,"Id(%s)",$2); node * id = newNode(strdup(message)); addBrother($$->child,id);addBrother($$,$3);}
                 ;
 
-VariaveisVar    :                                                           {;}
-                |       COMMA ID VariaveisVar                               {;}
+VariaveisVar    :       COMMA ID VariaveisVar                               {$$ = newNode("VarDecl"); node * type = newNode(strdup(lastType)); $$->child = type; sprintf(message,"Id(%s)",$2); node * id = newNode(strdup(message)); addBrother($$->child,id); addBrother($$,$3);}
+                |                                                           {$$ = NULL;}
                 ;
 
 Statement       :       LBRACE recursaoS RBRACE                             {;}
@@ -133,18 +133,18 @@ Statement       :       LBRACE recursaoS RBRACE                             {;}
                 |       MethodInvocation SEMICOLON                          {;}
                 |       Assignment SEMICOLON                                {;}
                 |       ParseArgs SEMICOLON                                 {;}
-                |       SEMICOLON                                           {;}
-                |       error SEMICOLON                                     {erro = 1;}
+                |       SEMICOLON                                           {$$ = NULL;}
+                |       error SEMICOLON                                     {$$ = NULL;erro = 1;}
                 ;
 
 recursaoS       :       Statement recursaoS                                 {;}
-                |                                                           {;}
+                |                                                           {$$ = NULL;}
                 ; 
                                                                             
 MethodInvocation:       ID LPAR Expr CommaExpr RPAR                         {;}
                 |       ID LPAR Expr RPAR                                   {;}
                 |       ID LPAR RPAR                                        {;}
-                |       ID LPAR error RPAR                                  {erro = 1;}
+                |       ID LPAR error RPAR                                  {$$ = NULL;erro = 1;}
                 ;
 
 CommaExpr       :       COMMA Expr                                          {;}
@@ -155,7 +155,7 @@ Assignment      :       ID ASSIGN Expr                                      {;}
                 ;
 
 ParseArgs       :       PARSEINT LPAR ID LSQ Expr RSQ RPAR                  {;}
-                |       PARSEINT LPAR error RPAR                            {erro = 1;}    
+                |       PARSEINT LPAR error RPAR                            {$$ = NULL;erro = 1;}    
                 ;
 
 Expr            :       Expr PLUS Expr                                      {;}
@@ -186,7 +186,7 @@ Expr            :       Expr PLUS Expr                                      {;}
                 |       INTLIT                                              {;}
                 |       REALLIT                                             {;}
                 |       BOOLLIT                                             {;}
-                |       LPAR error RPAR                                     {erro = 1;}
+                |       LPAR error RPAR                                     {$$ = NULL;erro = 1;}
                 ;
 
 %%
