@@ -11,7 +11,7 @@
     extern int mostraTree;
     char message[256];
     char lastType[32];
-    int debug = 0; //DEBUG: variavel apenas para debug!!!
+    int debug = 1; //DEBUG: variavel apenas para debug!!!
     int erro = 0; 
 %}
 
@@ -63,6 +63,7 @@
 %type <no> Assignment
 %type <no> ParseArgs
 %type <no> Expr
+%type <no> ExprOrAssign
 
 %nonassoc ELSE IF
 
@@ -122,12 +123,12 @@ VariaveisVar    :                                                           {$$ 
                 ;
 
 Statement       :       LBRACE recursaoS RBRACE                             {$$ = $2;  if(debug)printf("Statement1\n");}
-                |       IF LPAR Expr RPAR Statement  ELSE Statement         {$$ = newNode("If"); $$->child=$3; addBrother($3,$5);node * block = newNode("Block"); addBrother($5,block ); addBrother(block ,$7);if(debug)printf("Statement3\n");}
-                |       IF LPAR Expr RPAR Statement                         {$$ = newNode("If"); $$->child=$3; addBrother($3,$5);addBrother($5,newNode("Block"));if(debug)printf("Statement4\n");}
-                |       WHILE LPAR Expr RPAR Statement                      {$$ = newNode("While"); $$->child = $3; node * block = newNode("Block"); addBrother($3, block); block->child = $5;  if(debug)printf("Statement5\n");}
+                |       IF ExprOrAssign Statement ELSE Statement            {$$ = newNode("If"); $$->child=$2; addBrother($2,$3);node * block = newNode("Block"); addBrother($3,block ); addBrother(block ,$5);if(debug)printf("Statement3\n");}
+                |       IF ExprOrAssign Statement                           {$$ = newNode("If"); $$->child=$2; addBrother($2,$3);addBrother($3,newNode("Block"));if(debug)printf("Statement4\n");}
+                |       WHILE ExprOrAssign Statement                        {$$ = newNode("While"); $$->child = $2; node * block = newNode("Block"); addBrother($2, block); block->child = $3;  if(debug)printf("Statement5\n");}
                 |       RETURN Expr SEMICOLON                               {$$ = newNode("Return"); $$->child = $2; if(debug)printf("Statement6\n");} // TODO: verificar se e $$ ou $1 e se e brother ou child
                 |       RETURN SEMICOLON                                    {$$ = newNode("Return"); if(debug)printf("Statement7\n");}
-                |       PRINT LPAR Expr RPAR SEMICOLON                      {$$ = newNode("Print"); $$->child = $3; if(debug)printf("Statement10\n");}
+                |       PRINT ExprOrAssign SEMICOLON                        {$$ = newNode("Print"); $$->child = $2; if(debug)printf("Statement10\n");}
                 |       PRINT LPAR STRLIT RPAR SEMICOLON                    {$$ = newNode("Print"); sprintf(message,"StrLit(%s)",$3); $$->child = newNode(strdup(message)); if(debug)printf("Statement11\n");} //BUG: 
                 |       MethodInvocation SEMICOLON                          {$$ = $1;if(debug)printf("Statement8\n");}
                 |       Assignment SEMICOLON                                {$$ = $1;if(debug)printf("Statement8\n");}
@@ -157,6 +158,10 @@ ParseArgs       :       PARSEINT LPAR ID LSQ Expr RSQ RPAR                  {$$ 
                 |       PARSEINT LPAR error RPAR                            {$$ = newNode(NULL); erro = 1;if(debug)printf("ParseArgsError\n");}    
                 ;
 
+ExprOrAssign    :       LPAR Expr RPAR                                      {$$ = $2;}
+                |       Assignment                                          {$$ = $1;}
+                ;
+
 Expr            :       Expr PLUS Expr                                      {$$ = newNode("Add"); $$->child=$1; addBrother($1,$3);if(debug)printf("Expr1\n");}
                 |       Expr MINUS Expr                                     {$$ = newNode("Sub"); $$->child=$1; addBrother($1,$3);if(debug)printf("Expr2\n");}
                 |       Expr STAR Expr                                      {$$ = newNode("Mul"); $$->child=$1; addBrother($1,$3);if(debug)printf("Expr3\n");}
@@ -178,7 +183,6 @@ Expr            :       Expr PLUS Expr                                      {$$ 
                 |       PLUS Expr                                           {$$ = newNode("Plus"); $$->child=$2;if(debug)printf("Expr19\n");}
                 |       LPAR Expr RPAR                                      {$$ = $2;if(debug)printf("Expr20\n");}
                 |       MethodInvocation                                    {$$ = $1;if(debug)printf("Expr21\n");}
-                |       Assignment                                          {$$ = $1;if(debug)printf("Expr22\n");}
                 |       ParseArgs                                           {$$ = $1;if(debug)printf("Expr23\n");}
                 |       ID DOTLENGTH                                        {sprintf(message,"Id(%s)",$1); $$ = newNode(strdup(message)); addBrother($$,  newNode("Length"));if(debug)printf("Expr24\n");} // FIXME: aqui talvez nao seja brother e sim filho do $1
                 |       ID                                                  {sprintf(message,"Id(%s)",$1);$$ = newNode(strdup(message));if(debug)printf("Expr25\n");}

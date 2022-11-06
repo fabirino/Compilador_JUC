@@ -37,14 +37,7 @@
 . blocksAndMethods.java
 . ErrorsAndAST.java
 . exprAndMore_AST.java
-. field_decl.java
 . if_blocks 
 . lastOne.java
-. MethodFieldError.java
-. MethodFieldError2.java
-. MethodFieldError3.java
-. Miscellaneous.java
 . MultipleErrors.java
-. string_error2.java
 . varios_testes.java
-. various.java
