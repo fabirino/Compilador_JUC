@@ -90,7 +90,7 @@ REALLIT                 {REALLIT1}|{REALLIT2}|{REALLIT3}
 
 \"                              {col_string = contador_colunas; BEGIN STRING1;}
 <STRING1>{novalinha}            {printf("Line %d, col %d: unterminated string literal\n", contador_linhas, col_string);contador_colunas=1; contador_linhas++;BEGIN 0;}
-<STRING1>({SCAPES}|[^\r\n\"\\])*\" {if(flagLexx)printf("STRLIT(\"%s)\n",yytext); contador_colunas+=yyleng; BEGIN 0; return STRLIT;}
+<STRING1>({SCAPES}|[^\r\n\"\\])*\" {if(flagLexx)printf("STRLIT(\"%s)\n",yytext); contador_colunas+=yyleng; BEGIN 0; if(flagYacc){yylval.id = strdup(yytext);return STRLIT;}}
 <STRING1>[^\r\n\"]*\\[^f|n|r|t|\\|\"]*\"   { yyless(0); BEGIN STRINGERROR;}
 <STRING1>[^\r\n\"]*{novalinha}?            { yyless(0); BEGIN STRINGERROR;}
 <STRING1><<EOF>>                    {printf("Line %d, col %d: unterminated string literal\n", contador_linhas, col_string);exit(0);}
@@ -207,7 +207,7 @@ int main(int argc, char *argv[]) {
             }
         }
     }
-    printf("\n%d | %d\n",mostraTree,erro);
+    // printf("\n%d | %d\n",mostraTree,erro);
     return 0;
 }
 

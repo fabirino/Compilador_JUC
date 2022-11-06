@@ -10,6 +10,7 @@
     void yyerror (const char *s);
     extern int mostraTree;
     char message[256];
+    char printatudo[1024];
     char lastType[64];
     int debug = 1; //DEBUG: variavel apenas para debug!!!
     int erro = 0; 
@@ -110,7 +111,7 @@ Parametros      :       COMMA Type ID Parametros                            {$$ 
 MethodBody      :       LBRACE Expressao RBRACE                             {$$ = newNode("MethodBody");$$->child = $2;}
                 ;
 
-Expressao       :       Statement Expressao                                 {$$ = NULL;}//$$ = $1;TODO:!!!
+Expressao       :       Statement Expressao                                 {$$ = $1;}//addBrother($$,$2);TODO:!!!
                 |       VarDecl Expressao                                   {$$ = $1;addBrother($$,$2);}
                 |                                                           {$$ = NULL;}
                 ;
@@ -122,24 +123,24 @@ VariaveisVar    :       COMMA ID VariaveisVar                               {$$ 
                 |                                                           {$$ = NULL;}
                 ;
 
-Statement       :       LBRACE recursaoS RBRACE                             {;}
-                |       IF LPAR Expr RPAR Statement  ELSE Statement         {;}
-                |       IF LPAR Expr RPAR Statement                         {;}
-                |       WHILE LPAR Expr RPAR Statement                      {;}
-                |       RETURN Expr SEMICOLON                               {;} 
-                |       RETURN SEMICOLON                                    {;}
-                |       PRINT LPAR Expr RPAR SEMICOLON                      {;}
-                |       PRINT LPAR STRLIT RPAR SEMICOLON                    {;}  
-                |       MethodInvocation SEMICOLON                          {;}
-                |       Assignment SEMICOLON                                {;}
-                |       ParseArgs SEMICOLON                                 {;}
+Statement       :       LBRACE recursaoS RBRACE                             {$$ = $2;}
+                |       IF LPAR Expr RPAR Statement  ELSE Statement         {$$ = newNode("If"); $$->child=$3; addBrother($$->child,$5);}
+                |       IF LPAR Expr RPAR Statement                         {$$ = newNode("If"); $$->child=$3; addBrother($$->child,$5); addBrother($5,newNode("Block"));}
+                |       WHILE LPAR Expr RPAR Statement                      {$$ = newNode("While");}
+                |       RETURN Expr SEMICOLON                               {$$ = newNode("Return");$$->child = $2;} 
+                |       RETURN SEMICOLON                                    {$$ = newNode("Return");}
+                |       PRINT LPAR Expr RPAR SEMICOLON                      {$$ = newNode("Print"); $$->child = $3;}
+                |       PRINT LPAR STRLIT RPAR SEMICOLON                    {$$ = newNode("Print"); sprintf(printatudo,"StrLit(\"%s)",$3); $$->child = newNode(strdup(printatudo)); }  
+                |       MethodInvocation SEMICOLON                          {$$ = newNode("MethodInvocation");}//DEBUG:!!
+                |       Assignment SEMICOLON                                {$$ = $1;}
+                |       ParseArgs SEMICOLON                                 {$$ = $1;}
                 |       SEMICOLON                                           {$$ = NULL;}
                 |       error SEMICOLON                                     {$$ = NULL;erro = 1;}
                 ;
 
-recursaoS       :       Statement recursaoS                                 {;}
+recursaoS       :       Statement recursaoS                                 {$$ = $1;}//addBrother($$,$2);
                 |                                                           {$$ = NULL;}
-                ; 
+                ;
                                                                             
 MethodInvocation:       ID LPAR Expr CommaExpr RPAR                         {;}
                 |       ID LPAR Expr RPAR                                   {;}
@@ -151,41 +152,41 @@ CommaExpr       :       COMMA Expr                                          {;}
                 |       CommaExpr COMMA Expr                                {;}
                 ;
 
-Assignment      :       ID ASSIGN Expr                                      {;}
+Assignment      :       ID ASSIGN Expr                                      {$$ = newNode("Assign"); sprintf(message,"Id(%s)",$1); node * id = newNode(strdup(message)); $$->child = id;addBrother($$->child,$3);}
                 ;
 
-ParseArgs       :       PARSEINT LPAR ID LSQ Expr RSQ RPAR                  {;}
-                |       PARSEINT LPAR error RPAR                            {$$ = NULL;erro = 1;}    
+ParseArgs       :       PARSEINT LPAR ID LSQ Expr RSQ RPAR                  {$$ = newNode("ParseArgs"); sprintf(message,"Id(%s)",$3); node * id = newNode(strdup(message)); $$->child = id; addBrother($$->child,$5);}
+                |       PARSEINT LPAR error RPAR                            {$$ = NULL;erro = 1;}
                 ;
 
-Expr            :       Expr PLUS Expr                                      {;}
-                |       Expr MINUS Expr                                     {;}
-                |       Expr STAR Expr                                      {;}
-                |       Expr DIV Expr                                       {;}
-                |       Expr MOD Expr                                       {;}
-                |       Expr AND Expr                                       {;}
-                |       Expr OR Expr                                        {;}
-                |       Expr XOR Expr                                       {;}
-                |       Expr LSHIFT Expr                                    {;}
-                |       Expr RSHIFT Expr                                    {;}
-                |       Expr EQ Expr                                        {;}
-                |       Expr GE Expr                                        {;}
-                |       Expr GT Expr                                        {;}
-                |       Expr LE Expr                                        {;}
-                |       Expr LT Expr                                        {;}
-                |       Expr NE Expr                                        {;}
-                |       MINUS Expr                                          {;}
-                |       NOT Expr                                            {;}
-                |       PLUS Expr                                           {;}
-                |       LPAR Expr RPAR                                      {;}
-                |       MethodInvocation                                    {;}
-                |       Assignment                                          {;}
-                |       ParseArgs                                           {;}
-                |       ID DOTLENGTH                                        {;} 
-                |       ID                                                  {;}
-                |       INTLIT                                              {;}
-                |       REALLIT                                             {;}
-                |       BOOLLIT                                             {;}
+Expr            :       Expr PLUS Expr                                      {$$ = newNode("Add"); $$->child=$1; addBrother($1,$3);}
+                |       Expr MINUS Expr                                     {$$ = newNode("Sub"); $$->child=$1; addBrother($1,$3);}
+                |       Expr STAR Expr                                      {$$ = newNode("Mul"); $$->child=$1; addBrother($1,$3);}
+                |       Expr DIV Expr                                       {$$ = newNode("Div"); $$->child=$1; addBrother($1,$3);}
+                |       Expr MOD Expr                                       {$$ = newNode("Mod"); $$->child=$1; addBrother($1,$3);}
+                |       Expr AND Expr                                       {$$ = newNode("And"); $$->child=$1; addBrother($1,$3);}
+                |       Expr OR Expr                                        {$$ = newNode("Or"); $$->child=$1; addBrother($1,$3);}
+                |       Expr XOR Expr                                       {$$ = newNode("Xor"); $$->child=$1; addBrother($1,$3);}
+                |       Expr LSHIFT Expr                                    {$$ = newNode("Lshift"); $$->child=$1; addBrother($1,$3);}
+                |       Expr RSHIFT Expr                                    {$$ = newNode("Rshift"); $$->child=$1; addBrother($1,$3);}
+                |       Expr EQ Expr                                        {$$ = newNode("Eq"); $$->child=$1; addBrother($1,$3);}
+                |       Expr GE Expr                                        {$$ = newNode("Ge"); $$->child=$1; addBrother($1,$3);}
+                |       Expr GT Expr                                        {$$ = newNode("Gt"); $$->child=$1; addBrother($1,$3);}
+                |       Expr LE Expr                                        {$$ = newNode("Le"); $$->child=$1; addBrother($1,$3);}
+                |       Expr LT Expr                                        {$$ = newNode("Lt"); $$->child=$1; addBrother($1,$3);}
+                |       Expr NE Expr                                        {$$ = newNode("Ne"); $$->child=$1; addBrother($1,$3);}
+                |       MINUS Expr                                          {$$ = newNode("Minus"); $$->child=$2;}
+                |       NOT Expr                                            {$$ = newNode("Not"); $$->child=$2;}
+                |       PLUS Expr                                           {$$ = newNode("Plus");}
+                |       LPAR Expr RPAR                                      {$$ = $2;}
+                |       MethodInvocation                                    {$$ = NULL;}//$$ = $1;TODO:
+                |       Assignment                                          {$$ = $1;}
+                |       ParseArgs                                           {$$ = $1;}
+                |       ID DOTLENGTH                                        {sprintf(message,"Id(%s)",$1); $$ = newNode(strdup(message)); addBrother($$, newNode("Length"));} 
+                |       ID                                                  {sprintf(message,"Id(%s)",$1);$$ = newNode(strdup(message));}
+                |       INTLIT                                              {sprintf(message, "DecLit(%s)", $1);$$ = newNode(strdup(message));}
+                |       REALLIT                                             {sprintf(message, "RealLit(%s)", $1);$$ = newNode(strdup(message));}
+                |       BOOLLIT                                             {sprintf(message, "BoolLit(%s)", $1);$$ = newNode(strdup(message));}
                 |       LPAR error RPAR                                     {$$ = NULL;erro = 1;}
                 ;
 
