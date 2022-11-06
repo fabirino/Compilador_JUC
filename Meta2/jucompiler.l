@@ -4,7 +4,7 @@
                  -  Fábio Santos       2020212310
     ====================================================================================== */
     #include "y.tab.h"
-    #include "tree.h"
+    #include "STree.h"
     #include <stdio.h>
     #include <string.h>
 
@@ -18,7 +18,6 @@
     int col_comment = 1;
     int line_comment = 1;
     int mostraTree = 0;
-    extern Node * raiz;
     extern int erro; 
     char aux[1024];
 %}
@@ -216,13 +215,6 @@ int main(int argc, char *argv[]) {
                 printf("Flag nao existe");
                 return 0;
             }
-        }
-    }
-    if(mostraTree == 1){
-        if(erro == 0 ){
-            printTree(raiz,0);
-        }else{
-            freeTree(raiz);
         }
     }
 

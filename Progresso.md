@@ -16,8 +16,8 @@
 - Factorial_corrompido.java
 - FactorialErros.java
 - field_decl.java
-- MethodFieldError.java
-- MethodFieldError2.java
+- LexErrorWithTree.out
+- TypesFieldVar.java
 - various.java
 - simples.java
 
@@ -28,4 +28,23 @@
 - blocks2.java (corre infinitamente)
 - blocksAndMethods.java  (SegFault)
 - ErrorsAndAST.java (SegFault)
-- 
+- MethodFieldError.java
+- MethodFieldError2.java
+
+
+### SEGFAULT
+. blocks2.java
+. blocksAndMethods.java
+. ErrorsAndAST.java
+. exprAndMore_AST.java
+. field_decl.java
+. if_blocks 
+. lastOne.java
+. MethodFieldError.java
+. MethodFieldError2.java
+. MethodFieldError3.java
+. Miscellaneous.java
+. MultipleErrors.java
+. string_error2.java
+. varios_testes.java
+. various.java
