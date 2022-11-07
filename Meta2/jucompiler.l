@@ -174,7 +174,7 @@ REALLIT                 {REALLIT1}|{REALLIT2}|{REALLIT3}
 
 <<EOF>>                       {yyterminate();}
 
-.                             {printf("Line %d, col %d: illegal character (%s)\n", contador_linhas, contador_colunas,yytext);contador_colunas+=yyleng;col += yyleng;}  
+.                             {printf("Line %d, col %d: illegal character (%s)\n", contador_linhas, col,yytext);contador_colunas+=yyleng;col += yyleng;}  
 
 %%
 
