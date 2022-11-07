@@ -1,21 +1,18 @@
 #lex
 enunciado_projeto_2022_v1.0.pdf
 enunciado_projeto_2022_v2.0.pdf
-lex.yy.c
 
 #yacc
 y.tab.c
 y.tab.h
 y.output
+lex.yy.c
 
 #Meta2
-Meta2/testex.out
 Meta2/teste.out
 Meta2/jucompiler
 
-
 Comp2022.git
-Factorial.out
 
 
 # Compiled class file

@@ -104,7 +104,7 @@ REALLIT                 {REALLIT1}|{REALLIT2}|{REALLIT3}
 <STRINGERROR><<EOF>>             {printf("Line %d, col %d: unterminated string literal\n", contador_linhas, col_string);yyterminate();}
 <STRINGERROR>.                   {contador_colunas+=yyleng;}
 
-\/\*                          {col_comment = contador_colunas ; line_comment =contador_linhas;  BEGIN COMMENT;}
+\/\*                          {col_comment = contador_colunas ; line_comment =contador_linhas;contador_colunas+=yyleng ; BEGIN COMMENT;}
 <COMMENT>"*/"                 {contador_colunas+=yyleng; BEGIN 0;}
 <COMMENT>{novalinha}          {contador_colunas=1; contador_linhas++;}
 <COMMENT><<EOF>>              {printf("Line %d, col %d: unterminated comment\n",line_comment, col_comment);yyterminate();}
@@ -184,7 +184,6 @@ int main(int argc, char *argv[]) {
             flagLexx = 1;
             yylex();
         }else if(!strcmp(argv[1], "-e1")){
-            printf("Flag nao existe");
             yylex();
         }else if (!strcmp(argv[1], "-t")){
             mostraTree=1;
