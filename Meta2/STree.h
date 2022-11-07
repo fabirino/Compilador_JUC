@@ -1,13 +1,14 @@
+/* ===================================================================================
+	    Compiladores -  Eduardo Figueiredo 2020213717
+                        Fábio Santos       2020212310
+    ====================================================================================== */
+    
 #ifndef STREE_H
 #define STREE_H
 
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-
-#define true 1
-#define false 0
-
 
 typedef struct node{
     char * var;
