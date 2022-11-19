@@ -17,7 +17,7 @@ typedef struct node{
     struct node * child;
 }node;
 
-node * newNode(char * var);
+node * newNode(char * var,char * name);
 
 void addBrother(node* old, node* newn);
 

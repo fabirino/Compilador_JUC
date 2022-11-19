@@ -68,24 +68,22 @@ void print_tabs(sym_tab_list *lista){
     
 }
 
-// TODO: paramTypes
-
 symbol *add_symbol(char *name, char *type, int is_param){
     symbol* aux = (symbol*) malloc(sizeof(symbol));
     aux->name = name;
     aux->type = type;
     aux->param = is_param;
-    // aux->
+    aux->paramTypes = NULL; // TODO:
 
     return aux;
 }
 
-sym_tab *create_sym_tab(struct node * no){
+sym_tab *create_sym_tab(struct node * no, int is_class){
     sym_tab *symbol_table = (sym_tab *) malloc(sizeof(sym_tab));
-    // TODO: compor
-    symbol_table->name = "Factorial";
-    symbol_table->type = "Method/Class";
-    symbol *sym = add_symbol(no->var, no->var, 0);
+    symbol_table->name = no->name;
+    if(is_class) symbol_table->type = "Class";
+    else         symbol_table->type = "Method";
+    symbol *sym = add_symbol(no->name, no->var, 0);
     
 
 
@@ -93,7 +91,7 @@ sym_tab *create_sym_tab(struct node * no){
 
 sym_tab_list *create_symbol_tab_list(struct node * raiz){
     sym_tab_list *table_list = (sym_tab_list *) malloc(sizeof(sym_tab_list));
-    create_sym_tab(raiz);
+    create_sym_tab(raiz->child, 1);
     
     return table_list;
 }

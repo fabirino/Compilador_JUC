@@ -11,7 +11,7 @@
 #include "STree.h"
 
 typedef struct parametros_funcao{
-    char paramType[128];
+    char *paramType;
     param_list *next;
 
 } param_list;

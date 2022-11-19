@@ -10,7 +10,7 @@ diff ficheiro1 ficheiro2
 
 - lex jucompiler.l
 - yacc -y -d -t -v jucompiler.y
-- clang-14 -o jucompiler y.tab.c lex.yy.c tree.c
+- clang-14 -o jucompiler y.tab.c lex.yy.c STree.c
 
 `lex jucompiler.l && yacc -y -d -t -v jucompiler.y && clang-14 -o jucompiler y.tab.c lex.yy.c STree.c`
 
