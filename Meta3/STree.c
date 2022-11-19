@@ -5,13 +5,15 @@
 
 #include "STree.h"
 
-node * newNode(char * var,char * name) {
+node * newNode(char * var,char * name, int linha, int coluna) {
     node * aux2 = (node *) malloc(sizeof(node));
 
     aux2->var = var;
     aux2->name = name;
     aux2->brother = NULL;
     aux2->child = NULL;
+    aux2->linha = linha;
+    aux2->coluna = coluna;
 
     return aux2;
 

@@ -13,11 +13,13 @@
 typedef struct node{
     char * var; 
     char * name;
+    int linha;
+    int coluna;
     struct node * brother;
     struct node * child;
 }node;
 
-node * newNode(char * var,char * name);
+node * newNode(char * var, char * name, int linha, int coluna);
 
 void addBrother(node* old, node* newn);
 

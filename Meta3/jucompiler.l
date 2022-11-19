@@ -5,6 +5,7 @@
     ====================================================================================== */
     #include "y.tab.h"
     #include "STree.h"
+    #include "symtab.h"
     #include <stdio.h>
     #include <string.h>
 
@@ -21,6 +22,7 @@
     int mostraTree = 0;
     int erroSintax = 0; 
     struct node * raiz;
+    struct lista_tabs *lista_tabelas;
 %}
 
 ID                      ([a-z]|[A-Z]|"_"|"$")([a-z]|[A-Z]|"_"|"$"|[0-9])*
@@ -199,6 +201,21 @@ int main(int argc, char *argv[]) {
         }else if(!strcmp(argv[1], "-e2")){
             flagYacc=1;
             yyparse();
+        }else if(!strcmp(argv[1], "-s")){
+            mostraTree=1;
+            flagYacc=1;
+            yyparse();
+            if(raiz != NULL){
+                if(erroSintax == 0){
+                    lista_tabelas = create_symbol_tab_list(raiz);
+                    print_tabs(lista_tabelas);
+                    printf("passei caraca!!\n");
+                    printf("\n");
+                    printSTree(raiz,0);
+                }else{
+                    freeSTree(raiz);
+                }
+            }
         }
     }
     
@@ -224,6 +241,19 @@ int main(int argc, char *argv[]) {
             }else if(!strcmp(argv[i], "-e2")){
                 flagYacc=1;
                 yyparse();
+            }else if(!strcmp(argv[i], "-s")){
+                mostraTree=1;
+                flagYacc=1;
+                yyparse();
+                if(raiz != NULL){
+                    if(erroSintax == 0){
+                        print_tabs(lista_tabelas);
+                        printf("\n");
+                        printSTree(raiz,0); 
+                    }else{
+                        freeSTree(raiz);
+                    }
+                }
             }else{
                 printf("Flag nao existe");
                 return 0;
