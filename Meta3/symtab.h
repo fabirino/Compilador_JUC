@@ -23,18 +23,18 @@ typedef struct simbolo{
     int param; // 0-> param | 1->not param
     struct simbolo *next;
     // opcional
-    struct parametros_funcao *paramTypes;
+    struct parametros_funcao *methodParams;
 } symbol;
 
 typedef struct tabela_simbolos{
     char * name;
     char * type; // Method/Class
-    symbol *symbols;
+    struct simbolo *symbols;
 
 } sym_tab;
 
 typedef struct lista_tabs {
-    sym_tab *tab;
+    struct tabela_simbolos *tab;
     struct lista_tabs *next;
 
 } sym_tab_list;
@@ -42,7 +42,7 @@ typedef struct lista_tabs {
 
 void print_tabs(sym_tab_list *lista);
 
-symbol *add_symbol(sym_tab *tabela, char *name, char *type, int is_param);
+void add_symbol(sym_tab *tabela, char *name, char *type, int is_param);
 
 sym_tab_list *add_sym_table(sym_tab_list *lista, sym_tab *tabela);
 
