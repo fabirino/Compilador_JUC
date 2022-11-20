@@ -42,7 +42,7 @@ typedef struct lista_tabs {
 
 void print_tabs(sym_tab_list *lista);
 
-void add_symbol(sym_tab *tabela, char *name, char *type, int is_param);
+void add_symbol(sym_tab *tabela, char *name, char *type, struct parametros_funcao *parametros, int is_param);
 
 sym_tab_list *add_sym_table(sym_tab_list *lista, sym_tab *tabela);
 

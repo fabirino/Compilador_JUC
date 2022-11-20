@@ -67,12 +67,12 @@ void print_tabs(sym_tab_list *lista) {
     }
 }
 
-void add_symbol(sym_tab *tabela, char *name, char *type, int is_param) {
+void add_symbol(sym_tab *tabela, char *name, char *type, struct parametros_funcao *parametros, int is_param) {
     symbol *aux = (symbol *)malloc(sizeof(symbol));
     aux->name = name;
     aux->type = type;
     aux->param = is_param;
-    aux->methodParams = NULL; // TODO: adicionar os parametros da funcao que estao no MethodParams
+    aux->methodParams = parametros; // TODO: adicionar os parametros da funcao que estao no MethodParams
     aux->next = NULL;
     symbol * lista_simbolos = tabela->symbols;
     if(lista_simbolos == NULL){
@@ -138,7 +138,7 @@ sym_tab_list *create_symbol_tab_list(struct node *raiz) {
         if (!strcmp(methodOrField->var, "FieldDecl")) {
             printf("FieldDecl\n");
             // Variaveis globais
-            add_symbol(global,methodOrField->child->brother->name,methodOrField->child->var,0);
+            add_symbol(global,methodOrField->child->brother->name,methodOrField->child->var,NULL,0);
             printf("ADD_FieldDecl\n");
 
 
@@ -147,36 +147,45 @@ sym_tab_list *create_symbol_tab_list(struct node *raiz) {
             // while(methodOrField->brother){ =====
             // Contem o nome da funcao
             if(!strcmp(methodOrField->child->var, "MethodHeader")){
-                // char * param;
-                
-                // // Parametros da funcao
-                // if(!strcmp(methodOrField->child->child->brother->var, "MethodParams")){
-                //     // parametros = node ParamDecl
-                //     struct node * parametros = methodOrField->child->child->brother->child;
-                //     struct  parametros_funcao *lista_parametros = (parametros_funcao *)malloc(sizeof(parametros_funcao));
-                //     while(parametros){
-                //         // Adicionar os parametros da funcao ao nome
-                //         if(!strcmp(parametros->child, "StringArray")){
-                //             strcat(param,"String[]");
-                //         }else if(!strcmp(parametros->child, "Void")){
-                //             strcat(param,"void");
-                //         }else if(!strcmp(parametros->child, "Int")){
-                //             strcat(param,"int");
-                //         }else if(!strcmp(parametros->child, "Bool")){
-                //             strcat(param,"bool");
-                //         }else if(!strcmp(parametros->child, "Double")){
-                //             strcat(param,"double");
-                //         }
+                printf("entrei porra\n");
+                // Parametros da funcao
+                struct node * MP = methodOrField->child->child->brother->brother;
+                if(!strcmp(MP->var, "MethodParams")){
+                    // parametros = node ParamDecl
+                    printf("Entrei aqui no paranaue\n");
+                    struct node * parametros = MP->child;
+                    struct  parametros_funcao *lista_parametros = NULL;
+                   
+                    while(parametros){//BUG: lista...
+                        // Adicionar os parametros da funcao ao nome
 
-                //         parametros = parametros->brother;
-                //     }
-                //     char * name;
-                //     strcat(name,methodOrField->child->child->brother);
-                //     sym_tab *tabela = create_sym_tab(,  0);
-                // }
+                        // TODO: meter isto numa funcao e fazer um getType(char* name) para meter em minusculas
+                        lista_parametros = (struct parametros_funcao*) malloc(sizeof(struct parametros_funcao));
+                        lista_parametros->next = NULL;
+
+                        if(!strcmp(parametros->child->var, "StringArray")){
+                            lista_parametros->paramType = "String[]";
+                        }else if(!strcmp(parametros->child->var, "Void")){
+                            lista_parametros->paramType = "void";
+                        }else if(!strcmp(parametros->child->var, "Int")){
+                            lista_parametros->paramType = "int";
+                        }else if(!strcmp(parametros->child->var, "Bool")){
+                            lista_parametros->paramType = "bool";
+                        }else if(!strcmp(parametros->child->var, "Double")){
+                            lista_parametros->paramType = "double";
+                        }
+
+                        lista_parametros = lista_parametros->next;
+                        parametros = parametros->brother;
+                    }
+                    // printf("Parametro Func -> %s\n",lista_parametros->paramType);
+                    add_symbol(global,methodOrField->child->child->brother->name,methodOrField->child->child->var,lista_parametros,0);
+                    // TODO: criar tabela com o nome correto (nome(Parametros))
+                    sym_tab *tabela = create_sym_tab(MP,  0);
+                }
 
 
-                sym_tab *tabela = create_sym_tab(methodOrField,  0);
+                sym_tab *tabela = create_sym_tab(methodOrField, 0);
             }
             
             
