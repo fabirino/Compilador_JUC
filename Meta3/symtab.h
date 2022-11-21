@@ -24,6 +24,7 @@ typedef struct simbolo{
     struct simbolo *next;
     // opcional
     struct parametros_funcao *methodParams;
+    char parametrosString[1024];
 } symbol;
 
 typedef struct tabela_simbolos{
@@ -39,6 +40,8 @@ typedef struct lista_tabs {
 
 } sym_tab_list;
 
+char *getType(char *tipo);
+
 
 void print_tabs(sym_tab_list *lista);
 
@@ -47,6 +50,8 @@ void add_symbol(sym_tab *tabela, char *name, char *type, struct parametros_funca
 sym_tab_list *add_sym_table(sym_tab_list *lista, sym_tab *tabela);
 
 sym_tab_list *create_symbol_tab_list(struct node * raiz);
+
+param_list *create_param_list(param_list *lista, char *tipo);
 
 sym_tab *create_sym_tab(struct node * no, int is_class);
 
