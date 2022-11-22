@@ -30,7 +30,7 @@ typedef struct simbolo{
 typedef struct tabela_simbolos{
     char * name;
     char * type; // Method/Class
-    char * parametros; // Argumentos da funcao se for o caso
+    char parametros[1024]; // Argumentos da funcao se for o caso
     struct simbolo *symbols;
 
 } sym_tab;
