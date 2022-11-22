@@ -209,8 +209,6 @@ int main(int argc, char *argv[]) {
                 if(erroSintax == 0){
                     lista_tabelas = create_symbol_tab_list(raiz);
                     print_tabs(lista_tabelas);
-                    printf("passei caraca!!\n");
-                    printf("\n");
                     printSTree(raiz,0);
                 }else{
                     freeSTree(raiz);
