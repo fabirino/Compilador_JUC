@@ -112,10 +112,10 @@ char *add_symbol(sym_tab *tabela, char *name, char *type, struct parametros_func
 
         string2 = (char *)malloc(sizeof(string));
         string2 = &string[0];
-        printf("STRING 2 -> %s\n", string2); // DEBUG:
+        // printf("STRING 2 -> %s\n", string2); // DEBUG:
         // aux->parametrosString = string;
 
-        printf("--->%s\"<---\n", string); // DEBUG:
+        // printf("--->%s\"<---\n", string); // DEBUG:
     }
 
     symbol *lista_simbolos = tabela->symbols;
@@ -135,7 +135,7 @@ char *add_symbol(sym_tab *tabela, char *name, char *type, struct parametros_func
         lista_simbolos->next = (symbol *)malloc(sizeof(symbol));
         lista_simbolos->next = aux;
     }
-    string2 = &string[0];
+
     return string2;
 }
 
@@ -145,17 +145,17 @@ sym_tab_list *add_sym_table(sym_tab_list *lista, sym_tab *tabela) {
         lista = (sym_tab_list *)malloc(sizeof(sym_tab_list));
         lista->tab = tabela;
         lista->next = NULL;
-        printf("paramadd_sym_table --->%s\n", lista->tab->parametros);
+        // printf("paramadd_sym_table --->%s\n", lista->tab->parametros);
     } else {
-        printf("paramadd_sym_tablewhile --->%s | %s\n", aux->tab->name, aux->tab->parametros);
-        printf("%p\n", aux->tab->parametros);
+        // printf("paramadd_sym_tablewhile --->%s | %s\n", aux->tab->name, aux->tab->parametros);
+        // printf("%p\n", aux->tab->parametros);
         while (aux->next != NULL) {
             aux = aux->next;
-            printf("paramadd_sym_tablewhile --->%s | %s\n", aux->tab->name, aux->tab->parametros);
+            // printf("paramadd_sym_tablewhile --->%s | %s\n", aux->tab->name, aux->tab->parametros);
         }
         aux->next = (sym_tab_list *)malloc(sizeof(sym_tab_list));
         aux->next->tab = tabela;
-        printf("paramadd_sym_table --->%s\n", aux->next->tab->parametros);
+        // printf("paramadd_sym_table --->%s\n", aux->next->tab->parametros);
         aux->next->next = NULL;
     }
 
@@ -183,13 +183,14 @@ sym_tab *create_sym_tab(struct node *no, char *parametros, int is_class) {
     return symbol_table;
 }
 
-param_list *create_param_list(param_list *lista, char *tipo) {
+param_list *create_param_list(param_list *lista, struct node *no) {
 
     param_list *lista_parametros = lista;
     if (lista_parametros == NULL) {
         // printf("NULL \"add_symbol\"\n");
         lista = (struct parametros_funcao *)malloc(sizeof(struct parametros_funcao));
-        lista->paramType = tipo;
+        lista->paramType = getType(no->var);
+        lista->paramId = no->brother->name;
         lista->next = NULL;
     }
     // Adicionar o simbolo ao ultimo da lista
@@ -199,7 +200,8 @@ param_list *create_param_list(param_list *lista, char *tipo) {
             lista_parametros = lista_parametros->next;
         }
         lista_parametros->next = (struct parametros_funcao *)malloc(sizeof(struct parametros_funcao));
-        lista_parametros->next->paramType = tipo;
+        lista_parametros->next->paramType = getType(no->var);
+        lista_parametros->next->paramId = no->brother->name;
         lista_parametros->next->next = NULL;
     }
     return lista;
@@ -226,7 +228,6 @@ sym_tab_list *create_symbol_tab_list(struct node *raiz) {
         } else if (!strcmp(methodOrField->var, "MethodDecl")) {
             printf("MethodDecl\n");
             sym_tab *tabela = (struct tabela_simbolos *)malloc(sizeof(struct tabela_simbolos));
-            // while(methodOrField->brother){ =====
             // Contem o nome da funcao
             if (!strcmp(methodOrField->child->var, "MethodHeader")) {
                 printf("MethodHeader\n");
@@ -241,7 +242,7 @@ sym_tab_list *create_symbol_tab_list(struct node *raiz) {
                         while (parametros) {
                             //==================
                             printf("MethodParams\n");
-                            lista_parametros = create_param_list(lista_parametros, getType(parametros->child->var));
+                            lista_parametros = create_param_list(lista_parametros, parametros->child);
                             // printf("%s -> %s\n",methodOrField->child->child->brother->name,getType(parametros->child->var));
 
                             //====================
@@ -255,34 +256,45 @@ sym_tab_list *create_symbol_tab_list(struct node *raiz) {
                     // printf("Parametro Func -> %s\n",lista_parametros->paramType);//QUESTION: pq n tenho acesso a lista aqui??
                     char *parametrosString;
                     parametrosString = add_symbol(global, methodOrField->child->child->brother->name, getType(methodOrField->child->child->var), lista_parametros, 0);
-                    printf("param --->%s\n", parametrosString);
+                    // printf("param --->%s\n", parametrosString);
                     // char *parametrosString = add_symbol(global, methodOrField->child->child->brother->name, getType(methodOrField->child->child->var), lista_parametros, 0);
                     // TODO: criar tabela com o nome correto (nome(Parametros)) para a funcao
                     // Declaracao de funcoes
                     tabela = create_sym_tab(methodOrField->child->child->brother, parametrosString, 0);
-                    printf("paramtabela --->%s\n", tabela->parametros);
+                    // printf("paramtabela --->%s\n", tabela->parametros);
                     printf("MethodHeader -> create_sym_tab\n");
                     add_sym_table(table_list, tabela);
-                    sym_tab_list *aux = table_list;
-                    printf("paramtabelaWHILE --->%s\n", aux->tab->parametros);
-                    while (aux->next != NULL) {
-                        aux = aux->next;
-                        printf("paramtabelaWHILE --->%s\n", aux->tab->parametros);
-                    }
+                    // sym_tab_list *aux = table_list;
+                    // printf("paramtabelaWHILE --->%s\n", aux->tab->parametros);
+                    // while (aux->next != NULL) {
+                    //     aux = aux->next;
+                    //     printf("paramtabelaWHILE --->%s\n", aux->tab->parametros);
+                    // }
                     printf("MethodHeader -> add_sym_table\n");
-                }
+                    // COLOCAR OS PARAMETROS
+                    if (!strcmp(getType(methodOrField->child->child->var), "void")) {
+                        add_symbol(tabela, "return", "void", NULL, 0);
+                    }
+                    param_list *lista = lista_parametros;
+                    if (lista && strcmp(lista->paramType, "Vazio")) {
+                        add_symbol(tabela, lista->paramId, lista->paramType, NULL, 1);
 
-                //    sym_tab *tabela = create_sym_tab(methodOrField->child->child->brother, 0);
+                        while (lista->next != NULL) {
+                            // printf("%s -->create_param_list\n", lista_parametros->paramType);
+                            lista = lista->next;
+                            add_symbol(tabela, lista->paramId, lista->paramType, NULL, 1);
+                        }
+                    }
+                }
             }
-            // methodOrField = methodOrField->brother;
-            // } =======
 
             struct node *methodBody = methodOrField->child->brother;
             if (!strcmp(methodBody->var, "MethodBody")) {
                 struct node *varDeclOrReturn = methodBody->child;
                 while (varDeclOrReturn) {
                     if (!strcmp(varDeclOrReturn->var, "VarDecl")) {
-                        
+                        // TODO:
+                        add_symbol(tabela, varDeclOrReturn->child->brother->name, getType(varDeclOrReturn->child->var), NULL, 0); // TODO: VERIFICAR SE E PARAMETRO!!
                     } else if (!strcmp(varDeclOrReturn->var, "Return")) {
                         struct simbolo *cauda = (struct simbolo *)malloc(sizeof(struct simbolo));
                         cauda = tabela->symbols;
@@ -296,23 +308,6 @@ sym_tab_list *create_symbol_tab_list(struct node *raiz) {
                     }
                     varDeclOrReturn = varDeclOrReturn->brother;
                 }
-
-                // Return
-                //     if (returnNode && !strcmp(varDeclOrReturn->var, "Return")) {
-                //         // struct simbolo *cauda = (struct simbolo *)malloc(sizeof(struct simbolo));
-                //         // cauda = tabela->symbols;
-                //         // tabela->symbols->name = "return";
-                //         // tabela->symbols->type = "Type TODO";
-                //         // tabela->symbols->methodParams = NULL;
-                //         // strcpy(tabela->symbols->parametrosString, "");
-                //         // tabela->symbols->param = 0;
-                //         // tabela->symbols->next = cauda;
-
-                //         // head->name = "return";
-                //         // head->type = returnNode->child->var;
-                //         // head->next = tabela->symbols;
-                //         // tabela->symbols = head;
-                //     }
             }
         }
         methodOrField = methodOrField->brother;

@@ -12,6 +12,7 @@
 
 typedef struct parametros_funcao{
     char *paramType;
+    char *paramId;
     struct parametros_funcao *next;
 
 } param_list;
@@ -52,7 +53,7 @@ sym_tab_list *add_sym_table(sym_tab_list *lista, sym_tab *tabela);
 
 sym_tab_list *create_symbol_tab_list(struct node * raiz);
 
-param_list *create_param_list(param_list *lista, char *tipo);
+param_list *create_param_list(param_list *lista, struct node * no);
 
 sym_tab *create_sym_tab(struct node * no, char *parametros, int is_class);
 
