@@ -223,7 +223,7 @@ char *searchType(struct node *no, sym_tab *global, sym_tab *tabela) {
             }
         }
     }
-    //verificar na tabela local
+    // verificar na tabela local
     lista_simbolos = tabela->symbols;
     if (lista_simbolos) {
         if (!strcmp(no->name, lista_simbolos->name)) {
@@ -239,7 +239,7 @@ char *searchType(struct node *no, sym_tab *global, sym_tab *tabela) {
     }
     string = NULL;
 
-    return string;//SE NAO EXISTIR ESSA VARIAVEL RETORNA NULL!!
+    return string; // SE NAO EXISTIR ESSA VARIAVEL RETORNA NULL!!
 }
 
 sym_tab_list *create_symbol_tab_list(struct node *raiz) {
@@ -332,17 +332,21 @@ sym_tab_list *create_symbol_tab_list(struct node *raiz) {
                         add_symbol(tabela, varDeclOrReturn->child->brother->name, getType(varDeclOrReturn->child->var), NULL, 0); // TODO: VERIFICAR SE E PARAMETRO!!
                     } else if (!strcmp(varDeclOrReturn->var, "Return")) {
                         // if(DEBUG) printf("'return' -> %d\n", 1);
-                        char * aux ;
-                        if(varDeclOrReturn->child){
-                          aux = searchType(varDeclOrReturn->child,global,tabela);  
-                        }else{
+                        char *aux;
+                        if (varDeclOrReturn->child) {
+                            aux = searchType(varDeclOrReturn->child, global, tabela);
+                        } else {
                             aux = "void";
                         }
-                        if(aux == NULL){
-                            printf("AINDA FALTA IR PROCURAR O TIPO DESTA VARIAVEL OU A VARIAVEL NAO EXISTE MM\n");//DEBUG: MAIS A FRENTE TIRAR ESTE IF 
-                        }
-                        else if(strcmp(aux,tabela->symbols->type) ){
-                            printf("Line %d, col %d: Incompatible type %s in return statement\n",varDeclOrReturn->linha,varDeclOrReturn->coluna,tabela->symbols->type);
+                        if (aux == NULL) {
+                            printf("AINDA FALTA IR PROCURAR O TIPO DESTA VARIAVEL OU A VARIAVEL NAO EXISTE MM\n"); // DEBUG: MAIS A FRENTE TIRAR ESTE IF
+                        } else if (strcmp(aux, tabela->symbols->type)) {                                           // FIXME: A variavel existe !!
+                            // if(DEBUG) printf("'return' -> %s\n", varDeclOrReturn->child->name);
+                            if (varDeclOrReturn->child) {
+                                printf("Line %d, col %d: Incompatible type %s in return statement\n", varDeclOrReturn->child->linha, varDeclOrReturn->child->coluna, tabela->symbols->type);
+                            } else {
+                                printf("Line %d, col %d: Incompatible type %s in return statement\n", varDeclOrReturn->linha, varDeclOrReturn->coluna, tabela->symbols->type);
+                            }
                         }
                         // struct simbolo *cauda = (struct simbolo *)malloc(sizeof(struct simbolo));
                         // cauda = tabela->symbols;
