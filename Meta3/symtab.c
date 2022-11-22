@@ -31,7 +31,11 @@ void print_tabs(sym_tab_list *lista) {
         sym_tab *aux_tab = aux_table_list->tab;
         symbol *aux_sym_list = aux_tab->symbols;
 
-        printf("===== %s %s Symbol Table =====\n", aux_tab->type, aux_tab->name);
+        if (aux_tab->parametros != NULL) {
+            printf("===== %s %s%s Symbol Table =====\n", aux_tab->type, aux_tab->name, aux_tab->parametros);
+        } else {
+            printf("===== %s %s Symbol Table =====\n", aux_tab->type, aux_tab->name);
+        }
 
         while (aux_sym_list != NULL) {
             param_list *methodParams = aux_sym_list->methodParams;
@@ -39,9 +43,11 @@ void print_tabs(sym_tab_list *lista) {
             if (methodParams != NULL) {
 
                 if (aux_sym_list->param) {
-                    printf("%s\t\t%s\t%s\tparam\n", aux_sym_list->name, aux_sym_list->parametrosString, aux_sym_list->type);
+                    // printf("parametrostoString\"print\" -> %s\n", aux_sym_list->parametrosString); // DEBUG:
+                    printf("%s\t%s\t%s\tparam\n", aux_sym_list->name, aux_sym_list->parametrosString, aux_sym_list->type);
                 } else {
-                    printf("%s\t\t%s\t%s\n", aux_sym_list->name, aux_sym_list->parametrosString, aux_sym_list->type);
+                    // printf("parametrostoString\"print\" -> %s\n", aux_sym_list->parametrosString); // DEBUG:
+                    printf("%s\t%s\t%s\n", aux_sym_list->name, aux_sym_list->parametrosString, aux_sym_list->type);
                 }
 
             } else {
@@ -60,46 +66,58 @@ void print_tabs(sym_tab_list *lista) {
     }
 }
 
-void add_symbol(sym_tab *tabela, char *name, char *type, struct parametros_funcao *parametros, int is_param) {
+char *add_symbol(sym_tab *tabela, char *name, char *type, struct parametros_funcao *parametros, int is_param) {
     symbol *aux = (symbol *)malloc(sizeof(symbol));
     aux->name = name;
     aux->type = type;
     aux->param = is_param;
     aux->methodParams = parametros;
     aux->next = NULL;
+    strcpy(aux->parametrosString, "");
+    char string[1024];
+    char *string2 = NULL;
 
     // Colocar string com os argumentos da funcao
     param_list *methodParams = parametros;
-
     if (methodParams != NULL) {
-        char string[1024];
-        strcpy(string, "(");
-        int count = 0;
-        // Verificar se ha mais do que um argumento na funcao para meter virgulas entre eles
-        while (methodParams != NULL) {
-            count++;
-            methodParams = methodParams->next;
-        }
 
-        methodParams = parametros;
-        // So ha um argumento
-        if (count < 1) {
-            strcat(string, methodParams->paramType);
-            // ha mais que um argumento
-        } else {
+        strcpy(string, "(");
+        if (strcmp(methodParams->paramType, "Vazio")) {
+
+            int count = 0;
+            // Verificar se ha mais do que um argumento na funcao para meter virgulas entre eles
             while (methodParams != NULL) {
-                strcat(string, methodParams->paramType);
-                if (count>1)
-                    strcat(string, ",");
-                count--;
+                count++;
                 methodParams = methodParams->next;
+            }
+
+            methodParams = parametros;
+            // So ha um argumento
+            if (count < 1) {
+                strcat(string, methodParams->paramType);
+                // ha mais que um argumento
+            } else {
+                while (methodParams != NULL) {
+                    strcat(string, methodParams->paramType);
+                    if (count > 1)
+                        strcat(string, ",");
+                    count--;
+                    methodParams = methodParams->next;
+                }
             }
         }
         strcat(string, ")");
+
         strcpy(aux->parametrosString, string);
+
+        string2 = (char *)malloc(sizeof(string));
+        string2 = &string[0];
+        printf("STRING 2 -> %s\n", string2); // DEBUG:
+        // aux->parametrosString = string;
 
         printf("--->%s\"<---\n", string); // DEBUG:
     }
+
     symbol *lista_simbolos = tabela->symbols;
     if (lista_simbolos == NULL) {
         // printf("NULL \"add_symbol\"\n");
@@ -117,6 +135,8 @@ void add_symbol(sym_tab *tabela, char *name, char *type, struct parametros_funca
         lista_simbolos->next = (symbol *)malloc(sizeof(symbol));
         lista_simbolos->next = aux;
     }
+    string2 = &string[0];
+    return string2;
 }
 
 sym_tab_list *add_sym_table(sym_tab_list *lista, sym_tab *tabela) {
@@ -137,11 +157,13 @@ sym_tab_list *add_sym_table(sym_tab_list *lista, sym_tab *tabela) {
     return lista;
 }
 
-sym_tab *create_sym_tab(struct node *no, int is_class) {
+sym_tab *create_sym_tab(struct node *no, char *parametros, int is_class) {
     sym_tab *symbol_table = (sym_tab *)malloc(sizeof(sym_tab));
 
     symbol_table->name = no->name;
+
     symbol_table->symbols = NULL;
+    symbol_table->parametros = parametros;
 
     if (is_class)
         symbol_table->type = "Class";
@@ -175,7 +197,7 @@ param_list *create_param_list(param_list *lista, char *tipo) {
 
 sym_tab_list *create_symbol_tab_list(struct node *raiz) {
     sym_tab_list *table_list = NULL;
-    sym_tab *global = create_sym_tab(raiz->child, 1);
+    sym_tab *global = create_sym_tab(raiz->child, NULL, 1);
     printf("%s\n", global->name);
     table_list = add_sym_table(table_list, global);
     // printf("1\n");
@@ -201,33 +223,41 @@ sym_tab_list *create_symbol_tab_list(struct node *raiz) {
                 struct node *MP = methodOrField->child->child->brother->brother;
                 if (!strcmp(MP->var, "MethodParams")) {
 
-                    
                     struct node *parametros = MP->child; // parametros = node "ParamDecl"
                     struct parametros_funcao *lista_parametros = (struct parametros_funcao *)malloc(sizeof(struct parametros_funcao));
                     lista_parametros = NULL;
+                    if (parametros) {
+                        while (parametros) {
+                            //==================
+                            printf("MethodParams\n");
+                            lista_parametros = create_param_list(lista_parametros, getType(parametros->child->var));
+                            // printf("%s -> %s\n",methodOrField->child->child->brother->name,getType(parametros->child->var));
 
-                    while (parametros) { 
-                                         //==================
-                        printf("MethodParams\n");
-                        lista_parametros = create_param_list(lista_parametros, getType(parametros->child->var));
-                        // printf("%s -> %s\n",methodOrField->child->child->brother->name,getType(parametros->child->var));
-                        //====================
-                        parametros = parametros->brother;
+                            //====================
+                            parametros = parametros->brother;
+                        }
+                    } else {
+                        lista_parametros = (struct parametros_funcao *)malloc(sizeof(struct parametros_funcao));
+                        lista_parametros->paramType = "Vazio";
+                        lista_parametros->next = NULL;
                     }
-
                     // printf("Parametro Func -> %s\n",lista_parametros->paramType);//QUESTION: pq n tenho acesso a lista aqui??
-                    add_symbol(global, methodOrField->child->child->brother->name, getType(methodOrField->child->child->var), lista_parametros, 0);
+                    char parametrosString[1024];
+                    strcpy(parametrosString, add_symbol(global, methodOrField->child->child->brother->name, getType(methodOrField->child->child->var), lista_parametros, 0));
+                    printf("param --->%s\n", parametrosString);
+                    // char *parametrosString = add_symbol(global, methodOrField->child->child->brother->name, getType(methodOrField->child->child->var), lista_parametros, 0);
                     // TODO: criar tabela com o nome correto (nome(Parametros)) para a funcao
+                    // Declaracao de funcoes
+                    sym_tab *tabela = create_sym_tab(methodOrField->child->child->brother, parametrosString, 0);
+                    printf("param --->%s\n", tabela->parametros);
+                    printf("MethodHeader -> create_sym_tab\n");
+                    table_list = add_sym_table(table_list, tabela);
+                    printf("MethodHeader -> add_sym_table\n");
                 }
-                // Declaracao de funcoes
-                sym_tab *tabela = create_sym_tab(methodOrField->child->child->brother, 0);
-                printf("MethodHeader -> create_sym_tab\n");
-                table_list = add_sym_table(table_list, tabela);
-                printf("MethodHeader -> add_sym_table\n");
 
                 //    sym_tab *tabela = create_sym_tab(methodOrField->child->child->brother, 0);
             }
-                // methodOrField = methodOrField->brother;
+            // methodOrField = methodOrField->brother;
             // } =======
         }
 
