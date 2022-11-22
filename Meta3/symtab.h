@@ -57,6 +57,8 @@ sym_tab_list *create_symbol_tab_list(struct node * raiz);
 
 param_list *create_param_list(param_list *lista, struct node * no);
 
+char *searchType(struct node *no, sym_tab *global, sym_tab *tabela);
+
 sym_tab *create_sym_tab(struct node * no, char *parametros, int is_class);
 
 #endif

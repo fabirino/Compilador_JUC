@@ -207,6 +207,41 @@ param_list *create_param_list(param_list *lista, struct node *no) {
     return lista;
 }
 
+char *searchType(struct node *no, sym_tab *global, sym_tab *tabela) {
+    char *string;
+    // Procurar na tabela global primeiro
+    symbol *lista_simbolos = global->symbols;
+    if (lista_simbolos) {
+        if (!strcmp(no->name, lista_simbolos->name)) {
+            return lista_simbolos->type;
+        }
+        while (lista_simbolos->next != NULL) {
+            // printf("WHILE \"add_symbol\"\n");
+            lista_simbolos = lista_simbolos->next;
+            if (!strcmp(no->name, lista_simbolos->name)) {
+                return lista_simbolos->type;
+            }
+        }
+    }
+    //verificar na tabela local
+    lista_simbolos = tabela->symbols;
+    if (lista_simbolos) {
+        if (!strcmp(no->name, lista_simbolos->name)) {
+            return lista_simbolos->type;
+        }
+        while (lista_simbolos->next != NULL) {
+            // printf("WHILE \"add_symbol\"\n");
+            lista_simbolos = lista_simbolos->next;
+            if (!strcmp(no->name, lista_simbolos->name)) {
+                return lista_simbolos->type;
+            }
+        }
+    }
+    string = NULL;
+
+    return string;//SE NAO EXISTIR ESSA VARIAVEL RETORNA NULL!!
+}
+
 sym_tab_list *create_symbol_tab_list(struct node *raiz) {
     sym_tab_list *table_list = NULL;
     sym_tab *global = create_sym_tab(raiz->child, NULL, 1);
@@ -271,10 +306,10 @@ sym_tab_list *create_symbol_tab_list(struct node *raiz) {
                     //     printf("paramtabelaWHILE --->%s\n", aux->tab->parametros);
                     // }
                     printf("MethodHeader -> add_sym_table\n");
-                    //COLOCA RETURN
+                    // COLOCA RETURN
                     add_symbol(tabela, "return", getType(methodOrField->child->child->var), NULL, 0);
                     // COLOCAR OS PARAMETROS
-                    
+
                     param_list *lista = lista_parametros;
                     if (lista && strcmp(lista->paramType, "Vazio")) {
                         add_symbol(tabela, lista->paramId, lista->paramType, NULL, 1);
@@ -296,6 +331,19 @@ sym_tab_list *create_symbol_tab_list(struct node *raiz) {
                         // TODO:
                         add_symbol(tabela, varDeclOrReturn->child->brother->name, getType(varDeclOrReturn->child->var), NULL, 0); // TODO: VERIFICAR SE E PARAMETRO!!
                     } else if (!strcmp(varDeclOrReturn->var, "Return")) {
+                        // if(DEBUG) printf("'return' -> %d\n", 1);
+                        char * aux ;
+                        if(varDeclOrReturn->child){
+                          aux = searchType(varDeclOrReturn->child,global,tabela);  
+                        }else{
+                            aux = "void";
+                        }
+                        if(aux == NULL){
+                            printf("AINDA FALTA IR PROCURAR O TIPO DESTA VARIAVEL OU A VARIAVEL NAO EXISTE MM\n");//DEBUG: MAIS A FRENTE TIRAR ESTE IF 
+                        }
+                        else if(strcmp(aux,tabela->symbols->type) ){
+                            printf("Line %d, col %d: Incompatible type %s in return statement\n",varDeclOrReturn->linha,varDeclOrReturn->coluna,tabela->symbols->type);
+                        }
                         // struct simbolo *cauda = (struct simbolo *)malloc(sizeof(struct simbolo));
                         // cauda = tabela->symbols;
                         // tabela->symbols = (struct simbolo *)malloc(sizeof(struct simbolo));
