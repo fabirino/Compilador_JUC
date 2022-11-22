@@ -10,6 +10,8 @@
 #include <string.h>
 #include "STree.h"
 
+#define DEBUG 1
+
 typedef struct parametros_funcao{
     char *paramType;
     char *paramId;

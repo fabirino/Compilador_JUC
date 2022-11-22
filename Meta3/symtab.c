@@ -271,10 +271,10 @@ sym_tab_list *create_symbol_tab_list(struct node *raiz) {
                     //     printf("paramtabelaWHILE --->%s\n", aux->tab->parametros);
                     // }
                     printf("MethodHeader -> add_sym_table\n");
+                    //COLOCA RETURN
+                    add_symbol(tabela, "return", getType(methodOrField->child->child->var), NULL, 0);
                     // COLOCAR OS PARAMETROS
-                    if (!strcmp(getType(methodOrField->child->child->var), "void")) {
-                        add_symbol(tabela, "return", "void", NULL, 0);
-                    }
+                    
                     param_list *lista = lista_parametros;
                     if (lista && strcmp(lista->paramType, "Vazio")) {
                         add_symbol(tabela, lista->paramId, lista->paramType, NULL, 1);
@@ -296,15 +296,15 @@ sym_tab_list *create_symbol_tab_list(struct node *raiz) {
                         // TODO:
                         add_symbol(tabela, varDeclOrReturn->child->brother->name, getType(varDeclOrReturn->child->var), NULL, 0); // TODO: VERIFICAR SE E PARAMETRO!!
                     } else if (!strcmp(varDeclOrReturn->var, "Return")) {
-                        struct simbolo *cauda = (struct simbolo *)malloc(sizeof(struct simbolo));
-                        cauda = tabela->symbols;
-                        tabela->symbols = (struct simbolo *)malloc(sizeof(struct simbolo));
-                        tabela->symbols->name = "return";
-                        tabela->symbols->type = "Type TODO";
-                        tabela->symbols->methodParams = NULL;
-                        strcpy(tabela->symbols->parametrosString, "");
-                        tabela->symbols->param = 0;
-                        tabela->symbols->next = cauda;
+                        // struct simbolo *cauda = (struct simbolo *)malloc(sizeof(struct simbolo));
+                        // cauda = tabela->symbols;
+                        // tabela->symbols = (struct simbolo *)malloc(sizeof(struct simbolo));
+                        // tabela->symbols->name = "return";
+                        // tabela->symbols->type = "Type TODO";
+                        // tabela->symbols->methodParams = NULL;
+                        // strcpy(tabela->symbols->parametrosString, "");
+                        // tabela->symbols->param = 0;
+                        // tabela->symbols->next = cauda;
                     }
                     varDeclOrReturn = varDeclOrReturn->brother;
                 }
