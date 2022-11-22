@@ -10,7 +10,7 @@
     #include <string.h>
 
     int yyparse(void);
-
+    void colocaDados(char * mensagem, int line, int col);
     int contador_linhas = 1;
     int contador_colunas = 1;
     int col = 1;
@@ -91,7 +91,7 @@ REALLIT                 {REALLIT1}|{REALLIT2}|{REALLIT3}
 
 \"                                         {col_string = col; col += yyleng; BEGIN STRING1;}
 <STRING1>{novalinha}                       {printf("Line %d, col %d: unterminated string literal\n", contador_linhas, col_string);contador_colunas=1;col =1; contador_linhas++;BEGIN 0;}
-<STRING1>({SCAPES}|[^\r\n\"\\])*\"         {if(flagLexx)printf("STRLIT(\"%s)\n",yytext); contador_colunas+=yyleng;col += yyleng; BEGIN 0; if(flagYacc){yylval.id = strdup(yytext); return STRLIT;} }
+<STRING1>({SCAPES}|[^\r\n\"\\])*\"         {if(flagLexx)printf("STRLIT(\"%s)\n",yytext); contador_colunas+=yyleng;col += yyleng; BEGIN 0; if(flagYacc){colocaDados(strdup(yytext), contador_linhas, col-yyleng);return STRLIT;} }
 <STRING1>[^\r\n\"]*\\[^f|n|r|t|\\|\"]*\"   {yyless(0); BEGIN STRINGERROR;}
 <STRING1>[^\r\n\"]*{novalinha}?            {yyless(0); BEGIN STRINGERROR;}
 <STRING1><<EOF>>                           {printf("Line %d, col %d: unterminated string literal\n", contador_linhas, col_string); col += yyleng; yyterminate();}
@@ -119,26 +119,26 @@ REALLIT                 {REALLIT1}|{REALLIT2}|{REALLIT3}
 
 {novalinha}                   {contador_colunas=1; col =1; contador_linhas++;}
 
-{BOOLLIT}                     {if (flagLexx) printf("BOOLLIT(%s)\n",yytext);contador_colunas+=yyleng; col += yyleng;if(flagYacc) {yylval.id = strdup(yytext);return BOOLLIT;}}
-{AND}                         {if (flagLexx) printf("AND\n");contador_colunas+=yyleng; col += yyleng;               if(flagYacc) {return AND;}}
-{ASSIGN}                      {if (flagLexx) printf("ASSIGN\n");contador_colunas+=yyleng; col += yyleng;            if(flagYacc) {return ASSIGN;}}
-{STAR}                        {if (flagLexx) printf("STAR\n");contador_colunas+=yyleng; col += yyleng;              if(flagYacc) {return STAR;}}
+{BOOLLIT}                     {if (flagLexx) printf("BOOLLIT(%s)\n",yytext);contador_colunas+=yyleng; col += yyleng;if(flagYacc){colocaDados(strdup(yytext), contador_linhas, col-yyleng);return BOOLLIT;}}
+{AND}                         {if (flagLexx) printf("AND\n");contador_colunas+=yyleng; col += yyleng;               if(flagYacc){colocaDados(NULL, contador_linhas, col-yyleng);return AND;}}
+{ASSIGN}                      {if (flagLexx) printf("ASSIGN\n");contador_colunas+=yyleng; col += yyleng;            if(flagYacc){colocaDados(NULL, contador_linhas, col-yyleng);return ASSIGN;}}
+{STAR}                        {if (flagLexx) printf("STAR\n");contador_colunas+=yyleng; col += yyleng;              if(flagYacc){colocaDados(NULL, contador_linhas, col-yyleng);return STAR;}}
 {COMMA}                       {if (flagLexx) printf("COMMA\n");contador_colunas+=yyleng; col += yyleng;             if(flagYacc) {return COMMA;}}
-{DIV}                         {if (flagLexx) printf("DIV\n");contador_colunas+=yyleng; col += yyleng;               if(flagYacc) {return DIV;}}
-{EQ}                          {if (flagLexx) printf("EQ\n");contador_colunas+=yyleng; col += yyleng;                if(flagYacc) {return EQ;}}
-{GE}                          {if (flagLexx) printf("GE\n");contador_colunas+=yyleng; col += yyleng;                if(flagYacc) {return GE;}}
-{GT}                          {if (flagLexx) printf("GT\n");contador_colunas+=yyleng; col += yyleng;                if(flagYacc) {return GT;}}
+{DIV}                         {if (flagLexx) printf("DIV\n");contador_colunas+=yyleng; col += yyleng;               if(flagYacc){colocaDados(NULL, contador_linhas, col-yyleng);return DIV;}}
+{EQ}                          {if (flagLexx) printf("EQ\n");contador_colunas+=yyleng; col += yyleng;                if(flagYacc){colocaDados(NULL, contador_linhas, col-yyleng);return EQ;}}
+{GE}                          {if (flagLexx) printf("GE\n");contador_colunas+=yyleng; col += yyleng;                if(flagYacc){colocaDados(NULL, contador_linhas, col-yyleng);return GE;}}
+{GT}                          {if (flagLexx) printf("GT\n");contador_colunas+=yyleng; col += yyleng;                if(flagYacc){colocaDados(NULL, contador_linhas, col-yyleng);return GT;}}
 {LBRACE}                      {if (flagLexx) printf("LBRACE\n");contador_colunas+=yyleng; col += yyleng;            if(flagYacc) {return LBRACE;}}
-{LE}                          {if (flagLexx) printf("LE\n");contador_colunas+=yyleng; col += yyleng;                if(flagYacc) {return LE;}}
+{LE}                          {if (flagLexx) printf("LE\n");contador_colunas+=yyleng; col += yyleng;                if(flagYacc){colocaDados(NULL, contador_linhas, col-yyleng);return LE;}}
 {LPAR}                        {if (flagLexx) printf("LPAR\n");contador_colunas+=yyleng; col += yyleng;              if(flagYacc) {return LPAR;}}
 {LSQ}                         {if (flagLexx) printf("LSQ\n");contador_colunas+=yyleng; col += yyleng;               if(flagYacc) {return LSQ;}}
-{LT}                          {if (flagLexx) printf("LT\n");contador_colunas+=yyleng; col += yyleng;                if(flagYacc) {return LT;}}
-{MINUS}                       {if (flagLexx) printf("MINUS\n");contador_colunas+=yyleng; col += yyleng;             if(flagYacc) {return MINUS;}}
-{MOD}                         {if (flagLexx) printf("MOD\n");contador_colunas+=yyleng; col += yyleng;               if(flagYacc) {return MOD;}}
-{NE}                          {if (flagLexx) printf("NE\n");contador_colunas+=yyleng; col += yyleng;                if(flagYacc) {return NE;}}
-{NOT}                         {if (flagLexx) printf("NOT\n");contador_colunas+=yyleng; col += yyleng;               if(flagYacc) {return NOT;}}
-{OR}                          {if (flagLexx) printf("OR\n");contador_colunas+=yyleng; col += yyleng;                if(flagYacc) {return OR;}}
-{PLUS}                        {if (flagLexx) printf("PLUS\n");contador_colunas+=yyleng; col += yyleng;              if(flagYacc) {return PLUS;}}
+{LT}                          {if (flagLexx) printf("LT\n");contador_colunas+=yyleng; col += yyleng;                if(flagYacc){colocaDados(NULL, contador_linhas, col-yyleng);return LT;}}
+{MINUS}                       {if (flagLexx) printf("MINUS\n");contador_colunas+=yyleng; col += yyleng;             if(flagYacc){colocaDados(NULL, contador_linhas, col-yyleng);return MINUS;}}
+{MOD}                         {if (flagLexx) printf("MOD\n");contador_colunas+=yyleng; col += yyleng;               if(flagYacc){colocaDados(NULL, contador_linhas, col-yyleng);return MOD;}}
+{NE}                          {if (flagLexx) printf("NE\n");contador_colunas+=yyleng; col += yyleng;                if(flagYacc){colocaDados(NULL, contador_linhas, col-yyleng);return NE;}}
+{NOT}                         {if (flagLexx) printf("NOT\n");contador_colunas+=yyleng; col += yyleng;               if(flagYacc){colocaDados(NULL, contador_linhas, col-yyleng);return NOT;}}
+{OR}                          {if (flagLexx) printf("OR\n");contador_colunas+=yyleng; col += yyleng;                if(flagYacc){colocaDados(NULL, contador_linhas, col-yyleng);return OR;}}
+{PLUS}                        {if (flagLexx) printf("PLUS\n");contador_colunas+=yyleng; col += yyleng;              if(flagYacc){colocaDados(NULL, contador_linhas, col-yyleng);return PLUS;}}
 {RBRACE}                      {if (flagLexx) printf("RBRACE\n");contador_colunas+=yyleng; col += yyleng;            if(flagYacc) {return RBRACE;}}
 {RPAR}                        {if (flagLexx) printf("RPAR\n");contador_colunas+=yyleng; col += yyleng;              if(flagYacc) {return RPAR;}}
 {RSQ}                         {if (flagLexx) printf("RSQ\n");contador_colunas+=yyleng; col += yyleng;               if(flagYacc) {return RSQ;}}
@@ -146,18 +146,18 @@ REALLIT                 {REALLIT1}|{REALLIT2}|{REALLIT3}
 {ARROW}                       {if (flagLexx) printf("ARROW\n");contador_colunas+=yyleng; col += yyleng;             if(flagYacc) {return ARROW;}}   
 {LSHIFT}                      {if (flagLexx) printf("LSHIFT\n");contador_colunas+=yyleng; col += yyleng;            if(flagYacc) {return LSHIFT;}}
 {RSHIFT}                      {if (flagLexx) printf("RSHIFT\n");contador_colunas+=yyleng; col += yyleng;            if(flagYacc) {return RSHIFT;}}
-{XOR}                         {if (flagLexx) printf("XOR\n");contador_colunas+=yyleng; col += yyleng;               if(flagYacc) {return XOR;}}
+{XOR}                         {if (flagLexx) printf("XOR\n");contador_colunas+=yyleng; col += yyleng;               if(flagYacc){colocaDados(NULL, contador_linhas, col-yyleng);return XOR;}}
 {BOOL}                        {if (flagLexx) printf("BOOL\n");contador_colunas+=yyleng; col += yyleng;              if(flagYacc) {return BOOL;}}
 {CLASS}                       {if (flagLexx) printf("CLASS\n");contador_colunas+=yyleng; col += yyleng;             if(flagYacc) {return CLASS;}}
-{DOTLENGTH}                   {if (flagLexx) printf("DOTLENGTH\n");contador_colunas+=yyleng; col += yyleng;         if(flagYacc) {return DOTLENGTH;}}
+{DOTLENGTH}                   {if (flagLexx) printf("DOTLENGTH\n");contador_colunas+=yyleng; col += yyleng;         if(flagYacc){colocaDados(NULL, contador_linhas, col-yyleng);return DOTLENGTH;}}
 {DOUBLE}                      {if (flagLexx) printf("DOUBLE\n");contador_colunas+=yyleng; col += yyleng;            if(flagYacc) {return DOUBLE;}}
 {ELSE}                        {if (flagLexx) printf("ELSE\n");contador_colunas+=yyleng; col += yyleng;              if(flagYacc) {return ELSE;}}
 {IF}                          {if (flagLexx) printf("IF\n");contador_colunas+=yyleng; col += yyleng;                if(flagYacc) {return IF;}}
 {INT}                         {if (flagLexx) printf("INT\n");contador_colunas+=yyleng; col += yyleng;               if(flagYacc) {return INT;}}
 {PRINT}                       {if (flagLexx) printf("PRINT\n");contador_colunas+=yyleng; col += yyleng;             if(flagYacc) {return PRINT;}}
-{PARSEINT}                    {if (flagLexx) printf("PARSEINT\n");contador_colunas+=yyleng; col += yyleng;          if(flagYacc) {return PARSEINT;}}
+{PARSEINT}                    {if (flagLexx) printf("PARSEINT\n");contador_colunas+=yyleng; col += yyleng;          if(flagYacc){colocaDados(NULL, contador_linhas, col-yyleng);return PARSEINT;}}
 {PUBLIC}                      {if (flagLexx) printf("PUBLIC\n");contador_colunas+=yyleng; col += yyleng;            if(flagYacc) {return PUBLIC;}}
-{RETURN}                      {if (flagLexx) printf("RETURN\n");contador_colunas+=yyleng; col += yyleng;            if(flagYacc) {return RETURN;}}
+{RETURN}                      {if (flagLexx) printf("RETURN\n");contador_colunas+=yyleng; col += yyleng;            if(flagYacc){colocaDados(NULL, contador_linhas, col-yyleng);return RETURN;}}
 {STATIC}                      {if (flagLexx) printf("STATIC\n");contador_colunas+=yyleng; col += yyleng;            if(flagYacc) {return STATIC;}}
 {STRING}                      {if (flagLexx) printf("STRING\n");contador_colunas+=yyleng; col += yyleng;            if(flagYacc) {return STRING;}}
 {VOID}                        {if (flagLexx) printf("VOID\n");contador_colunas+=yyleng; col += yyleng;              if(flagYacc) {return VOID;}}
@@ -166,17 +166,23 @@ REALLIT                 {REALLIT1}|{REALLIT2}|{REALLIT3}
 
 {RESERVED}                    {if (flagLexx) printf("RESERVED(%s)\n",yytext); contador_colunas+=yyleng; col += yyleng;if(flagYacc) {return RESERVED;}}
 
-{ID}                          {if (flagLexx) printf("ID(%s)\n", yytext); contador_colunas+=yyleng;col += yyleng; if(flagYacc) {yylval.id = strdup(yytext); return ID;}}
+{ID}                          {if (flagLexx) printf("ID(%s)\n", yytext); contador_colunas+=yyleng;col += yyleng; if(flagYacc){colocaDados(strdup(yytext), contador_linhas, col-yyleng);return ID;}}
 
-{INTLIT}                      {if (flagLexx) printf("INTLIT(%s)\n",yytext); contador_colunas+=yyleng;col += yyleng; if(flagYacc) {yylval.id = strdup(yytext); return INTLIT;}}
+{INTLIT}                      {if (flagLexx) printf("INTLIT(%s)\n",yytext); contador_colunas+=yyleng;col += yyleng; if(flagYacc) if(flagYacc){colocaDados(strdup(yytext), contador_linhas, col-yyleng);return INTLIT;}}
 
-{REALLIT}                     {if (flagLexx) printf("REALLIT(%s)\n",yytext); contador_colunas+=yyleng; col += yyleng; if(flagYacc) {yylval.id = strdup(yytext); return REALLIT;}}
+{REALLIT}                     {if (flagLexx) printf("REALLIT(%s)\n",yytext); contador_colunas+=yyleng; col += yyleng; if(flagYacc){colocaDados(strdup(yytext), contador_linhas, col-yyleng);return REALLIT;}}
 
 <<EOF>>                       {yyterminate();}
 
 .                             {printf("Line %d, col %d: illegal character (%s)\n", contador_linhas, col,yytext); contador_colunas+=yyleng; col += yyleng;}  
 
 %%
+
+void colocaDados(char * mensagem, int line, int col){
+    yylval.info.message = mensagem;
+    yylval.info.line=line;
+    yylval.info.col=col;
+}
 
 int main(int argc, char *argv[]) {
 
