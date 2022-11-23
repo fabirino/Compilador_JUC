@@ -46,10 +46,9 @@ typedef struct lista_tabs {
 
 char *getType(char *tipo);
 
-
 void print_tabs(sym_tab_list *lista);
 
-char * add_symbol(sym_tab *tabela, char *name, char *type, struct parametros_funcao *parametros, int is_param);
+char * add_symbol(sym_tab *tabela, char *name, char *type, struct parametros_funcao *parametros, struct node* no,int is_param);
 
 sym_tab_list *add_sym_table(sym_tab_list *lista, sym_tab *tabela);
 
@@ -57,7 +56,11 @@ sym_tab_list *create_symbol_tab_list(struct node * raiz);
 
 param_list *create_param_list(param_list *lista, struct node * no);
 
-char *searchType(struct node *no, sym_tab *global, sym_tab *tabela);
+char *searchType(struct node *no, sym_tab *global, sym_tab *tabela,int altera);
+
+char *getTypeOperation(struct node *no, sym_tab *global, sym_tab *tabela);
+
+int searchFunc(struct simbolo * simbolo, sym_tab *global, char *parametrosString);
 
 sym_tab *create_sym_tab(struct node * no, char *parametros, int is_class);
 

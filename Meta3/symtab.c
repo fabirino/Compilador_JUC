@@ -66,7 +66,7 @@ void print_tabs(sym_tab_list *lista) {
     }
 }
 
-char *add_symbol(sym_tab *tabela, char *name, char *type, struct parametros_funcao *parametros, int is_param) {
+char *add_symbol(sym_tab *tabela, char *name, char *type, struct parametros_funcao *parametros, struct node *no, int is_param) {
     symbol *aux = (symbol *)malloc(sizeof(symbol));
     aux->name = name;
     aux->type = type;
@@ -116,6 +116,14 @@ char *add_symbol(sym_tab *tabela, char *name, char *type, struct parametros_func
         // aux->parametrosString = string;
 
         // printf("--->%s\"<---\n", string); // DEBUG:
+    }
+
+    // Verificar se é uma funcao que ja existe
+    if (parametros != NULL) {
+        if (searchFunc(aux, tabela, string)) { // Se for uma funcao tem de estar definida na tabela global
+            printf("Line %d, col %d: Symbol %s%s already defined\n", no->linha, no->coluna, aux->name, string);
+            return NULL;
+        }
     }
 
     symbol *lista_simbolos = tabela->symbols;
@@ -207,39 +215,189 @@ param_list *create_param_list(param_list *lista, struct node *no) {
     return lista;
 }
 
-char *searchType(struct node *no, sym_tab *global, sym_tab *tabela) {
+char *searchType(struct node *no, sym_tab *global, sym_tab *tabela, int altera) {
     char *string;
     // Procurar na tabela global primeiro
-    symbol *lista_simbolos = global->symbols;
-    if (lista_simbolos) {
-        if (!strcmp(no->name, lista_simbolos->name)) {
-            return lista_simbolos->type;
-        }
-        while (lista_simbolos->next != NULL) {
-            // printf("WHILE \"add_symbol\"\n");
-            lista_simbolos = lista_simbolos->next;
-            if (!strcmp(no->name, lista_simbolos->name)) {
+    char aux[64];
+    // printf("1\n");
+    if (global) {
+
+        symbol *lista_simbolos = global->symbols;
+        // if (DEBUG)
+        //     printf("'DEBUG' -> %s | %s\n", lista_simbolos->name, no->name);
+        // printf("2\n");
+        if (lista_simbolos) {
+            // printf("3\n");
+            if (!strcmp(no->name, lista_simbolos->name) && lista_simbolos->param == 0) {
+                if (altera) {
+                    strcpy(aux, no->var);
+                    strcat(aux, " - ");
+                    strcat(aux, lista_simbolos->type);
+                    // if (DEBUG)
+                    //     printf("'DEBUG1' -> %s\n", aux);
+                    strcpy(no->var, aux);
+                }
                 return lista_simbolos->type;
+            }
+            while (lista_simbolos->next != NULL) {
+                // printf("WHILE \"add_symbol\"\n");
+                lista_simbolos = lista_simbolos->next;
+                if (!strcmp(no->name, lista_simbolos->name) && lista_simbolos->param == 0) {
+                    if (altera) {
+                        strcpy(aux, no->var);
+                        strcat(aux, " - ");
+                        strcat(aux, lista_simbolos->type);
+                        // if (DEBUG)
+                        //     printf("'DEBUG2' -> %s\n", aux);
+                        strcpy(no->var, aux);
+                    }
+                    return lista_simbolos->type;
+                }
             }
         }
     }
+    // printf("4\n");
     // verificar na tabela local
-    lista_simbolos = tabela->symbols;
-    if (lista_simbolos) {
-        if (!strcmp(no->name, lista_simbolos->name)) {
-            return lista_simbolos->type;
-        }
-        while (lista_simbolos->next != NULL) {
-            // printf("WHILE \"add_symbol\"\n");
-            lista_simbolos = lista_simbolos->next;
+    if (tabela) {
+        symbol *lista_simbolos = tabela->symbols;
+        // printf("5\n");
+        if (lista_simbolos) {
+            // printf("6\n");
             if (!strcmp(no->name, lista_simbolos->name)) {
+                // printf("7\n");
+                if (altera) {
+                    strcpy(aux, no->var);
+                    strcat(aux, " - ");
+                    strcat(aux, lista_simbolos->type);
+                    // if (DEBUG)
+                    //     printf("'DEBUG3' -> %s\n", aux);
+                    strcpy(no->var, aux);
+                }
                 return lista_simbolos->type;
+            }
+            while (lista_simbolos->next != NULL) {
+                // printf("WHILE \"add_symbol\"\n");
+                lista_simbolos = lista_simbolos->next;
+                // if (DEBUG)
+                // printf("'DEBUG' -> %s | %s\n", lista_simbolos->name, no->name);
+
+                if (!strcmp(no->name, lista_simbolos->name)) {
+                    // printf("Entrou\n");
+                    if (altera) {
+                        strcpy(aux, no->var);
+                        strcat(aux, " - ");
+                        strcat(aux, lista_simbolos->type);
+                        // if (DEBUG)
+                        //     printf("'DEBUG4' -> %s\n", aux);
+                        strcpy(no->var, aux);
+                    }
+                    return lista_simbolos->type;
+                }
             }
         }
     }
+    if (altera) {
+        strcpy(aux, no->var);
+        strcat(aux, " - undef");
+        strcpy(no->var, aux);
+    }
+
     string = NULL;
 
     return string; // SE NAO EXISTIR ESSA VARIAVEL RETORNA NULL!!
+}
+
+int searchFunc(struct simbolo *simbolo, sym_tab *global, char *parametrosString) {
+    struct simbolo *aux = global->symbols;
+    while (aux) {
+        if (!strcmp(simbolo->name, aux->name) && !strcmp(aux->parametrosString, parametrosString)) {
+            return 1;
+        }
+        aux = aux->next;
+    }
+
+    return 0;
+}
+
+char *getTypeOperation(struct node *no, sym_tab *global, sym_tab *tabela) {
+    char *string = NULL;
+    char aux[64];
+
+    char *aux1 = strndup(no->var, 2);
+    printf("DEBUG\"getTypeOperation\" --->>%s\n", aux1);
+    if (!strcmp("De", aux1)) { // Declit
+        strcpy(aux, no->var);
+        strcat(aux, " - int");
+        strcpy(no->var, aux);
+        float val = atof(no->name);
+        if (val < -2147483648 || val > 2147483648) {
+            printf("Line %d, col %d: Number %s out of bounds\n", no->linha, no->coluna, no->name);
+        }
+        return "int";
+    } else if (!strcmp("Re", aux1)) { // Realit
+        strcpy(aux, no->var);
+        strcat(aux, " - double");
+        strcpy(no->var, aux);
+        return "double";
+    } else if (!strcmp("Bo", aux1)) { // Boolit
+        strcpy(aux, no->var);
+        strcat(aux, " - boolean");
+        strcpy(no->var, aux);
+        return "boolean";
+    } else if (!strcmp("Id", aux1)) { // Id
+        return searchType(no, global, tabela, 1);
+        
+    } else if (!strcmp("Le", aux1)) { // Length
+        char *auxc = getTypeOperation(no->child, global, tabela);
+        strcpy(aux, no->var);
+        strcat(aux, " - ");
+        strcat(aux, auxc);
+        strcpy(no->var, aux);
+        if (strcmp(auxc, "String[]")) {
+            printf("Line %d, col%d: Operator .length cannot be applied to type %s\n", no->linha, no->coluna, auxc);
+        }
+        return auxc;
+    }
+    // else if (!strcmp("Ad", aux1) || !strcmp("Su", aux1) || !strcmp("Mu", aux1) || !strcmp("Di", aux1)) { // Add || Sub || Mul || Div
+    //     char *auxc = getTypeOperation(no->child, global, tabela);
+    //     char *auxb = getTypeOperation(no->child->brother, global, tabela);
+    //     if ((!strcmp(auxc, "int") || !strcmp(auxc, "double")) && (!strcmp(auxb, "int") || !strcmp(auxb, "double"))) {
+    //         strcpy(aux, no->var);
+    //         strcat(aux, " - double");
+    //         strcpy(no->var, aux);
+    //     } else {
+    //         strcpy(aux, no->var);
+    //         strcat(aux, " - undef");
+    //         strcpy(no->var, aux);
+    //         if (!strcmp("Ad", aux1))
+    //             printf("Line %d, col %d: Operator + cannot be applied to types %s, %s\n", no->linha, no->coluna, auxc, auxb);
+    //         else if (!strcmp("Su", aux1))
+    //             printf("Line %d, col %d: Operator - cannot be applied to types %s, %s\n", no->linha, no->coluna, auxc, auxb);
+    //         else if (!strcmp("Mu", aux1))
+    //             printf("Line %d, col %d: Operator * cannot be applied to types %s, %s\n", no->linha, no->coluna, auxc, auxb);
+    //         else if (!strcmp("Di", aux1))
+    //             printf("Line %d, col %d: Operator / cannot be applied to types %s, %s\n", no->linha, no->coluna, auxc, auxb);
+    //     }
+    // } else if (!strcmp("Ge", aux1) || !strcmp("Gt", aux1) || !strcmp("Le", aux1) || !strcmp("Lt", aux1)) {
+    // } else if (!strcmp("Ca", aux1)) {
+    // } else { // SE ENTRAR E PQ E UMA OPERACAO("ASSIGN,...")
+    //     char *auxc = getTypeOperation(no->child, global, tabela);
+    //     char *auxb = getTypeOperation(no->child->brother, global, tabela);
+    //     if (!strcmp(auxc, auxb)) {
+    //         strcpy(aux, no->var);
+    //         strcat(aux, " - ");
+    //         strcat(aux, auxb);
+    //         strcpy(no->var, aux);
+    //         return auxb;
+    //     } else {
+    //         strcpy(aux, no->var);
+    //         strcat(aux, " - undef");
+    //         strcpy(no->var, aux);
+    //         return "undef";
+    //     }
+    // }
+
+    return string;
 }
 
 sym_tab_list *create_symbol_tab_list(struct node *raiz) {
@@ -257,8 +415,12 @@ sym_tab_list *create_symbol_tab_list(struct node *raiz) {
         if (!strcmp(methodOrField->var, "FieldDecl")) {
             printf("FieldDecl\n");
             // Variaveis globais
-            add_symbol(global, methodOrField->child->brother->name, getType(methodOrField->child->var), NULL, 0);
-            printf("ADD_FieldDecl\n");
+            if (searchType(methodOrField->child->brother, global, NULL, 0) == NULL) {
+                add_symbol(global, methodOrField->child->brother->name, getType(methodOrField->child->var), NULL, NULL, 0);
+                printf("ADD_FieldDecl\n");
+            } else {
+                printf("Variavel ja definida\n");
+            }
 
         } else if (!strcmp(methodOrField->var, "MethodDecl")) {
             printf("MethodDecl\n");
@@ -290,34 +452,36 @@ sym_tab_list *create_symbol_tab_list(struct node *raiz) {
                     }
                     // printf("Parametro Func -> %s\n",lista_parametros->paramType);//QUESTION: pq n tenho acesso a lista aqui??
                     char *parametrosString;
-                    parametrosString = add_symbol(global, methodOrField->child->child->brother->name, getType(methodOrField->child->child->var), lista_parametros, 0);
-                    // printf("param --->%s\n", parametrosString);
-                    // char *parametrosString = add_symbol(global, methodOrField->child->child->brother->name, getType(methodOrField->child->child->var), lista_parametros, 0);
-                    // TODO: criar tabela com o nome correto (nome(Parametros)) para a funcao
-                    // Declaracao de funcoes
-                    tabela = create_sym_tab(methodOrField->child->child->brother, parametrosString, 0);
-                    // printf("paramtabela --->%s\n", tabela->parametros);
-                    printf("MethodHeader -> create_sym_tab\n");
-                    add_sym_table(table_list, tabela);
-                    // sym_tab_list *aux = table_list;
-                    // printf("paramtabelaWHILE --->%s\n", aux->tab->parametros);
-                    // while (aux->next != NULL) {
-                    //     aux = aux->next;
-                    //     printf("paramtabelaWHILE --->%s\n", aux->tab->parametros);
-                    // }
-                    printf("MethodHeader -> add_sym_table\n");
-                    // COLOCA RETURN
-                    add_symbol(tabela, "return", getType(methodOrField->child->child->var), NULL, 0);
-                    // COLOCAR OS PARAMETROS
+                    parametrosString = add_symbol(global, methodOrField->child->child->brother->name, getType(methodOrField->child->child->var), lista_parametros, methodOrField->child->child->brother, 0);
+                    if (parametrosString) {
 
-                    param_list *lista = lista_parametros;
-                    if (lista && strcmp(lista->paramType, "Vazio")) {
-                        add_symbol(tabela, lista->paramId, lista->paramType, NULL, 1);
+                        // printf("param --->%s\n", parametrosString);
+                        // char *parametrosString = add_symbol(global, methodOrField->child->child->brother->name, getType(methodOrField->child->child->var), lista_parametros, 0);
+                        // TODO: criar tabela com o nome correto (nome(Parametros)) para a funcao
+                        tabela = create_sym_tab(methodOrField->child->child->brother, parametrosString, 0);
+                        // printf("paramtabela --->%s\n", tabela->parametros);
+                        printf("MethodHeader -> create_sym_tab\n");
+                        add_sym_table(table_list, tabela);
+                        // sym_tab_list *aux = table_list;
+                        // printf("paramtabelaWHILE --->%s\n", aux->tab->parametros);
+                        // while (aux->next != NULL) {
+                        //     aux = aux->next;
+                        //     printf("paramtabelaWHILE --->%s\n", aux->tab->parametros);
+                        // }
+                        printf("MethodHeader -> add_sym_table\n");
+                        // COLOCA RETURN
+                        add_symbol(tabela, "return", getType(methodOrField->child->child->var), NULL, NULL, 0);
+                        // COLOCAR OS PARAMETROS
 
-                        while (lista->next != NULL) {
-                            // printf("%s -->create_param_list\n", lista_parametros->paramType);
-                            lista = lista->next;
-                            add_symbol(tabela, lista->paramId, lista->paramType, NULL, 1);
+                        param_list *lista = lista_parametros;
+                        if (lista && strcmp(lista->paramType, "Vazio")) {
+                            add_symbol(tabela, lista->paramId, lista->paramType, NULL, NULL, 1);
+
+                            while (lista->next != NULL) {
+                                // printf("%s -->create_param_list\n", lista_parametros->paramType);
+                                lista = lista->next;
+                                add_symbol(tabela, lista->paramId, lista->paramType, NULL, NULL, 1);
+                            }
                         }
                     }
                 }
@@ -328,35 +492,29 @@ sym_tab_list *create_symbol_tab_list(struct node *raiz) {
                 struct node *varDeclOrReturn = methodBody->child;
                 while (varDeclOrReturn) {
                     if (!strcmp(varDeclOrReturn->var, "VarDecl")) {
-                        // TODO:
-                        add_symbol(tabela, varDeclOrReturn->child->brother->name, getType(varDeclOrReturn->child->var), NULL, 0); // TODO: VERIFICAR SE E PARAMETRO!!
+                        add_symbol(tabela, varDeclOrReturn->child->brother->name, getType(varDeclOrReturn->child->var), NULL, NULL, 0); // TODO: VERIFICAR SE E PARAMETRO!!
                     } else if (!strcmp(varDeclOrReturn->var, "Return")) {
+                        // printf("F\n");
                         // if(DEBUG) printf("'return' -> %d\n", 1);
                         char *aux;
                         if (varDeclOrReturn->child) {
-                            aux = searchType(varDeclOrReturn->child, global, tabela);
+                            // printf("--->%s\n", varDeclOrReturn->child->var);
+                            aux = getTypeOperation(varDeclOrReturn->child, global, tabela);
+                            // printf("Fuii\n");
                         } else {
                             aux = "void";
                         }
-                        if (aux == NULL) {
-                            printf("AINDA FALTA IR PROCURAR O TIPO DESTA VARIAVEL OU A VARIAVEL NAO EXISTE MM\n"); // DEBUG: MAIS A FRENTE TIRAR ESTE IF
-                        } else if (strcmp(aux, tabela->symbols->type)) {                                           // FIXME: A variavel existe !!
+                        if (aux == NULL) {                                                                                                                                      // SE FOR UMA OPERACAO OU UMA DECLARACAO PROCURAR O TIPO, EX DECLIT,ADD,...
+                            printf("Line %d, col %d: VARIAVEL NAO EXISTE MM %s\n", varDeclOrReturn->child->linha, varDeclOrReturn->child->coluna, varDeclOrReturn->child->var); // DEBUG: MAIS A FRENTE TIRAR ESTE IF
+                        } else if (strcmp(aux, tabela->symbols->type)) {                                                                                                        // FIXME: A variavel existe !!
                             // if(DEBUG) printf("'return' -> %s\n", varDeclOrReturn->child->name);
                             if (varDeclOrReturn->child) {
-                                printf("Line %d, col %d: Incompatible type %s in return statement\n", varDeclOrReturn->child->linha, varDeclOrReturn->child->coluna, tabela->symbols->type);
+                                printf("Line %d, col %d: Incompatible type %s in return statement\n", varDeclOrReturn->child->linha, varDeclOrReturn->child->coluna, aux);
                             } else {
-                                printf("Line %d, col %d: Incompatible type %s in return statement\n", varDeclOrReturn->linha, varDeclOrReturn->coluna, tabela->symbols->type);
+                                printf("Line %d, col %d: Incompatible type %s in return statement\n", varDeclOrReturn->linha, varDeclOrReturn->coluna, aux);
                             }
                         }
-                        // struct simbolo *cauda = (struct simbolo *)malloc(sizeof(struct simbolo));
-                        // cauda = tabela->symbols;
-                        // tabela->symbols = (struct simbolo *)malloc(sizeof(struct simbolo));
-                        // tabela->symbols->name = "return";
-                        // tabela->symbols->type = "Type TODO";
-                        // tabela->symbols->methodParams = NULL;
-                        // strcpy(tabela->symbols->parametrosString, "");
-                        // tabela->symbols->param = 0;
-                        // tabela->symbols->next = cauda;
+                        // printf("Passei\n");
                     }
                     varDeclOrReturn = varDeclOrReturn->brother;
                 }
