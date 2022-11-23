@@ -15,6 +15,8 @@
 typedef struct parametros_funcao{
     char *paramType;
     char *paramId;
+    int linha;
+    int col;
     struct parametros_funcao *next;
 
 } param_list;
@@ -61,6 +63,8 @@ char *searchType(struct node *no, sym_tab *global, sym_tab *tabela,int altera);
 char *getTypeOperation(struct node *no, sym_tab *global, sym_tab *tabela);
 
 int searchFunc(struct simbolo * simbolo, sym_tab *global, char *parametrosString);
+
+char *verifyParams (param_list *lista, sym_tab *tabela);
 
 sym_tab *create_sym_tab(struct node * no, char *parametros, int is_class);
 
