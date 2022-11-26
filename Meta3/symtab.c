@@ -316,7 +316,8 @@ char *getTypeOperation(struct node *no, sym_tab *global, sym_tab *tabela) {
     char aux[64];
 
     char *aux1 = strndup(no->var, 2);
-    printf("DEBUG\"getTypeOperation\" --->>%s\n", aux1);
+    if (DEBUG)
+        printf("DEBUG\"getTypeOperation\" --->>%s\n", aux1);
     if (!strcmp("De", aux1)) { // Declit
         strcpy(aux, no->var);
         strcat(aux, " - int");
@@ -368,11 +369,12 @@ char *getTypeOperation(struct node *no, sym_tab *global, sym_tab *tabela) {
         //             printf("Line %d, col %d: Operator * cannot be applied to types %s, %s\n", no->linha, no->coluna, auxc, auxb);
         //         else if (!strcmp("Di", aux1))
         //             printf("Line %d, col %d: Operator / cannot be applied to types %s, %s\n", no->linha, no->coluna, auxc, auxb);
-    }else if (!strcmp("Ca", aux1)) {
-        return callHandler(no,global,tabela);
+    } else if (!strcmp("Ca", aux1)) {
+        return callHandler(no, global, tabela);
     }
     // } else if (!strcmp("Ge", aux1) || !strcmp("Gt", aux1) || !strcmp("Le", aux1) || !strcmp("Lt", aux1)) {
-    // } else { // SE ENTRAR E PQ E UMA OPERACAO("ASSIGN,...")
+    // }
+    // else if(!strcmp("As", aux1)){ // SE ENTRAR E PQ E UMA OPERACAO("ASSIGN,...")
     //     char *auxc = getTypeOperation(no->child, global, tabela);
     //     char *auxb = getTypeOperation(no->child->brother, global, tabela);
     //     if (!strcmp(auxc, auxb)) {
@@ -387,6 +389,8 @@ char *getTypeOperation(struct node *no, sym_tab *global, sym_tab *tabela) {
     //         strcpy(no->var, aux);
     //         return "undef";
     //     }
+    //     if (DEBUG)
+    //         printf("getTypeOperation--> %s/n", string);
     // }
     // if (DEBUG)
     //     printf("getTypeOperation--> %s/n", string);
@@ -416,7 +420,7 @@ char *verifyParams(param_list *lista, sym_tab *tabela) {
     return TIPO;
 }
 
-char * callHandler(struct node *no, sym_tab *global, sym_tab *tabela) {
+char *callHandler(struct node *no, sym_tab *global, sym_tab *tabela) {
     // Consultar os argumentos da funcao
     node *funcao = no->child;
     node *argumentos = funcao->brother;
@@ -516,7 +520,7 @@ char * callHandler(struct node *no, sym_tab *global, sym_tab *tabela) {
         if (DEBUG)
             printf("'string' -> %s\n", string);
         strcpy(funcao->var, aux);
-        char * str = (char *)malloc(sizeof(str));
+        char *str = (char *)malloc(sizeof(str));
         str = &func_type[0];
         return str;
     }
@@ -525,24 +529,24 @@ char * callHandler(struct node *no, sym_tab *global, sym_tab *tabela) {
 sym_tab_list *create_symbol_tab_list(struct node *raiz) {
     sym_tab_list *table_list = NULL;
     sym_tab *global = create_sym_tab(raiz->child, NULL, 1);
-    printf("%s\n", global->name);
+    if (DEBUG) printf("%s\n", global->name);
     table_list = add_sym_table(table_list, global);
 
     // Pode ser MethodDecl ou FieldDecl
     node *methodOrField = raiz->child->brother;
     while (methodOrField) {
         if (!strcmp(methodOrField->var, "FieldDecl")) {
-            printf("FieldDecl\n");
+            if (DEBUG) printf("FieldDecl\n");
             // Variaveis globais
             add_symbol(global, methodOrField->child->brother->name, getType(methodOrField->child->var), NULL, NULL, 0);
-            printf("ADD_FieldDecl\n");
+            if (DEBUG) printf("ADD_FieldDecl\n");
 
         } else if (!strcmp(methodOrField->var, "MethodDecl")) {
-            printf("MethodDecl\n");
+            if (DEBUG) printf("MethodDecl\n");
             sym_tab *tabela = (struct tabela_simbolos *)malloc(sizeof(struct tabela_simbolos));
             // Contem o nome da funcao
             if (!strcmp(methodOrField->child->var, "MethodHeader")) {
-                printf("MethodHeader\n");
+                if (DEBUG) printf("MethodHeader\n");
                 // Parametros da funcao
                 struct node *MP = methodOrField->child->child->brother->brother;
                 if (!strcmp(MP->var, "MethodParams")) {
@@ -553,7 +557,7 @@ sym_tab_list *create_symbol_tab_list(struct node *raiz) {
                     if (parametros) {
                         while (parametros) {
                             //==================
-                            printf("MethodParams\n");
+                            if (DEBUG) printf("MethodParams\n");
                             lista_parametros = create_param_list(lista_parametros, parametros->child);
 
                             //====================
@@ -570,10 +574,10 @@ sym_tab_list *create_symbol_tab_list(struct node *raiz) {
 
                         tabela = create_sym_tab(methodOrField->child->child->brother, parametrosString, 0);
 
-                        printf("MethodHeader -> create_sym_tab\n");
+                        if (DEBUG) printf("MethodHeader -> create_sym_tab\n");
                         add_sym_table(table_list, tabela);
 
-                        printf("MethodHeader -> add_sym_table\n");
+                        if (DEBUG) printf("MethodHeader -> add_sym_table\n");
                         // COLOCA RETURN
                         add_symbol(tabela, "return", getType(methodOrField->child->child->var), NULL, NULL, 0);
                         // COLOCAR OS PARAMETROS
@@ -610,7 +614,7 @@ sym_tab_list *create_symbol_tab_list(struct node *raiz) {
                             aux = "void";
                         }
                         if (aux == NULL) {                                                                                                                                      // SE FOR UMA OPERACAO OU UMA DECLARACAO PROCURAR O TIPO, EX DECLIT,ADD,...
-                            printf("Line %d, col %d: VARIAVEL NAO EXISTE MM %s\n", varDeclOrReturn->child->linha, varDeclOrReturn->child->coluna, varDeclOrReturn->child->var); // DEBUG: MAIS A FRENTE TIRAR ESTE IF
+                            printf("Line %d, col %d: ] %s\n", varDeclOrReturn->child->linha, varDeclOrReturn->child->coluna, varDeclOrReturn->child->var); // DEBUG: MAIS A FRENTE TIRAR ESTE IF
                         } else if (strcmp(aux, tabela->symbols->type)) {                                                                                                        // FIXME: A variavel existe !!
                             if (varDeclOrReturn->child) {
                                 printf("Line %d, col %d: Incompatible type %s in return statement\n", varDeclOrReturn->child->linha, varDeclOrReturn->child->coluna, aux);
@@ -618,8 +622,9 @@ sym_tab_list *create_symbol_tab_list(struct node *raiz) {
                                 printf("Line %d, col %d: Incompatible type %s in return statement\n", varDeclOrReturn->linha, varDeclOrReturn->coluna, aux);
                             }
                         }
-                    }else if (!strcmp(varDeclOrReturn->var, "Call")) {
-                        getTypeOperation(varDeclOrReturn->child, global, tabela);
+                    } else {
+                        // callHandler(varDeclOrReturn, global, tabela);
+                        getTypeOperation(varDeclOrReturn, global, tabela);
                     }
                     varDeclOrReturn = varDeclOrReturn->brother;
                 }
@@ -627,6 +632,6 @@ sym_tab_list *create_symbol_tab_list(struct node *raiz) {
         }
         methodOrField = methodOrField->brother;
     }
-    printf("FIM_CREATE_SYMBOL_TABLE_LIST\n");
+    if (DEBUG) printf("FIM_CREATE_SYMBOL_TABLE_LIST\n");
     return table_list;
 }
