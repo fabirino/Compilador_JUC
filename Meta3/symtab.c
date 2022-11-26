@@ -368,9 +368,10 @@ char *getTypeOperation(struct node *no, sym_tab *global, sym_tab *tabela) {
         //             printf("Line %d, col %d: Operator * cannot be applied to types %s, %s\n", no->linha, no->coluna, auxc, auxb);
         //         else if (!strcmp("Di", aux1))
         //             printf("Line %d, col %d: Operator / cannot be applied to types %s, %s\n", no->linha, no->coluna, auxc, auxb);
+    }else if (!strcmp("Ca", aux1)) {
+        return callHandler(no,global,tabela);
     }
     // } else if (!strcmp("Ge", aux1) || !strcmp("Gt", aux1) || !strcmp("Le", aux1) || !strcmp("Lt", aux1)) {
-    // } else if (!strcmp("Ca", aux1)) {
     // } else { // SE ENTRAR E PQ E UMA OPERACAO("ASSIGN,...")
     //     char *auxc = getTypeOperation(no->child, global, tabela);
     //     char *auxb = getTypeOperation(no->child->brother, global, tabela);
@@ -415,7 +416,7 @@ char *verifyParams(param_list *lista, sym_tab *tabela) {
     return TIPO;
 }
 
-void callHandler(struct node *no, sym_tab *global, sym_tab *tabela) {
+char * callHandler(struct node *no, sym_tab *global, sym_tab *tabela) {
     // Consultar os argumentos da funcao
     node *funcao = no->child;
     node *argumentos = funcao->brother;
@@ -499,6 +500,7 @@ void callHandler(struct node *no, sym_tab *global, sym_tab *tabela) {
         strcpy(aux, funcao->var);
         strcat(aux, " - undef");
         strcpy(funcao->var, aux);
+        return "undef";
     } else {
         // Type do call
         memset(aux, 0, 64);
@@ -511,8 +513,12 @@ void callHandler(struct node *no, sym_tab *global, sym_tab *tabela) {
         strcpy(aux, funcao->var);
         strcat(aux, " - ");
         strcat(aux, string);
-        if(DEBUG) printf("'string' -> %s\n", string);
-        // strcpy(funcao->var, aux);
+        if (DEBUG)
+            printf("'string' -> %s\n", string);
+        strcpy(funcao->var, aux);
+        char * str = (char *)malloc(sizeof(str));
+        str = &func_type[0];
+        return str;
     }
 }
 
@@ -596,29 +602,24 @@ sym_tab_list *create_symbol_tab_list(struct node *raiz) {
                     if (!strcmp(varDeclOrReturn->var, "VarDecl")) {
                         add_symbol(tabela, varDeclOrReturn->child->brother->name, getType(varDeclOrReturn->child->var), NULL, varDeclOrReturn->child->brother, 0); // TODO: VERIFICAR SE E PARAMETRO!!
                     } else if (!strcmp(varDeclOrReturn->var, "Return")) {
-                        if (varDeclOrReturn->child && !strcmp(varDeclOrReturn->child->var, "Call")) {
-                            callHandler(varDeclOrReturn->child, global, tabela);
+
+                        char *aux;
+                        if (varDeclOrReturn->child) {
+                            aux = getTypeOperation(varDeclOrReturn->child, global, tabela);
                         } else {
-                            char *aux;
+                            aux = "void";
+                        }
+                        if (aux == NULL) {                                                                                                                                      // SE FOR UMA OPERACAO OU UMA DECLARACAO PROCURAR O TIPO, EX DECLIT,ADD,...
+                            printf("Line %d, col %d: VARIAVEL NAO EXISTE MM %s\n", varDeclOrReturn->child->linha, varDeclOrReturn->child->coluna, varDeclOrReturn->child->var); // DEBUG: MAIS A FRENTE TIRAR ESTE IF
+                        } else if (strcmp(aux, tabela->symbols->type)) {                                                                                                        // FIXME: A variavel existe !!
                             if (varDeclOrReturn->child) {
-                                aux = getTypeOperation(varDeclOrReturn->child, global, tabela);
+                                printf("Line %d, col %d: Incompatible type %s in return statement\n", varDeclOrReturn->child->linha, varDeclOrReturn->child->coluna, aux);
                             } else {
-                                aux = "void";
-                            }
-                            if (aux == NULL) {                                                                                                                                      // SE FOR UMA OPERACAO OU UMA DECLARACAO PROCURAR O TIPO, EX DECLIT,ADD,...
-                                printf("Line %d, col %d: VARIAVEL NAO EXISTE MM %s\n", varDeclOrReturn->child->linha, varDeclOrReturn->child->coluna, varDeclOrReturn->child->var); // DEBUG: MAIS A FRENTE TIRAR ESTE IF
-                            } else if (strcmp(aux, tabela->symbols->type)) {                                                                                                        // FIXME: A variavel existe !!
-                                if (varDeclOrReturn->child) {
-                                    printf("Line %d, col %d: Incompatible type %s in return statement\n", varDeclOrReturn->child->linha, varDeclOrReturn->child->coluna, aux);
-                                } else {
-                                    printf("Line %d, col %d: Incompatible type %s in return statement\n", varDeclOrReturn->linha, varDeclOrReturn->coluna, aux);
-                                }
+                                printf("Line %d, col %d: Incompatible type %s in return statement\n", varDeclOrReturn->linha, varDeclOrReturn->coluna, aux);
                             }
                         }
-                    }
-
-                    else if (!strcmp(varDeclOrReturn->var, "Call")) {
-                        callHandler(varDeclOrReturn, global, tabela);
+                    }else if (!strcmp(varDeclOrReturn->var, "Call")) {
+                        getTypeOperation(varDeclOrReturn->child, global, tabela);
                     }
                     varDeclOrReturn = varDeclOrReturn->brother;
                 }

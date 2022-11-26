@@ -69,6 +69,6 @@ char *verifyParams (param_list *lista, sym_tab *tabela);
 
 sym_tab *create_sym_tab(struct node * no, char *parametros, int is_class);
 
-void callHandler(struct node *no, sym_tab *global, sym_tab *tabela);
+char * callHandler(struct node *no, sym_tab *global, sym_tab *tabela);
 
 #endif
