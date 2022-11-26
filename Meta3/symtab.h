@@ -7,6 +7,7 @@
 #define SYMTAB_H
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include "STree.h"
 
@@ -67,5 +68,7 @@ int searchFunc(struct simbolo * simbolo, sym_tab *global, char *parametrosString
 char *verifyParams (param_list *lista, sym_tab *tabela);
 
 sym_tab *create_sym_tab(struct node * no, char *parametros, int is_class);
+
+void callHandler(struct node *no, sym_tab *global, sym_tab *tabela);
 
 #endif
