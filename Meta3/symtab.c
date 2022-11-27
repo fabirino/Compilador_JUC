@@ -327,19 +327,19 @@ char *getTypeOperation(struct node *no, sym_tab *global, sym_tab *tabela) {
         if (val < -2147483648 || val > 2147483648) {
             printf("Line %d, col %d: Number %s out of bounds\n", no->linha, no->coluna, no->name);
         }
-        return "int";
+        string = "int";
     } else if (!strcmp("Re", aux1)) { // Realit
         strcpy(aux, no->var);
         strcat(aux, " - double");
         strcpy(no->var, aux);
-        return "double";
+        string = "double";
     } else if (!strcmp("Bo", aux1)) { // Boolit
         strcpy(aux, no->var);
         strcat(aux, " - boolean");
         strcpy(no->var, aux);
-        return "boolean";
+        string = "boolean";
     } else if (!strcmp("Id", aux1)) { // Id
-        return searchType(no, global, tabela, 1);
+        string = searchType(no, global, tabela, 1);
 
     } else if (!strcmp("Le", aux1)) { // Length
         char *auxc = getTypeOperation(no->child, global, tabela);
@@ -350,28 +350,42 @@ char *getTypeOperation(struct node *no, sym_tab *global, sym_tab *tabela) {
         if (strcmp(auxc, "String[]")) {
             printf("Line %d, col%d: Operator .length cannot be applied to type %s\n", no->linha, no->coluna, auxc);
         }
-        return auxc;
+        string = auxc;
     } else if (!strcmp("Ad", aux1) || !strcmp("Su", aux1) || !strcmp("Mu", aux1) || !strcmp("Di", aux1)) { // Add || Sub || Mul || Div
         char *auxc = getTypeOperation(no->child, global, tabela);
         char *auxb = getTypeOperation(no->child->brother, global, tabela);
-        //     if ((!strcmp(auxc, "int") || !strcmp(auxc, "double")) && (!strcmp(auxb, "int") || !strcmp(auxb, "double"))) {
-        //         strcpy(aux, no->var);
-        //         strcat(aux, " - double");
-        //         strcpy(no->var, aux);
-        //     } else {
-        //         strcpy(aux, no->var);
-        //         strcat(aux, " - undef");
-        //         strcpy(no->var, aux);
-        //         if (!strcmp("Ad", aux1))
-        //             printf("Line %d, col %d: Operator + cannot be applied to types %s, %s\n", no->linha, no->coluna, auxc, auxb);
-        //         else if (!strcmp("Su", aux1))
-        //             printf("Line %d, col %d: Operator - cannot be applied to types %s, %s\n", no->linha, no->coluna, auxc, auxb);
-        //         else if (!strcmp("Mu", aux1))
-        //             printf("Line %d, col %d: Operator * cannot be applied to types %s, %s\n", no->linha, no->coluna, auxc, auxb);
-        //         else if (!strcmp("Di", aux1))
-        //             printf("Line %d, col %d: Operator / cannot be applied to types %s, %s\n", no->linha, no->coluna, auxc, auxb);
+
+        printf("------>%s %s|%s\n",no->var, auxc, auxb);
+        if (auxc && auxb) {
+            char tip1[32];
+            strcpy(tip1, auxc);
+            char tip2[32];
+            strcpy(tip2, auxb);
+            if (!strcmp(tip1, tip2) && (!strcmp(tip1, "int") || !strcmp(tip1, "double"))) {
+                strcpy(aux, no->var);
+                strcat(aux, " - ");
+                strcat(aux, tip1);
+                if (DEBUG)
+                    printf("'aux->' -> %s\n", aux);
+                no->var = (char *)malloc(sizeof(aux));
+                strcpy(no->var, aux);
+            } else {
+                strcpy(aux, no->var);
+                strcat(aux, " - undef");
+                no->var = (char *)malloc(sizeof(aux));
+                strcpy(no->var, aux);
+                if (!strcmp("Ad", aux1))
+                    printf("Line %d, col %d: Operator + cannot be applied to types %s, %s\n", no->linha, no->coluna, auxc, auxb);
+                else if (!strcmp("Su", aux1))
+                    printf("Line %d, col %d: Operator - cannot be applied to types %s, %s\n", no->linha, no->coluna, auxc, auxb);
+                else if (!strcmp("Mu", aux1))
+                    printf("Line %d, col %d: Operator * cannot be applied to types %s, %s\n", no->linha, no->coluna, auxc, auxb);
+                else if (!strcmp("Di", aux1))
+                    printf("Line %d, col %d: Operator / cannot be applied to types %s, %s\n", no->linha, no->coluna, auxc, auxb);
+            }
+        }
     } else if (!strcmp("Ca", aux1)) {
-        return callHandler(no, global, tabela);
+        string = callHandler(no, global, tabela);
     }
     // } else if (!strcmp("Ge", aux1) || !strcmp("Gt", aux1) || !strcmp("Le", aux1) || !strcmp("Lt", aux1)) {
     // }
@@ -395,6 +409,7 @@ char *getTypeOperation(struct node *no, sym_tab *global, sym_tab *tabela) {
     // }
     // if (DEBUG)
     //     printf("getTypeOperation--> %s/n", string);
+    printf("string -> %s\n", string);
     return string;
 }
 
@@ -465,7 +480,7 @@ char *callHandler(struct node *no, sym_tab *global, sym_tab *tabela) {
 
         } else if (!strcmp("Id", aux1)) { // Id
             type = searchType(argumentos, global, tabela, 1);
-            strcat(string,type);
+            strcat(string, type);
             if (DEBUG)
                 printf("'Type' -> %s\n", type);
         }
@@ -474,8 +489,6 @@ char *callHandler(struct node *no, sym_tab *global, sym_tab *tabela) {
             strcat(string, ",");
         }
         count--;
-        if (DEBUG)
-            printf("'string' -> %s\n", string);
         argumentos = argumentos->brother;
     }
     strcat(string, ")");
