@@ -355,13 +355,13 @@ char *getTypeOperation(struct node *no, sym_tab *global, sym_tab *tabela) {
         char *auxc = getTypeOperation(no->child, global, tabela);
         char *auxb = getTypeOperation(no->child->brother, global, tabela);
 
-        printf("------>%s %s|%s\n",no->var, auxc, auxb);
+        printf("------>%s %s|%s\n", no->var, auxc, auxb);
         if (auxc && auxb) {
             char tip1[32];
             strcpy(tip1, auxc);
             char tip2[32];
             strcpy(tip2, auxb);
-            if (!strcmp(tip1, tip2) && (!strcmp(tip1, "int") || !strcmp(tip1, "double"))) {
+            if ((!strcmp(tip1, tip2) || !strcmp(tip1, "double"))) {
                 strcpy(aux, no->var);
                 strcat(aux, " - ");
                 strcat(aux, tip1);
@@ -369,6 +369,15 @@ char *getTypeOperation(struct node *no, sym_tab *global, sym_tab *tabela) {
                     printf("'aux->' -> %s\n", aux);
                 no->var = (char *)malloc(sizeof(aux));
                 strcpy(no->var, aux);
+                string = auxb;
+            } else if ((!strcmp(tip1, "int") && !strcmp(tip2, "double")) ||(!strcmp(tip2, "int") && !strcmp(tip1, "double")) ) {
+                strcpy(aux, no->var);
+                strcat(aux, " - double");
+                if (DEBUG)
+                    printf("'aux->' -> %s\n", aux);
+                no->var = (char *)malloc(sizeof(aux));
+                strcpy(no->var, aux);
+                string = "double";
             } else {
                 strcpy(aux, no->var);
                 strcat(aux, " - undef");
@@ -382,6 +391,7 @@ char *getTypeOperation(struct node *no, sym_tab *global, sym_tab *tabela) {
                     printf("Line %d, col %d: Operator * cannot be applied to types %s, %s\n", no->linha, no->coluna, auxc, auxb);
                 else if (!strcmp("Di", aux1))
                     printf("Line %d, col %d: Operator / cannot be applied to types %s, %s\n", no->linha, no->coluna, auxc, auxb);
+                string = "undef";
             }
         }
     } else if (!strcmp("Ca", aux1)) {
