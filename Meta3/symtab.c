@@ -370,7 +370,7 @@ char *getTypeOperation(struct node *no, sym_tab *global, sym_tab *tabela) {
                 no->var = (char *)malloc(sizeof(aux));
                 strcpy(no->var, aux);
                 string = auxb;
-            } else if ((!strcmp(tip1, "int") && !strcmp(tip2, "double")) ||(!strcmp(tip2, "int") && !strcmp(tip1, "double")) ) {
+            } else if ((!strcmp(tip1, "int") && !strcmp(tip2, "double")) || (!strcmp(tip2, "int") && !strcmp(tip1, "double"))) {
                 strcpy(aux, no->var);
                 strcat(aux, " - double");
                 if (DEBUG)
@@ -399,24 +399,37 @@ char *getTypeOperation(struct node *no, sym_tab *global, sym_tab *tabela) {
     }
     // } else if (!strcmp("Ge", aux1) || !strcmp("Gt", aux1) || !strcmp("Le", aux1) || !strcmp("Lt", aux1)) {
     // }
-    // else if(!strcmp("As", aux1)){ // SE ENTRAR E PQ E UMA OPERACAO("ASSIGN,...")
-    //     char *auxc = getTypeOperation(no->child, global, tabela);
-    //     char *auxb = getTypeOperation(no->child->brother, global, tabela);
-    //     if (!strcmp(auxc, auxb)) {
-    //         strcpy(aux, no->var);
-    //         strcat(aux, " - ");
-    //         strcat(aux, auxb);
-    //         strcpy(no->var, aux);
-    //         return auxb;
-    //     } else {
-    //         strcpy(aux, no->var);
-    //         strcat(aux, " - undef");
-    //         strcpy(no->var, aux);
-    //         return "undef";
-    //     }
+    else if (!strcmp("As", aux1)) { // SE ENTRAR E PQ E UMA OPERACAO("ASSIGN,...")
+        printf("1\n");
+        char *auxc = getTypeOperation(no->child, global, tabela);
+        char *auxb = getTypeOperation(no->child->brother, global, tabela);
+        if (auxc && auxb) {
+            char tip1[32];
+            strcpy(tip1, auxc);
+            char tip2[32];
+            strcpy(tip2, auxb);
+            if (DEBUG)
+                    printf("'<Assign-->' -> %s|%s\n", tip1,tip2);
+            if (!strcmp(auxc, auxb)) {
+                strcpy(aux, no->var);
+                strcat(aux, " - ");
+                strcat(aux, auxb);
+                no->var = (char *)malloc(sizeof(aux));
+                strcpy(no->var, aux);
+                string = auxb;
+            } else {
+                strcpy(aux, no->var);
+                strcat(aux, " - ");
+                strcat(aux, auxc);
+                no->var = (char *)malloc(sizeof(aux));
+                strcpy(no->var, aux);
+                printf("Line %d, col %d: Operator = cannot be applied to types %s, %s\n",no->linha,no->coluna,auxc,auxb);
+                string = auxc;
+            }
+        }
     //     if (DEBUG)
     //         printf("getTypeOperation--> %s/n", string);
-    // }
+    }
     // if (DEBUG)
     //     printf("getTypeOperation--> %s/n", string);
     printf("string -> %s\n", string);
