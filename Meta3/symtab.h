@@ -11,7 +11,7 @@
 #include <string.h>
 #include "STree.h"
 
-#define DEBUG 1
+#define DEBUG 0
 
 typedef struct parametros_funcao{
     char *paramType;

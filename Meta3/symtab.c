@@ -393,7 +393,7 @@ char *getTypeOperation(struct node *no, sym_tab *global, sym_tab *tabela) {
                 string = "undef";
             }
         }else{
-            if(auxb){ //existe filho
+            if (auxc == NULL && auxb == NULL){
                 strcpy(aux, no->var);
                 strcat(aux, " - undef");
                 no->var = (char *)malloc(sizeof(aux));
@@ -401,7 +401,22 @@ char *getTypeOperation(struct node *no, sym_tab *global, sym_tab *tabela) {
                 string = "undef";
                 auxc = (char *)malloc(sizeof(string));
                 auxc = string;
-            }else if(auxc){ 
+                strcpy(aux, no->var);
+                strcat(aux, " - undef");
+                no->var = (char *)malloc(sizeof(aux));
+                strcpy(no->var, aux);
+                auxb = (char *)malloc(sizeof(string));
+                auxb = string;
+            }
+            else if(auxc == NULL){ //existe filho
+                strcpy(aux, no->var);
+                strcat(aux, " - undef");
+                no->var = (char *)malloc(sizeof(aux));
+                strcpy(no->var, aux);
+                string = "undef";
+                auxc = (char *)malloc(sizeof(string));
+                auxc = string;
+            }else if(auxb == NULL){ 
                 strcpy(aux, no->var);
                 strcat(aux, " - undef");
                 no->var = (char *)malloc(sizeof(aux));
