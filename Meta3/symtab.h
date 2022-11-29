@@ -11,7 +11,7 @@
 #include <string.h>
 #include "STree.h"
 
-#define DEBUG 1
+#define DEBUG 0
 
 typedef struct parametros_funcao{
     char *paramType;
@@ -59,7 +59,7 @@ sym_tab_list *create_symbol_tab_list(struct node * raiz);
 
 param_list *create_param_list(param_list *lista, struct node * no);
 
-char *searchType(struct node *no, sym_tab *global, sym_tab *tabela,int altera);
+char *searchType(struct node *no, sym_tab *global, sym_tab *tabela, int altera);
 
 char *getTypeOperation(struct node *no, sym_tab *global, sym_tab *tabela);
 
