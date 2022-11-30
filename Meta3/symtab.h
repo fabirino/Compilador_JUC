@@ -61,14 +61,19 @@ param_list *create_param_list(param_list *lista, struct node * no);
 
 char *searchType(struct node *no, sym_tab *global, sym_tab *tabela, int altera);
 
+char * callHandler(struct node *no, sym_tab *global, sym_tab *tabela);
+
 char *getTypeOperation(struct node *no, sym_tab *global, sym_tab *tabela);
 
 int searchFunc(struct simbolo * simbolo, sym_tab *global, char *parametrosString);
 
 char *verifyParams (param_list *lista, sym_tab *tabela);
 
+sym_tab *searchTable(char *name, char *parametros, sym_tab_list *lista);
+
+void commentnodes(struct node *raiz,sym_tab *global,sym_tab_list *lista);
+
 sym_tab *create_sym_tab(struct node * no, char *parametros, int is_class);
 
-char * callHandler(struct node *no, sym_tab *global, sym_tab *tabela);
 
 #endif

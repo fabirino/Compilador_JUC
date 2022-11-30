@@ -251,7 +251,7 @@ Expr2           :       Expr2 PLUS Expr2                                    {$$ 
                 |       LPAR Expr RPAR                                      {$$ = $2;}
                 |       MethodInvocation                                    {$$ = $1;}
                 |       ParseArgs                                           {$$ = $1;}
-                |       ID DOTLENGTH                                        {$$ = newNode("Length","", contador_linhas, col); sprintf(message, "Id(%s)", $1.message); $$->child = newNode(strdup(message),strdup($1.message), $1.line, $1.col);} 
+                |       ID DOTLENGTH                                        {$$ = newNode("Length","", $2.line, $2.col); sprintf(message, "Id(%s)", $1.message); $$->child = newNode(strdup(message),strdup($1.message), $1.line, $1.col);} 
                 |       ID                                                  {sprintf(message, "Id(%s)", $1.message); $$ = newNode(strdup(message),strdup($1.message), $1.line, $1.col);}
                 |       INTLIT                                              {sprintf(message, "DecLit(%s)", $1.message); $$ = newNode(strdup(message),strdup($1.message), $1.line, $1.col);}
                 |       REALLIT                                             {sprintf(message, "RealLit(%s)", $1.message); $$ = newNode(strdup(message),strdup($1.message), $1.line, $1.col);}

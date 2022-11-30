@@ -224,7 +224,7 @@ param_list *create_param_list(param_list *lista, struct node *no) {
     return lista;
 }
 
-char *searchType(struct node *no, sym_tab *global, sym_tab *tabela,int altera) {
+char *searchType(struct node *no, sym_tab *global, sym_tab *tabela, int altera) {
     char *string;
     char aux[64];
 
@@ -232,7 +232,7 @@ char *searchType(struct node *no, sym_tab *global, sym_tab *tabela,int altera) {
     if (tabela) {
         symbol *lista_simbolos = tabela->symbols;
         if (lista_simbolos) {
-            if (!strcmp(no->name, lista_simbolos->name) && !strcmp("", lista_simbolos->parametrosString)) {
+            if (!strcmp(no->name, lista_simbolos->name) && lista_simbolos->methodParams == NULL) {
                 if (altera) {
                     strcpy(aux, no->var);
                     strcat(aux, " - ");
@@ -244,7 +244,7 @@ char *searchType(struct node *no, sym_tab *global, sym_tab *tabela,int altera) {
             while (lista_simbolos->next != NULL) {
                 lista_simbolos = lista_simbolos->next;
 
-                if (!strcmp(no->name, lista_simbolos->name)) {
+                if (!strcmp(no->name, lista_simbolos->name) && lista_simbolos->methodParams == NULL) {
 
                     if (altera) {
                         strcpy(aux, no->var);
@@ -263,7 +263,7 @@ char *searchType(struct node *no, sym_tab *global, sym_tab *tabela,int altera) {
 
         if (lista_simbolos) {
 
-            if (!strcmp(no->name, lista_simbolos->name) && lista_simbolos->param == 0) {
+            if (!strcmp(no->name, lista_simbolos->name) && lista_simbolos->param == 0 && lista_simbolos->methodParams == NULL) {
                 if (altera) {
                     strcpy(aux, no->var);
                     strcat(aux, " - ");
@@ -275,7 +275,7 @@ char *searchType(struct node *no, sym_tab *global, sym_tab *tabela,int altera) {
             while (lista_simbolos->next != NULL) {
                 // printf("WHILE \"add_symbol\"\n");
                 lista_simbolos = lista_simbolos->next;
-                if (!strcmp(no->name, lista_simbolos->name) && lista_simbolos->param == 0) {
+                if (!strcmp(no->name, lista_simbolos->name) && lista_simbolos->param == 0 && lista_simbolos->methodParams == NULL) {
                     if (altera) {
                         strcpy(aux, no->var);
                         strcat(aux, " - ");
@@ -401,13 +401,11 @@ char *getTypeOperation(struct node *no, sym_tab *global, sym_tab *tabela) {
                 string = "undef";
                 auxc = (char *)malloc(sizeof(string));
                 auxc = string;
-                strcpy(aux, no->var);
-                strcat(aux, " - undef");
                 no->var = (char *)malloc(sizeof(aux));
                 strcpy(no->var, aux);
                 auxb = (char *)malloc(sizeof(string));
                 auxb = string;
-            } else if (auxc == NULL) { // existe filho
+            } else if (auxc == NULL) { // nao existe filho
                 strcpy(aux, no->var);
                 strcat(aux, " - undef");
                 no->var = (char *)malloc(sizeof(aux));
@@ -450,7 +448,7 @@ char *getTypeOperation(struct node *no, sym_tab *global, sym_tab *tabela) {
             if ((!strcmp(auxc, auxb) && (!strcmp(auxc, "double") || !strcmp(auxc, "int")))) { // verificar se e int ou double
                 // continua
             } else if ((!strcmp(auxc, "int") && !strcmp(auxb, "double")) || (!strcmp(auxb, "int") && !strcmp(auxc, "double"))) {
-                //continua
+                // continua
             } else {
                 if (!strcmp("Ge", aux1))
                     printf("Line %d, col %d: Operator >= cannot be applied to types %s, %s\n", no->linha, no->coluna, auxc, auxb);
@@ -548,9 +546,6 @@ char *getTypeOperation(struct node *no, sym_tab *global, sym_tab *tabela) {
                 string = "undef";
                 auxc = (char *)malloc(sizeof(string));
                 auxc = string;
-
-                strcpy(aux, no->var);
-                strcat(aux, " - undef");
                 no->var = (char *)malloc(sizeof(aux));
                 strcpy(no->var, aux);
                 auxb = (char *)malloc(sizeof(string));
@@ -575,14 +570,13 @@ char *getTypeOperation(struct node *no, sym_tab *global, sym_tab *tabela) {
             printf("Line %d, col %d: Operator Integer.parseInt cannot be applied to types %s, %s\n", no->linha, no->coluna, auxc, auxb);
         }
 
-
-    } else if (!strcmp("Ass", aux1)) { //Assign
+    } else if (!strcmp("Ass", aux1)) { // Assign
         char *auxc = getTypeOperation(no->child, global, tabela);
         char *auxb = getTypeOperation(no->child->brother, global, tabela);
         if (auxc && auxb) {
             if (DEBUG)
                 printf("'<Assign-->' -> %s|%s\n", auxc, auxb);
-                
+
             if (!strcmp(auxc, auxb)) {
                 strcpy(aux, no->var);
                 strcat(aux, " - ");
@@ -590,12 +584,7 @@ char *getTypeOperation(struct node *no, sym_tab *global, sym_tab *tabela) {
                 no->var = (char *)malloc(sizeof(aux));
                 strcpy(no->var, aux);
                 string = auxb;
-            } else if (!strcmp(auxc, "undef") || !strcmp(auxb, "undef")) {
-                strcpy(aux, no->var);
-                strcat(aux, " - undef");
-                no->var = (char *)malloc(sizeof(aux));
-                strcpy(no->var, aux);
-            } else if ((!strcmp(auxc, "int") && !strcmp(auxb, "double")) || (!strcmp(auxb, "int") && !strcmp(auxc, "double"))) {
+            } else if (!strcmp(auxb, "int") && !strcmp(auxc, "double")) {
                 strcpy(aux, no->var);
                 strcat(aux, " - double");
                 no->var = (char *)malloc(sizeof(aux));
@@ -610,11 +599,42 @@ char *getTypeOperation(struct node *no, sym_tab *global, sym_tab *tabela) {
                 printf("Line %d, col %d: Operator = cannot be applied to types %s, %s\n", no->linha, no->coluna, auxc, auxb);
                 string = auxc;
             }
+        } else { // existe alguma variavel que e undef
+            if (auxc == NULL && auxb == NULL) {
+                strcpy(aux, no->var);
+                strcat(aux, " - undef");
+                no->var = (char *)malloc(sizeof(aux));
+                strcpy(no->var, aux);
+                string = "undef";
+                auxc = (char *)malloc(sizeof(string));
+                auxc = string;
+                no->var = (char *)malloc(sizeof(aux));
+                strcpy(no->var, aux);
+                auxb = (char *)malloc(sizeof(string));
+                auxb = string;
+            } else if (auxc == NULL) { // nao existe filho
+                strcpy(aux, no->var);
+                strcat(aux, " - undef");
+                no->var = (char *)malloc(sizeof(aux));
+                strcpy(no->var, aux);
+                string = "undef";
+                auxc = (char *)malloc(sizeof(string));
+                auxc = string;
+            } else if (auxb == NULL) {
+                strcpy(aux, no->var);
+                strcat(aux, " - undef");
+                no->var = (char *)malloc(sizeof(aux));
+                strcpy(no->var, aux);
+                string = "undef";
+                auxb = (char *)malloc(sizeof(string));
+                auxb = string;
+            }
+            printf("Line %d, col %d: Operator = cannot be applied to types %s, %s\n", no->linha, no->coluna, auxc, auxb);
         }
     } else if (!strcmp("If", aux1) || !strcmp("Els", aux1)) {
         struct node *auxin = no->child;
         while (auxin) {
-            getTypeOperation(auxin, global, tabela);
+            getTypeOperation(auxin, global, tabela); // falta fazer este erros aqui como esta no alguns erros !
             auxin = auxin->brother;
         }
     }
@@ -695,7 +715,7 @@ char *callHandler(struct node *no, sym_tab *global, sym_tab *tabela) {
             if (DEBUG)
                 printf("'Type' -> %s\n", type);
         } else if (!strcmp("Ca", aux1)) { // Id
-            type = callHandler(argumentos,global,tabela);
+            type = callHandler(argumentos, global, tabela);
             strcpy(aux, argumentos->var);
             strcat(aux, " - ");
             strcat(aux, type);
@@ -727,7 +747,7 @@ char *callHandler(struct node *no, sym_tab *global, sym_tab *tabela) {
     }
 
     if (!existe) {
-        printf("Line %d, col %d: Cannot find symbol %s%s \n", no->linha, no->coluna, funcao->name, string);
+        printf("Line %d, col %d: Cannot find symbol %s%s \n", funcao->linha, funcao->coluna, funcao->name, string);
         // Undef no call
         memset(aux, 0, 64);
         strcpy(aux, no->var);
@@ -757,6 +777,135 @@ char *callHandler(struct node *no, sym_tab *global, sym_tab *tabela) {
         char *str = (char *)malloc(sizeof(str));
         str = &func_type[0];
         return str;
+    }
+}
+
+sym_tab *searchTable(char *name, char *parametros, sym_tab_list *lista) {
+
+    sym_tab_list *lista_tabelas = lista;
+
+    if (lista_tabelas->tab) {
+
+        if (!strcmp(name, lista_tabelas->tab->name) && !strcmp(parametros, lista_tabelas->tab->parametros)) {
+
+            return lista_tabelas->tab;
+        }
+        while (lista_tabelas->next != NULL) {
+            // printf("WHILE \"searchTable\"\n");
+            lista_tabelas = lista_tabelas->next;
+            if (!strcmp(name, lista_tabelas->tab->name) && !strcmp(parametros, lista_tabelas->tab->parametros)) {
+                return lista_tabelas->tab;
+            }
+        }
+    }
+
+    return NULL;
+}
+
+void commentnodes(struct node *raiz, sym_tab *global, sym_tab_list *lista) {
+
+    node *methodOrField = raiz->child->brother;
+    while (methodOrField) {
+        if (!strcmp(methodOrField->var, "MethodDecl")) {
+            if (DEBUG)
+                printf("MethodDecl\n");
+
+            sym_tab *tabela;
+            // Contem o nome da funcao
+            if (!strcmp(methodOrField->child->var, "MethodHeader")) {
+                if (DEBUG)
+                    printf("MethodHeader\n");
+                // Parametros da funcao
+                struct node *MP = methodOrField->child->child->brother->brother;
+                if (!strcmp(MP->var, "MethodParams")) {
+
+                    struct node *parametros = MP->child; // parametros = node "ParamDecl"
+                    struct parametros_funcao *lista_parametros = (struct parametros_funcao *)malloc(sizeof(struct parametros_funcao));
+                    lista_parametros = NULL;
+                    if (parametros) {
+                        while (parametros) {
+                            //==================
+                            if (DEBUG)
+                                printf("MethodParams\n");
+
+                            lista_parametros = create_param_list(lista_parametros, parametros->child);
+
+                            //====================
+                            parametros = parametros->brother;
+                        }
+                    } else {
+                        lista_parametros = (struct parametros_funcao *)malloc(sizeof(struct parametros_funcao));
+                        lista_parametros->paramType = "Vazio";
+                        lista_parametros->next = NULL;
+                    }
+                    char parametrosString[1024];
+                    if (lista_parametros) {
+                        strcpy(parametrosString, "(");
+                        param_list *methodParams = lista_parametros;
+                        if (strcmp(methodParams->paramType, "Vazio")) {
+
+                            int count = 0;
+                            // Verificar se ha mais do que um argumento na funcao para meter virgulas entre eles
+                            while (methodParams != NULL) {
+                                count++;
+                                methodParams = methodParams->next;
+                            }
+
+                            methodParams = lista_parametros;
+                            // So ha um argumento
+                            if (count < 1) {
+                                strcat(parametrosString, methodParams->paramType);
+                                // ha mais que um argumento
+                            } else {
+                                while (methodParams != NULL) {
+                                    strcat(parametrosString, methodParams->paramType);
+                                    if (count > 1)
+                                        strcat(parametrosString, ",");
+                                    count--;
+                                    methodParams = methodParams->next;
+                                }
+                            }
+                        }
+                        strcat(parametrosString, ")");
+                        if (DEBUG)printf("-->%s|%s\n",methodOrField->child->child->brother->name,parametrosString);
+                        tabela = searchTable(methodOrField->child->child->brother->name, parametrosString, lista);
+                        // printf("ooooo->%s\n",tabela->name);
+                    }
+                }
+            }
+
+            struct node *methodBody = methodOrField->child->brother;
+            if (!strcmp(methodBody->var, "MethodBody")) {
+                struct node *varDeclOrReturn = methodBody->child;
+                while (varDeclOrReturn) {
+                    if (!strcmp(varDeclOrReturn->var, "VarDecl")) {
+                        add_symbol(tabela, varDeclOrReturn->child->brother->name, getType(varDeclOrReturn->child->var), NULL, varDeclOrReturn->child->brother, 0); // TODO: VERIFICAR SE E PARAMETRO!!
+                    } else if (!strcmp(varDeclOrReturn->var, "Return")) {
+                        char *aux;
+                        if (varDeclOrReturn->child) {
+                            aux = getTypeOperation(varDeclOrReturn->child, global, tabela);
+                        } else {
+                            aux = "void";
+                        }
+                        if (aux == NULL) {                                                                                                                 // SE FOR UMA OPERACAO OU UMA DECLARACAO PROCURAR O TIPO, EX DECLIT,ADD,...
+                            printf("Line %d, col %d: ] %s\n", varDeclOrReturn->child->linha, varDeclOrReturn->child->coluna, varDeclOrReturn->child->var); // DEBUG: MAIS A FRENTE TIRAR ESTE IF
+                        } else if ((!strcmp(aux, "int") && !strcmp("double", tabela->symbols->type))) {                                                    // FIXME: A variavel existe !!
+                            //continua                                                                                                                               // continua
+                        } else if (strcmp(aux, tabela->symbols->type)) {
+                            if (varDeclOrReturn->child) {
+                                printf("Line %d, col %d: Incompatible type %s in return statement\n", varDeclOrReturn->child->linha, varDeclOrReturn->child->coluna, aux);
+                            } else {
+                                printf("Line %d, col %d: Incompatible type %s in return statement\n", varDeclOrReturn->linha, varDeclOrReturn->coluna, aux);
+                            }
+                        }
+                    } else {
+                        getTypeOperation(varDeclOrReturn, global, tabela);
+                    }
+                    varDeclOrReturn = varDeclOrReturn->brother;
+                }
+            }
+        }
+        methodOrField = methodOrField->brother;
     }
 }
 
@@ -840,40 +989,12 @@ sym_tab_list *create_symbol_tab_list(struct node *raiz) {
                     }
                 }
             }
-
-            struct node *methodBody = methodOrField->child->brother;
-            if (!strcmp(methodBody->var, "MethodBody")) {
-                struct node *varDeclOrReturn = methodBody->child;
-                while (varDeclOrReturn) {
-                    if (!strcmp(varDeclOrReturn->var, "VarDecl")) {
-                        add_symbol(tabela, varDeclOrReturn->child->brother->name, getType(varDeclOrReturn->child->var), NULL, varDeclOrReturn->child->brother, 0); // TODO: VERIFICAR SE E PARAMETRO!!
-                    } else if (!strcmp(varDeclOrReturn->var, "Return")) {
-
-                        char *aux;
-                        if (varDeclOrReturn->child) {
-                            aux = getTypeOperation(varDeclOrReturn->child, global, tabela);
-                        } else {
-                            aux = "void";
-                        }
-                        if (aux == NULL) {                                                                                                                 // SE FOR UMA OPERACAO OU UMA DECLARACAO PROCURAR O TIPO, EX DECLIT,ADD,...
-                            printf("Line %d, col %d: ] %s\n", varDeclOrReturn->child->linha, varDeclOrReturn->child->coluna, varDeclOrReturn->child->var); // DEBUG: MAIS A FRENTE TIRAR ESTE IF
-                        } else if (strcmp(aux, tabela->symbols->type)) {                                                                                   // FIXME: A variavel existe !!
-                            if (varDeclOrReturn->child) {
-                                printf("Line %d, col %d: Incompatible type %s in return statement\n", varDeclOrReturn->child->linha, varDeclOrReturn->child->coluna, aux);
-                            } else {
-                                printf("Line %d, col %d: Incompatible type %s in return statement\n", varDeclOrReturn->linha, varDeclOrReturn->coluna, aux);
-                            }
-                        }
-                    } else {
-                        // callHandler(varDeclOrReturn, global, tabela);
-                        getTypeOperation(varDeclOrReturn, global, tabela);
-                    }
-                    varDeclOrReturn = varDeclOrReturn->brother;
-                }
-            }
         }
         methodOrField = methodOrField->brother;
     }
+
+    // correr  a arvore outra vez para anotar
+    commentnodes(raiz, global, table_list);
     if (DEBUG)
         printf("FIM_CREATE_SYMBOL_TABLE_LIST\n");
     return table_list;
