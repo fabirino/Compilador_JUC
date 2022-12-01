@@ -462,15 +462,15 @@ char *getTypeOperation(struct node *no, sym_tab *global, sym_tab *tabela) {
         } else {
             if (auxc == NULL && auxb == NULL) {
                 auxc = (char *)malloc(sizeof(string));
-                auxc = string;
+                auxc = "undef";
                 auxb = (char *)malloc(sizeof(string));
-                auxb = string;
+                auxb = "undef";
             } else if (auxc == NULL) { // existe filho
                 auxc = (char *)malloc(sizeof(string));
-                auxc = string;
+                auxc = "undef";
             } else if (auxb == NULL) {
                 auxb = (char *)malloc(sizeof(string));
-                auxb = string;
+                auxb = "undef";
             }
             if (!strcmp("Ge", aux1))
                 printf("Line %d, col %d: Operator >= cannot be applied to types %s, %s\n", no->linha, no->coluna, auxc, auxb);
@@ -502,15 +502,15 @@ char *getTypeOperation(struct node *no, sym_tab *global, sym_tab *tabela) {
         } else {
             if (auxc == NULL && auxb == NULL) {
                 auxc = (char *)malloc(sizeof(string));
-                auxc = string;
+                auxc = "undef";
                 auxb = (char *)malloc(sizeof(string));
-                auxb = string;
+                auxb = "undef";
             } else if (auxc == NULL) { // existe filho
                 auxc = (char *)malloc(sizeof(string));
-                auxc = string;
+                auxc = "undef";
             } else if (auxb == NULL) {
                 auxb = (char *)malloc(sizeof(string));
-                auxb = string;
+                auxb = "undef";
             }
             printf("Line %d, col %d: Operator == cannot be applied to types %s, %s\n", no->linha, no->coluna, auxc, auxb);
         }
@@ -534,6 +534,40 @@ char *getTypeOperation(struct node *no, sym_tab *global, sym_tab *tabela) {
             strcpy(no->var, aux);
             string = "undef";
             printf("Line %d, col %d: Operator ! cannot be applied to type undef\n", no->linha, no->coluna);
+        }
+
+    } else if (!strcmp("Min", aux1) || !strcmp("Plu", aux1)) {
+        char *auxc = getTypeOperation(no->child, global, tabela);
+        if (auxc) {
+
+            if (!strcmp(auxc, "int") || !strcmp(auxc, "double")) {
+                strcpy(aux, no->var);
+                strcat(aux, " - ");
+                strcat(aux, auxc);
+                no->var = (char *)malloc(sizeof(aux));
+                strcpy(no->var, aux);
+                string = auxc;
+            } else {
+                strcpy(aux, no->var);
+                strcat(aux, " - undef");
+                no->var = (char *)malloc(sizeof(aux));
+                strcpy(no->var, aux);
+                string = "undef";
+                if (!strcmp("Min", aux1))
+                    printf("Line %d, col %d: Operator - cannot be applied to type %s\n", no->linha, no->coluna, auxc);
+                else
+                    printf("Line %d, col %d: Operator + cannot be applied to type %s\n", no->linha, no->coluna, auxc);
+            }
+        } else {
+            strcpy(aux, no->var);
+            strcat(aux, " - undef");
+            no->var = (char *)malloc(sizeof(aux));
+            strcpy(no->var, aux);
+            string = "undef";
+            if (!strcmp("Min", aux1))
+                printf("Line %d, col %d: Operator - cannot be applied to type undef\n", no->linha, no->coluna);
+            else
+                printf("Line %d, col %d: Operator + cannot be applied to type undef\n", no->linha, no->coluna);
         }
 
     } else if (!strcmp("Xor", aux1) || !strcmp("Or", aux1) || !strcmp("And", aux1)) {
@@ -831,56 +865,53 @@ char *callHandler(struct node *no, sym_tab *global, sym_tab *tabela) {
         }
         aux_list = aux_list->next;
     }
-    //TODO:
-    // Verificar se a funcao pode ser chamada com outros argumentos
-    if(!existe){ // Se ja existe nao e necessario procurar outra vez
+    //  Verificar se a funcao pode ser chamada com outros argumentos
+    if (!existe) { // Se ja existe nao e necessario procurar outra vez
         aux_list = global->symbols;
         while (aux_list) { // Percorrer todas as funcoes
-            printf("'Aux_list_name e funcao' -> %s|%s\n", aux_list->name, funcao->name);
-            if (!strcmp(aux_list->name, funcao->name)){
-                char copy1[32];
-                char copy2[32];
-                strcpy(copy1, aux_list->parametrosString);
-                strcpy(copy2, string);
-                char *tok1 = strtok(copy1, "(),");
-                char *tok2 = strtok(copy2, "(),");
-                int count1=0;
-                int count2=0;
+            // printf("'Aux_list_name e funcao' -> %s|%s\n", aux_list->name, funcao->name);
+            if (!strcmp(aux_list->name, funcao->name)) {
+                char *copy1 = strdup(aux_list->parametrosString);
+                char *copy2 = strdup(string);
+                int count1 = 0;
+                int count2 = 0;
 
-                while(tok1 != NULL){ // contar os parametros das funcoes a comparar
+                char *tok1;
+                while ((tok1 = strtok_r(copy1, "(),", &copy1))) { // contar os parametros das funcoes a comparar
                     count1++;
-                    printf("'Token1' -> %s\n", tok1);
-                    tok1 = strtok(NULL, "(),");
                 }
-                while(tok2 != NULL){ // contar os parametros das funcoes a comparar
+
+                char *tok2;
+                while ((tok2 = strtok_r(copy2, "(),", &copy2))) { // contar os parametros das funcoes a comparar
                     count2++;
-                    printf("'Token2' -> %s\n", tok1);
-                    tok2 = strtok(NULL, "(),");
                 }
 
-                if(count1==count2){
+                if (count1 == count2) {
+                    char *copy1 = strdup(aux_list->parametrosString);
+                    char *copy2 = strdup(string);
                     int count3 = 0;
-                    strcpy(copy1, aux_list->parametrosString);
-                    strcpy(copy2, string);
-                    char *tok1 = strtok(copy1, "(),");
-                    char *tok2 = strtok(copy2, "(),");
+                    // printf("Parametros pretendidos -> %s\n", copy1);
+                    // printf("Parametros recebidos -> %s\n", copy2);
 
-                    while(tok1!=NULL || tok2!=NULL){
-                        if(!strcmp(tok2, "int") && !strcmp(tok1, "double")){
+                    while ((tok2 = strtok_r(copy2, "(),", &copy2)) && (tok1 = strtok_r(copy1, "(),", &copy1))) {
+                        if (!strcmp(tok2, "int") && !strcmp(tok1, "double")) {
+                            // printf("Tokens identicos -> %s|%s\n", tok1, tok2);
                             // continua
-                        } else if(!strcmp(tok1, tok2)){
-                            //continua
-                        } else{
+                        } else if (!strcmp(tok1, tok2)) {
+                            // printf("Tokens iguais -> %s|%s\n", tok1, tok2);
+                            // continua
+                        } else {
+                            // printf("Tokens diferentes -> %s|%s\n", tok1, tok2);
                             // sao diferentes
                             break;
                         }
-                        count++;
-                        tok1 = strtok(NULL, "(),");
-                        tok2 = strtok(NULL, "(),");
+                        count3++;
                     }
-
-                    if(count3==count2){
+                    // printf("count 2 e 3 -> %d|%d\n", count2, count3);
+                    if (count3 == count2) {
+                        // printf("passou os counts\n");
                         existe = 1;
+                        strcpy(string,aux_list->parametrosString);
                         break;
                     }
                 }
@@ -888,7 +919,7 @@ char *callHandler(struct node *no, sym_tab *global, sym_tab *tabela) {
             aux_list = aux_list->next;
         }
     }
-    //END:
+
     if (!existe) {
         printf("Line %d, col %d: Cannot find symbol %s%s \n", funcao->linha, funcao->coluna, funcao->name, string);
         // Undef no call
