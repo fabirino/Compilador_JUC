@@ -514,6 +514,92 @@ char *getTypeOperation(struct node *no, sym_tab *global, sym_tab *tabela) {
             }
             printf("Line %d, col %d: Operator == cannot be applied to types %s, %s\n", no->linha, no->coluna, auxc, auxb);
         }
+    } else if (!strcmp("Not", aux1)) {
+        char *auxc = getTypeOperation(no->child, global, tabela);
+        if (auxc) {
+            strcpy(aux, no->var);
+            strcat(aux, " - boolean");
+            no->var = (char *)malloc(sizeof(aux));
+            strcpy(no->var, aux);
+            string = "boolean";
+            if (!strcmp(auxc, "boolean")) {
+                // CONTINUA
+            } else {
+                printf("Line %d, col %d: Operator ! cannot be applied to type %s\n", no->linha, no->coluna, auxc);
+            }
+        } else {
+            strcpy(aux, no->var);
+            strcat(aux, " - undef");
+            no->var = (char *)malloc(sizeof(aux));
+            strcpy(no->var, aux);
+            string = "undef";
+            printf("Line %d, col %d: Operator ! cannot be applied to type undef\n", no->linha, no->coluna);
+        }
+
+    } else if (!strcmp("Xor", aux1) || !strcmp("Or", aux1) || !strcmp("And", aux1)) {
+        char *auxc = getTypeOperation(no->child, global, tabela);
+        char *auxb = getTypeOperation(no->child->brother, global, tabela);
+
+        if (auxc && auxb) {
+            if (!strcmp(auxc, auxb) && (!strcmp(auxc, "boolean") || !strcmp(auxc, "int"))) {
+                strcpy(aux, no->var);
+                strcat(aux, " - ");
+                strcat(aux, auxc);
+                no->var = (char *)malloc(sizeof(aux));
+                strcpy(no->var, aux);
+                string = auxc;
+            } else {
+                strcpy(aux, no->var);
+                strcat(aux, " - undef");
+                no->var = (char *)malloc(sizeof(aux));
+                strcpy(no->var, aux);
+                string = "undef";
+                if (!strcmp("Xor", aux1))
+                    printf("Line %d, col %d: Operator ^ cannot be applied to types %s, %s\n", no->linha, no->coluna, auxc, auxb);
+                else if (!strcmp("And", aux1))
+                    printf("Line %d, col %d: Operator & cannot be applied to types %s, %s\n", no->linha, no->coluna, auxc, auxb);
+                else
+                    printf("Line %d, col %d: Operator | cannot be applied to types %s, %s\n", no->linha, no->coluna, auxc, auxb);
+            }
+        } else {
+            if (auxc == NULL && auxb == NULL) {
+                strcpy(aux, no->var);
+                strcat(aux, " - undef");
+                no->var = (char *)malloc(sizeof(aux));
+                strcpy(no->var, aux);
+                string = "undef";
+                auxc = (char *)malloc(sizeof(string));
+                auxc = string;
+                no->var = (char *)malloc(sizeof(aux));
+                strcpy(no->var, aux);
+                auxb = (char *)malloc(sizeof(string));
+                auxb = string;
+            } else if (auxc == NULL) { // nao existe filho
+                strcpy(aux, no->var);
+                strcat(aux, " - undef");
+                no->var = (char *)malloc(sizeof(aux));
+                strcpy(no->var, aux);
+                string = "undef";
+                auxc = (char *)malloc(sizeof(string));
+                auxc = string;
+            } else if (auxb == NULL) {
+                strcpy(aux, no->var);
+                strcat(aux, " - undef");
+                no->var = (char *)malloc(sizeof(aux));
+                strcpy(no->var, aux);
+                string = "undef";
+                auxb = (char *)malloc(sizeof(string));
+                auxb = string;
+            }
+            // erros
+
+            if (!strcmp("Xor", aux1))
+                printf("Line %d, col %d: Operator ^ cannot be applied to types %s, %s\n", no->linha, no->coluna, auxc, auxb);
+            else if (!strcmp("And", aux1))
+                printf("Line %d, col %d: Operator & cannot be applied to types %s, %s\n", no->linha, no->coluna, auxc, auxb);
+            else
+                printf("Line %d, col %d: Operator | cannot be applied to types %s, %s\n", no->linha, no->coluna, auxc, auxb);
+        }
 
     } else if (!strcmp("Par", aux1)) { // ParseArgs
         char *auxc = getTypeOperation(no->child, global, tabela);
@@ -745,7 +831,64 @@ char *callHandler(struct node *no, sym_tab *global, sym_tab *tabela) {
         }
         aux_list = aux_list->next;
     }
+    //TODO:
+    // Verificar se a funcao pode ser chamada com outros argumentos
+    if(!existe){ // Se ja existe nao e necessario procurar outra vez
+        aux_list = global->symbols;
+        while (aux_list) { // Percorrer todas as funcoes
+            printf("'Aux_list_name e funcao' -> %s|%s\n", aux_list->name, funcao->name);
+            if (!strcmp(aux_list->name, funcao->name)){
+                char copy1[32];
+                char copy2[32];
+                strcpy(copy1, aux_list->parametrosString);
+                strcpy(copy2, string);
+                char *tok1 = strtok(copy1, "(),");
+                char *tok2 = strtok(copy2, "(),");
+                int count1=0;
+                int count2=0;
 
+                while(tok1 != NULL){ // contar os parametros das funcoes a comparar
+                    count1++;
+                    printf("'Token1' -> %s\n", tok1);
+                    tok1 = strtok(NULL, "(),");
+                }
+                while(tok2 != NULL){ // contar os parametros das funcoes a comparar
+                    count2++;
+                    printf("'Token2' -> %s\n", tok1);
+                    tok2 = strtok(NULL, "(),");
+                }
+
+                if(count1==count2){
+                    int count3 = 0;
+                    strcpy(copy1, aux_list->parametrosString);
+                    strcpy(copy2, string);
+                    char *tok1 = strtok(copy1, "(),");
+                    char *tok2 = strtok(copy2, "(),");
+
+                    while(tok1!=NULL || tok2!=NULL){
+                        if(!strcmp(tok2, "int") && !strcmp(tok1, "double")){
+                            // continua
+                        } else if(!strcmp(tok1, tok2)){
+                            //continua
+                        } else{
+                            // sao diferentes
+                            break;
+                        }
+                        count++;
+                        tok1 = strtok(NULL, "(),");
+                        tok2 = strtok(NULL, "(),");
+                    }
+
+                    if(count3==count2){
+                        existe = 1;
+                        break;
+                    }
+                }
+            }
+            aux_list = aux_list->next;
+        }
+    }
+    //END:
     if (!existe) {
         printf("Line %d, col %d: Cannot find symbol %s%s \n", funcao->linha, funcao->coluna, funcao->name, string);
         // Undef no call
@@ -880,7 +1023,7 @@ void commentnodes(struct node *raiz, sym_tab *global, sym_tab_list *lista) {
                 struct node *varDeclOrReturn = methodBody->child;
                 while (varDeclOrReturn) {
                     if (!strcmp(varDeclOrReturn->var, "VarDecl")) {
-                        add_symbol(tabela, varDeclOrReturn->child->brother->name, getType(varDeclOrReturn->child->var), NULL, varDeclOrReturn->child->brother, 0);            
+                        add_symbol(tabela, varDeclOrReturn->child->brother->name, getType(varDeclOrReturn->child->var), NULL, varDeclOrReturn->child->brother, 0);
                     } else if (!strcmp(varDeclOrReturn->var, "Return")) {
                         char *aux;
                         if (varDeclOrReturn->child) {
@@ -900,7 +1043,10 @@ void commentnodes(struct node *raiz, sym_tab *global, sym_tab_list *lista) {
                             }
                         }
                     } else if (!strcmp(varDeclOrReturn->var, "Print")) {
-                        getTypeOperation(varDeclOrReturn->child, global, tabela);
+                        char *type = getTypeOperation(varDeclOrReturn->child, global, tabela);
+                        if (!strcmp(type, "undef") || !strcmp(type, "void")) {
+                            printf("Line %d, col %d: Incompatible type %s in System.out.print statement\n", varDeclOrReturn->child->child->linha, varDeclOrReturn->child->child->coluna, type);
+                        }
                     } else {
                         getTypeOperation(varDeclOrReturn, global, tabela);
                     }
@@ -927,7 +1073,7 @@ sym_tab_list *create_symbol_tab_list(struct node *raiz) {
                 printf("FieldDecl\n");
             // Variaveis globais
             if (searchType(methodOrField->child->brother, global, NULL, 0)) {
-                printf("Line %d, col %d: Symbol %s already defined\n",methodOrField->child->brother->linha,methodOrField->child->brother->coluna,methodOrField->child->brother->name);
+                printf("Line %d, col %d: Symbol %s already defined\n", methodOrField->child->brother->linha, methodOrField->child->brother->coluna, methodOrField->child->brother->name);
             } else {
                 add_symbol(global, methodOrField->child->brother->name, getType(methodOrField->child->var), NULL, NULL, 0);
             }
