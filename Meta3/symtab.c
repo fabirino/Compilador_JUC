@@ -867,7 +867,8 @@ void commentnodes(struct node *raiz, sym_tab *global, sym_tab_list *lista) {
                             }
                         }
                         strcat(parametrosString, ")");
-                        if (DEBUG)printf("-->%s|%s\n",methodOrField->child->child->brother->name,parametrosString);
+                        if (DEBUG)
+                            printf("-->%s|%s\n", methodOrField->child->child->brother->name, parametrosString);
                         tabela = searchTable(methodOrField->child->child->brother->name, parametrosString, lista);
                         // printf("ooooo->%s\n",tabela->name);
                     }
@@ -879,7 +880,7 @@ void commentnodes(struct node *raiz, sym_tab *global, sym_tab_list *lista) {
                 struct node *varDeclOrReturn = methodBody->child;
                 while (varDeclOrReturn) {
                     if (!strcmp(varDeclOrReturn->var, "VarDecl")) {
-                        add_symbol(tabela, varDeclOrReturn->child->brother->name, getType(varDeclOrReturn->child->var), NULL, varDeclOrReturn->child->brother, 0); // TODO: VERIFICAR SE E PARAMETRO!!
+                        add_symbol(tabela, varDeclOrReturn->child->brother->name, getType(varDeclOrReturn->child->var), NULL, varDeclOrReturn->child->brother, 0);            
                     } else if (!strcmp(varDeclOrReturn->var, "Return")) {
                         char *aux;
                         if (varDeclOrReturn->child) {
@@ -890,7 +891,7 @@ void commentnodes(struct node *raiz, sym_tab *global, sym_tab_list *lista) {
                         if (aux == NULL) {                                                                                                                 // SE FOR UMA OPERACAO OU UMA DECLARACAO PROCURAR O TIPO, EX DECLIT,ADD,...
                             printf("Line %d, col %d: ] %s\n", varDeclOrReturn->child->linha, varDeclOrReturn->child->coluna, varDeclOrReturn->child->var); // DEBUG: MAIS A FRENTE TIRAR ESTE IF
                         } else if ((!strcmp(aux, "int") && !strcmp("double", tabela->symbols->type))) {                                                    // FIXME: A variavel existe !!
-                            //continua                                                                                                                               // continua
+                            // continua                                                                                                                               // continua
                         } else if (strcmp(aux, tabela->symbols->type)) {
                             if (varDeclOrReturn->child) {
                                 printf("Line %d, col %d: Incompatible type %s in return statement\n", varDeclOrReturn->child->linha, varDeclOrReturn->child->coluna, aux);
@@ -898,6 +899,8 @@ void commentnodes(struct node *raiz, sym_tab *global, sym_tab_list *lista) {
                                 printf("Line %d, col %d: Incompatible type %s in return statement\n", varDeclOrReturn->linha, varDeclOrReturn->coluna, aux);
                             }
                         }
+                    } else if (!strcmp(varDeclOrReturn->var, "Print")) {
+                        getTypeOperation(varDeclOrReturn->child, global, tabela);
                     } else {
                         getTypeOperation(varDeclOrReturn, global, tabela);
                     }
@@ -923,7 +926,11 @@ sym_tab_list *create_symbol_tab_list(struct node *raiz) {
             if (DEBUG)
                 printf("FieldDecl\n");
             // Variaveis globais
-            add_symbol(global, methodOrField->child->brother->name, getType(methodOrField->child->var), NULL, NULL, 0);
+            if (searchType(methodOrField->child->brother, global, NULL, 0)) {
+                printf("Line %d, col %d: Symbol %s already defined\n",methodOrField->child->brother->linha,methodOrField->child->brother->coluna,methodOrField->child->brother->name);
+            } else {
+                add_symbol(global, methodOrField->child->brother->name, getType(methodOrField->child->var), NULL, NULL, 0);
+            }
             if (DEBUG)
                 printf("ADD_FieldDecl\n");
 
