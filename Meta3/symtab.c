@@ -182,6 +182,7 @@ sym_tab *create_sym_tab(struct node *no, char *parametros, int is_class) {
     sym_tab *symbol_table = (sym_tab *)malloc(sizeof(sym_tab));
 
     symbol_table->name = no->name;
+    symbol_table->comment = 0;
 
     symbol_table->symbols = (struct simbolo *)malloc(sizeof(struct simbolo));
     symbol_table->symbols = NULL;
@@ -325,7 +326,7 @@ char *getTypeOperation(struct node *no, sym_tab *global, sym_tab *tabela) {
         strcat(aux, " - int");
         strcpy(no->var, aux);
         float val = atof(no->name);
-        if (val < -2147483648 || val > 2147483648) {
+        if (val <= -2147483648 || val >= 2147483648) {
             printf("Line %d, col %d: Number %s out of bounds\n", no->linha, no->coluna, no->name);
         }
         string = "int";
@@ -754,7 +755,7 @@ char *getTypeOperation(struct node *no, sym_tab *global, sym_tab *tabela) {
     } else if (!strcmp("If", aux1) || !strcmp("Els", aux1)) {
         struct node *auxin = no->child;
         while (auxin) {
-            if (!strcmp(auxin->var,"Return") && auxin->child)
+            if (!strcmp(auxin->var, "Return") && auxin->child)
                 // printf("%s\n",auxin->var->name);
                 auxin = auxin->child;
             getTypeOperation(auxin, global, tabela); // falta fazer este erros aqui como esta no alguns erros !
@@ -817,8 +818,8 @@ char *callHandler(struct node *no, sym_tab *global, sym_tab *tabela) {
             strcat(aux, type);
             strcpy(argumentos->var, aux);
             strcat(string, type);
-        }else{
-            type = getTypeOperation(argumentos,global, tabela);
+        } else {
+            type = getTypeOperation(argumentos, global, tabela);
             strcat(string, type);
         }
 
@@ -890,7 +891,7 @@ char *callHandler(struct node *no, sym_tab *global, sym_tab *tabela) {
                     if (count3 == count2) {
                         // printf("passou os counts\n");
                         existe = 1;
-                        strcpy(string,aux_list->parametrosString);
+                        strcpy(string, aux_list->parametrosString);
                         break;
                     }
                 }
@@ -1023,44 +1024,45 @@ void commentnodes(struct node *raiz, sym_tab *global, sym_tab_list *lista) {
                         if (DEBUG)
                             printf("-->%s|%s\n", methodOrField->child->child->brother->name, parametrosString);
                         tabela = searchTable(methodOrField->child->child->brother->name, parametrosString, lista);
-                        // printf("ooooo->%s\n",tabela->name);
-                    }
-                }
-            }
-
-            struct node *methodBody = methodOrField->child->brother;
-            if (!strcmp(methodBody->var, "MethodBody")) {
-                struct node *varDeclOrReturn = methodBody->child;
-                while (varDeclOrReturn) {
-                    if (!strcmp(varDeclOrReturn->var, "VarDecl")) {
-                        add_symbol(tabela, varDeclOrReturn->child->brother->name, getType(varDeclOrReturn->child->var), NULL, varDeclOrReturn->child->brother, 0);
-                    } else if (!strcmp(varDeclOrReturn->var, "Return")) {
-                        char *aux;
-                        if (varDeclOrReturn->child) {
-                            aux = getTypeOperation(varDeclOrReturn->child, global, tabela);
-                        } else {
-                            aux = "void";
-                        }
-                        if (aux == NULL) {                                                                                                                 // SE FOR UMA OPERACAO OU UMA DECLARACAO PROCURAR O TIPO, EX DECLIT,ADD,...
-                            printf("Line %d, col %d: ] %s\n", varDeclOrReturn->child->linha, varDeclOrReturn->child->coluna, varDeclOrReturn->child->var); // DEBUG: MAIS A FRENTE TIRAR ESTE IF
-                        } else if ((!strcmp(aux, "int") && !strcmp("double", tabela->symbols->type))) {                                                    // FIXME: A variavel existe !!
-                            // continua                                                                                                                               // continua
-                        } else if (strcmp(aux, tabela->symbols->type)) {
-                            if (varDeclOrReturn->child) {
-                                printf("Line %d, col %d: Incompatible type %s in return statement\n", varDeclOrReturn->child->linha, varDeclOrReturn->child->coluna, aux);
-                            } else {
-                                printf("Line %d, col %d: Incompatible type %s in return statement\n", varDeclOrReturn->linha, varDeclOrReturn->coluna, aux);
+                        if (tabela && tabela->comment == 0) {
+                            struct node *methodBody = methodOrField->child->brother;
+                            tabela->comment = 1;
+                            if (!strcmp(methodBody->var, "MethodBody")) {
+                                struct node *varDeclOrReturn = methodBody->child;
+                                while (varDeclOrReturn) {
+                                    if (!strcmp(varDeclOrReturn->var, "VarDecl")) {
+                                        add_symbol(tabela, varDeclOrReturn->child->brother->name, getType(varDeclOrReturn->child->var), NULL, varDeclOrReturn->child->brother, 0);
+                                    } else if (!strcmp(varDeclOrReturn->var, "Return")) {
+                                        char *aux;
+                                        if (varDeclOrReturn->child) {
+                                            aux = getTypeOperation(varDeclOrReturn->child, global, tabela);
+                                        } else {
+                                            aux = "void";
+                                        }
+                                        if (aux == NULL) {                                                                                                                 // SE FOR UMA OPERACAO OU UMA DECLARACAO PROCURAR O TIPO, EX DECLIT,ADD,...
+                                            printf("Line %d, col %d: ] %s\n", varDeclOrReturn->child->linha, varDeclOrReturn->child->coluna, varDeclOrReturn->child->var); // DEBUG: MAIS A FRENTE TIRAR ESTE IF
+                                        } else if ((!strcmp(aux, "int") && !strcmp("double", tabela->symbols->type))) {                                                    // FIXME: A variavel existe !!
+                                            // continua                                                                                                                               // continua
+                                        } else if (strcmp(aux, tabela->symbols->type)) {
+                                            if (varDeclOrReturn->child) {
+                                                printf("Line %d, col %d: Incompatible type %s in return statement\n", varDeclOrReturn->child->linha, varDeclOrReturn->child->coluna, aux);
+                                            } else {
+                                                printf("Line %d, col %d: Incompatible type %s in return statement\n", varDeclOrReturn->linha, varDeclOrReturn->coluna, aux);
+                                            }
+                                        }
+                                    } else if (!strcmp(varDeclOrReturn->var, "Print")) {
+                                        char *type = getTypeOperation(varDeclOrReturn->child, global, tabela);
+                                        if (!strcmp(type, "undef") || !strcmp(type, "void")) {
+                                            printf("Line %d, col %d: Incompatible type %s in System.out.print statement\n", varDeclOrReturn->child->child->linha, varDeclOrReturn->child->child->coluna, type);
+                                        }
+                                    } else {
+                                        getTypeOperation(varDeclOrReturn, global, tabela);
+                                    }
+                                    varDeclOrReturn = varDeclOrReturn->brother;
+                                }
                             }
                         }
-                    } else if (!strcmp(varDeclOrReturn->var, "Print")) {
-                        char *type = getTypeOperation(varDeclOrReturn->child, global, tabela);
-                        if (!strcmp(type, "undef") || !strcmp(type, "void")) {
-                            printf("Line %d, col %d: Incompatible type %s in System.out.print statement\n", varDeclOrReturn->child->child->linha, varDeclOrReturn->child->child->coluna, type);
-                        }
-                    } else {
-                        getTypeOperation(varDeclOrReturn, global, tabela);
                     }
-                    varDeclOrReturn = varDeclOrReturn->brother;
                 }
             }
         }
