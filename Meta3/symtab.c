@@ -292,7 +292,7 @@ char *searchType(struct node *no, sym_tab *global, sym_tab *tabela, int altera) 
         strcpy(aux, no->var);
         strcat(aux, " - undef");
         strcpy(no->var, aux);
-        printf("Line %d, col %d: Cannot find symbol %s \n", no->linha, no->coluna, no->name);
+        printf("Line %d, col %d: Cannot find symbol %s\n", no->linha, no->coluna, no->name);
     }
 
     string = NULL;
@@ -754,6 +754,9 @@ char *getTypeOperation(struct node *no, sym_tab *global, sym_tab *tabela) {
     } else if (!strcmp("If", aux1) || !strcmp("Els", aux1)) {
         struct node *auxin = no->child;
         while (auxin) {
+            if (!strcmp(auxin->var,"Return") && auxin->child)
+                // printf("%s\n",auxin->var->name);
+                auxin = auxin->child;
             getTypeOperation(auxin, global, tabela); // falta fazer este erros aqui como esta no alguns erros !
             auxin = auxin->brother;
         }
@@ -807,39 +810,15 @@ char *callHandler(struct node *no, sym_tab *global, sym_tab *tabela) {
     while (argumentos) {
         // Anotar a arvore e adicionar a string de parametros
         aux1 = strndup(argumentos->var, 2);
-        if (!strcmp("De", aux1)) { // Declit
-            strcpy(aux, argumentos->var);
-            strcat(aux, " - int");
-            strcpy(argumentos->var, aux);
-            strcat(string, "int");
-            float val = atof(argumentos->name);
-            if (val < -2147483648 || val > 2147483648) {
-                printf("Line %d, col %d: Number %s out of bounds\n", argumentos->linha, argumentos->coluna, argumentos->name);
-            }
-
-        } else if (!strcmp("Re", aux1)) { // Realit
-            strcpy(aux, argumentos->var);
-            strcat(aux, " - double");
-            strcpy(argumentos->var, aux);
-            strcat(string, "double");
-
-        } else if (!strcmp("Bo", aux1)) { // Boolit
-            strcpy(aux, argumentos->var);
-            strcat(aux, " - boolean");
-            strcpy(argumentos->var, aux);
-            strcat(string, "boolean");
-
-        } else if (!strcmp("Id", aux1)) { // Id
-            type = searchType(argumentos, global, tabela, 1);
-            strcat(string, type);
-            if (DEBUG)
-                printf("'Type' -> %s\n", type);
-        } else if (!strcmp("Ca", aux1)) { // Id
+        if (!strcmp("Ca", aux1)) { // Id
             type = callHandler(argumentos, global, tabela);
             strcpy(aux, argumentos->var);
             strcat(aux, " - ");
             strcat(aux, type);
             strcpy(argumentos->var, aux);
+            strcat(string, type);
+        }else{
+            type = getTypeOperation(argumentos,global, tabela);
             strcat(string, type);
         }
 
@@ -921,7 +900,7 @@ char *callHandler(struct node *no, sym_tab *global, sym_tab *tabela) {
     }
 
     if (!existe) {
-        printf("Line %d, col %d: Cannot find symbol %s%s \n", funcao->linha, funcao->coluna, funcao->name, string);
+        printf("Line %d, col %d: Cannot find symbol %s%s\n", funcao->linha, funcao->coluna, funcao->name, string);
         // Undef no call
         memset(aux, 0, 64);
         strcpy(aux, no->var);
