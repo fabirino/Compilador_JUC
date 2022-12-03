@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <limits.h>
 #include "STree.h"
 
 #define DEBUG 0
@@ -49,6 +50,10 @@ typedef struct lista_tabs {
 } sym_tab_list;
 
 char *getType(char *tipo);
+
+int checkOoB_I(char *numero);
+
+int checkOoB_D(char *numero);
 
 void print_tabs(sym_tab_list *lista);
 

@@ -313,6 +313,36 @@ int searchFunc(struct simbolo *simbolo, sym_tab *global, char *parametrosString)
     return 0;
 }
 
+// Funcao que checka se o Int esta Out Of Bounds
+int checkOoB_I(char *numero) { // Declit()
+    char *num = strdup(numero);
+    char *aux = (char *)malloc(sizeof(num));
+
+    int count = 0;
+    for (int i = 0; i < strlen(num); i++) {
+        if (num[i] != '_') {
+            aux[count++] = num[i];
+        }
+    }
+
+    double final = atof(aux);
+    if (final > INT_MAX || final < INT_MIN)
+        return 1;
+    else
+        return 0;
+}
+
+// Funcao que checka se o Double esta Out Of Bounds
+int checkOoB_D(char *numero) {
+    char *num = strdup(numero);
+    char *token = NULL;
+
+    while ((token = strtok_r(num, "_", &num))) {
+    }
+
+    return 0;
+}
+
 char *getTypeOperation(struct node *no, sym_tab *global, sym_tab *tabela) {
     char *string = NULL;
     char aux[64];
@@ -325,10 +355,8 @@ char *getTypeOperation(struct node *no, sym_tab *global, sym_tab *tabela) {
         strcpy(aux, no->var);
         strcat(aux, " - int");
         strcpy(no->var, aux);
-        float val = atof(no->name);
-        if (val <= -2147483648 || val >= 2147483648) {
+        if (checkOoB_I(no->name))
             printf("Line %d, col %d: Number %s out of bounds\n", no->linha, no->coluna, no->name);
-        }
         string = "int";
     } else if (!strcmp("Rea", aux1)) { // Realit
         strcpy(aux, no->var);
@@ -364,16 +392,12 @@ char *getTypeOperation(struct node *no, sym_tab *global, sym_tab *tabela) {
                 strcpy(aux, no->var);
                 strcat(aux, " - ");
                 strcat(aux, auxc);
-                if (DEBUG)
-                    printf("'aux->' -> %s\n", aux);
                 no->var = (char *)malloc(sizeof(aux));
                 strcpy(no->var, aux);
                 string = auxb;
             } else if ((!strcmp(auxc, "int") && !strcmp(auxb, "double")) || (!strcmp(auxb, "int") && !strcmp(auxc, "double"))) {
                 strcpy(aux, no->var);
                 strcat(aux, " - double");
-                if (DEBUG)
-                    printf("'aux->' -> %s\n", aux);
                 no->var = (char *)malloc(sizeof(aux));
                 strcpy(no->var, aux);
                 string = "double";
