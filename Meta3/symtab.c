@@ -357,7 +357,7 @@ int checkOoB_D(char *numero) {
 
     double parte1 = atof(aux);
     double parte2 = atof(exp);
-    
+
     // Verificar se as casas decimais estao de acordo com a notacao cientifica
     if (parte1 > 1 || parte1 < -1) { // passar de 234.1e10 para 2.341e12
         double exponent = log10(parte1);
@@ -402,6 +402,11 @@ char *getTypeOperation(struct node *no, sym_tab *global, sym_tab *tabela) {
         if (checkOoB_D(no->name))
             printf("Line %d, col %d: Number %s out of bounds\n", no->linha, no->coluna, no->name);
         string = "double";
+    } else if (!strcmp("Str", aux1)) { // StrLit
+        strcpy(aux, no->var);
+        strcat(aux, " - String");
+        strcpy(no->var, aux);
+        string = "String";
     } else if (!strcmp("Boo", aux1)) { // Boolit
         strcpy(aux, no->var);
         strcat(aux, " - boolean");
@@ -891,13 +896,48 @@ char *getTypeOperation(struct node *no, sym_tab *global, sym_tab *tabela) {
             }
             printf("Line %d, col %d: Operator = cannot be applied to types %s, %s\n", no->linha, no->coluna, auxc, auxb);
         }
-    } else if (!strcmp("If", aux1) || !strcmp("Els", aux1)) {
+
+    } else if (!strcmp(aux1, "Pri")) {
+        char *type = getTypeOperation(no->child, global, tabela);
+        if (!strcmp(type, "undef") || !strcmp(type, "void")) {
+            char *call = strndup(no->child->var, 2);
+            if (!strcmp(call, "Ca"))
+                printf("Line %d, col %d: Incompatible type %s in System.out.print statement\n", no->child->child->linha, no->child->child->coluna, type);
+            else//TODO:VER MELHOR ISTO AQUI
+                printf("Line %d, col %d: Incompatible type %s in System.out.print statement\n", no->child->linha, no->child->coluna, type);
+        }
+    } else if (!strcmp("If", aux1) || !strcmp("Els", aux1) || !strcmp("Whi", aux1)) {
         struct node *auxin = no->child;
         while (auxin) {
-            if (!strcmp(auxin->var, "Return") && auxin->child)
-                // printf("%s\n",auxin->var->name);
-                auxin = auxin->child;
-            getTypeOperation(auxin, global, tabela); // falta fazer este erros aqui como esta no alguns erros !
+            if (!strcmp(auxin->var, "Return") && auxin->child) {
+                char *aux;
+                if (auxin->child) {
+                    aux = getTypeOperation(auxin->child, global, tabela);
+                } else {
+                    aux = "void";
+                }
+                if (aux == NULL) {                                                                                   // SE FOR UMA OPERACAO OU UMA DECLARACAO PROCURAR O TIPO, EX DECLIT,ADD,...
+                    printf("Line %d, col %d: ] %s\n", auxin->child->linha, auxin->child->coluna, auxin->child->var); // DEBUG: MAIS A FRENTE TIRAR ESTE IF
+                } else if ((!strcmp(aux, "int") && !strcmp("double", tabela->symbols->type))) {                      // FIXME: A variavel existe !!
+                    // continua                                                                                                                               // continua
+                } else if (strcmp(aux, tabela->symbols->type)) {
+                    if (auxin->child) {
+                        printf("Line %d, col %d: Incompatible type %s in return statement\n", auxin->child->linha, auxin->child->coluna, aux);
+                    } else {
+                        printf("Line %d, col %d: Incompatible type %s in return statement\n", auxin->linha, auxin->coluna, aux);
+                    }
+                }
+            } else if (!strcmp(auxin->var, "Block") && auxin->child) {
+                struct node *block = auxin->child;
+
+                while (block) {
+                    getTypeOperation(block, global, tabela);
+                    block = block->brother;
+                }
+            } else {
+                getTypeOperation(auxin, global, tabela); // falta fazer este erros aqui como esta no alguns erros !
+            }
+            // printf("%s\n",auxin->var->name);
             auxin = auxin->brother;
         }
     }
@@ -1205,11 +1245,6 @@ void commentnodes(struct node *raiz, sym_tab *global, sym_tab_list *lista) {
                                             } else {
                                                 printf("Line %d, col %d: Incompatible type %s in return statement\n", varDeclOrReturn->linha, varDeclOrReturn->coluna, aux);
                                             }
-                                        }
-                                    } else if (!strcmp(varDeclOrReturn->var, "Print")) {
-                                        char *type = getTypeOperation(varDeclOrReturn->child, global, tabela);
-                                        if (!strcmp(type, "undef") || !strcmp(type, "void")) {
-                                            printf("Line %d, col %d: Incompatible type %s in System.out.print statement\n", varDeclOrReturn->child->child->linha, varDeclOrReturn->child->child->coluna, type);
                                         }
                                     } else {
                                         getTypeOperation(varDeclOrReturn, global, tabela);
