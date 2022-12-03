@@ -813,10 +813,6 @@ char *callHandler(struct node *no, sym_tab *global, sym_tab *tabela) {
         aux1 = strndup(argumentos->var, 2);
         if (!strcmp("Ca", aux1)) { // Id
             type = callHandler(argumentos, global, tabela);
-            strcpy(aux, argumentos->var);
-            strcat(aux, " - ");
-            strcat(aux, type);
-            strcpy(argumentos->var, aux);
             strcat(string, type);
         } else {
             type = getTypeOperation(argumentos, global, tabela);
@@ -892,6 +888,7 @@ char *callHandler(struct node *no, sym_tab *global, sym_tab *tabela) {
                         // printf("passou os counts\n");
                         existe = 1;
                         strcpy(string, aux_list->parametrosString);
+                        strcpy(func_type, aux_list->type);
                         break;
                     }
                 }
