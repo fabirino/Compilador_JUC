@@ -335,10 +335,44 @@ int checkOoB_I(char *numero) { // Declit()
 // Funcao que checka se o Double esta Out Of Bounds
 int checkOoB_D(char *numero) {
     char *num = strdup(numero);
-    char *token = NULL;
+    char *aux = (char *)malloc(sizeof(num));
+    char *exp = (char *)malloc(sizeof(num));
+    int expoente = 0;
 
-    while ((token = strtok_r(num, "_", &num))) {
+    int count = 0;
+    for (int i = 0; i < strlen(num); i++) {
+        // Verificar qual parte pertence ao numero e qual pertence ao expoente
+        if (expoente == 0) {
+            if (num[i] != '_') {
+                aux[count++] = num[i];
+            }
+            if (num[i] == 'E' || num[i] == 'e') {
+                expoente = 1;
+                count = 0;
+            }
+        } else {
+            exp[count++] = num[i];
+        }
     }
+
+    double parte1 = atof(aux);
+    double parte2 = atof(exp);
+    
+    // Verificar se as casas decimais estao de acordo com a notacao cientifica
+    if (parte1 > 1 || parte1 < -1) { // passar de 234.1e10 para 2.341e12
+        double exponent = log10(parte1);
+        parte2 += exponent;
+    } else { // passar de 0.001e10 para 1e7
+        double exponent = notacaoCient(parte1);
+        parte2 -= exponent;
+    }
+
+    long double final = parte1 * calcpow10(parte2);
+
+    if (final >= DBL_MAX || final <= DBL_MIN || parte2 <= -324 || parte2 >= 308)
+        return 1;
+    else
+        return 0;
 
     return 0;
 }
@@ -365,6 +399,8 @@ char *getTypeOperation(struct node *no, sym_tab *global, sym_tab *tabela) {
         strcpy(aux, no->var);
         strcat(aux, " - double");
         strcpy(no->var, aux);
+        if (checkOoB_D(no->name))
+            printf("Line %d, col %d: Number %s out of bounds\n", no->linha, no->coluna, no->name);
         string = "double";
     } else if (!strcmp("Boo", aux1)) { // Boolit
         strcpy(aux, no->var);
