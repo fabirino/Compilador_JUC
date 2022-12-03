@@ -346,11 +346,14 @@ int checkOoB_D(char *numero) {
 char *getTypeOperation(struct node *no, sym_tab *global, sym_tab *tabela) {
     char *string = NULL;
     char aux[64];
+
     if (DEBUG)
         printf("'no->var' -> %s linha - %d\n", no->var, no->linha);
     char *aux1 = strndup(no->var, 3);
+
     if (DEBUG)
         printf("DEBUG\"getTypeOperation\" --->>%s\n", aux1);
+
     if (!strcmp("Dec", aux1)) { // Declit
         strcpy(aux, no->var);
         strcat(aux, " - int");
@@ -381,7 +384,7 @@ char *getTypeOperation(struct node *no, sym_tab *global, sym_tab *tabela) {
             printf("Line %d, col %d: Operator .length cannot be applied to type %s\n", no->linha, no->coluna, auxc);
         }
         string = "int";
-    } else if (!strcmp("Add", aux1) || !strcmp("Sub", aux1) || !strcmp("Mul", aux1) || !strcmp("Div", aux1)) { // Add || Sub || Mul || Div
+    } else if (!strcmp("Add", aux1) || !strcmp("Sub", aux1) || !strcmp("Mul", aux1) || !strcmp("Div", aux1) || !strcmp("Mod", aux1)) { // Add || Sub || Mul || Div
         char *auxc = getTypeOperation(no->child, global, tabela);
         char *auxb = getTypeOperation(no->child->brother, global, tabela);
 
@@ -415,6 +418,9 @@ char *getTypeOperation(struct node *no, sym_tab *global, sym_tab *tabela) {
                     printf("Line %d, col %d: Operator * cannot be applied to types %s, %s\n", no->linha, no->coluna, auxc, auxb);
                 else if (!strcmp("Div", aux1))
                     printf("Line %d, col %d: Operator / cannot be applied to types %s, %s\n", no->linha, no->coluna, auxc, auxb);
+                else if (!strcmp("Mod", aux1))
+                    printf("Line %d, col %d: Operator %% cannot be applied to types %s, %s\n", no->linha, no->coluna, auxc, auxb);
+
                 string = "undef";
             }
         } else {
@@ -455,8 +461,81 @@ char *getTypeOperation(struct node *no, sym_tab *global, sym_tab *tabela) {
                 printf("Line %d, col %d: Operator * cannot be applied to types %s, %s\n", no->linha, no->coluna, auxc, auxb);
             else if (!strcmp("Div", aux1))
                 printf("Line %d, col %d: Operator / cannot be applied to types %s, %s\n", no->linha, no->coluna, auxc, auxb);
+            else if (!strcmp("Mod", aux1))
+                printf("Line %d, col %d: Operator %% cannot be applied to types %s, %s\n", no->linha, no->coluna, auxc, auxb);
+
             string = "undef";
         }
+
+    } else if (!strcmp("Lsh", aux1) || !strcmp("Rsh", aux1)) { // Rshift || Lshift
+        if (no->child && no->child->brother) {
+            char *aux2 = strndup(no->child->var, 2);
+            char *aux3 = strndup(no->child->brother->var, 2);
+            if (!strcmp("Id", aux2) && !strcmp("Id", aux3)) {
+                return "none";
+            }
+        }
+        char *auxc = getTypeOperation(no->child, global, tabela);
+        char *auxb = getTypeOperation(no->child->brother, global, tabela);
+        if (DEBUG)
+            printf("------>%s %s|%s\n", no->var, auxc, auxb);
+        if (auxc && auxb) {
+            if ((!strcmp(auxc, auxb) && !strcmp(auxc, "int"))) { // verificar se e int ou double
+                strcpy(aux, no->var);
+                strcat(aux, " - ");
+                strcat(aux, auxc);
+                no->var = (char *)malloc(sizeof(aux));
+                strcpy(no->var, aux);
+                string = auxb;
+            } else {
+                strcpy(aux, no->var);
+                strcat(aux, " - undef");
+                no->var = (char *)malloc(sizeof(aux));
+                strcpy(no->var, aux);
+
+                if (!strcmp("Lsh", aux1))
+                    printf("Line %d, col %d: Operator << cannot be applied to types %s, %s\n", no->linha, no->coluna, auxc, auxb);
+                else
+                    printf("Line %d, col %d: Operator >> cannot be applied to types %s, %s\n", no->linha, no->coluna, auxc, auxb);
+                string = "undef";
+            }
+
+        } else {
+            if (auxc == NULL && auxb == NULL) {
+                strcpy(aux, no->var);
+                strcat(aux, " - undef");
+                no->var = (char *)malloc(sizeof(aux));
+                strcpy(no->var, aux);
+                string = "undef";
+                auxc = (char *)malloc(sizeof(string));
+                auxc = string;
+                no->var = (char *)malloc(sizeof(aux));
+                strcpy(no->var, aux);
+                auxb = (char *)malloc(sizeof(string));
+                auxb = string;
+            } else if (auxc == NULL) { // nao existe filho
+                strcpy(aux, no->var);
+                strcat(aux, " - undef");
+                no->var = (char *)malloc(sizeof(aux));
+                strcpy(no->var, aux);
+                string = "undef";
+                auxc = (char *)malloc(sizeof(string));
+                auxc = string;
+            } else if (auxb == NULL) {
+                strcpy(aux, no->var);
+                strcat(aux, " - undef");
+                no->var = (char *)malloc(sizeof(aux));
+                strcpy(no->var, aux);
+                string = "undef";
+                auxb = (char *)malloc(sizeof(string));
+                auxb = string;
+            }
+            if (!strcmp("Lsh", aux1))
+                printf("Line %d, col %d: Operator << cannot be applied to types %s, %s\n", no->linha, no->coluna, auxc, auxb);
+            else
+                printf("Line %d, col %d: Operator >> cannot be applied to types %s, %s\n", no->linha, no->coluna, auxc, auxb);
+        }
+
     } else if (!strcmp("Cal", aux1)) { // Call
         string = callHandler(no, global, tabela);
 
@@ -820,11 +899,13 @@ char *callHandler(struct node *no, sym_tab *global, sym_tab *tabela) {
     node *funcao = no->child;
     node *argumentos = funcao->brother;
     char string[1024];
+    char string2[1024];
     char aux[128];
     char *aux1;
     char *type;
     char func_type[32];
     int count = 0;
+    int nCountFunction = 0;
     strcpy(string, "(");
     // Contar o numero de argumentos (para saber as virgulas)
     while (argumentos) {
@@ -850,6 +931,7 @@ char *callHandler(struct node *no, sym_tab *global, sym_tab *tabela) {
         argumentos = argumentos->brother;
     }
     strcat(string, ")");
+    strcpy(string2, string);
 
     if (DEBUG)
         printf("'Call - String Argumentos' -> %s\n", string);
@@ -863,16 +945,18 @@ char *callHandler(struct node *no, sym_tab *global, sym_tab *tabela) {
             strcpy(func_type, aux_list->type);
             break;
         }
+        // printf("dentro--->%d\n",nCountFunction);
         aux_list = aux_list->next;
     }
-    //  Verificar se a funcao pode ser chamada com outros argumentos
+
     if (!existe) { // Se ja existe nao e necessario procurar outra vez
         aux_list = global->symbols;
         while (aux_list) { // Percorrer todas as funcoes
             // printf("'Aux_list_name e funcao' -> %s|%s\n", aux_list->name, funcao->name);
-            if (!strcmp(aux_list->name, funcao->name)) {
+            if (!strcmp(aux_list->name, funcao->name)) { //  Verificar se a funcao pode ser chamada com outros argumentos
+                // printf("entrou--->%d\n",nCountFunction);
                 char *copy1 = strdup(aux_list->parametrosString);
-                char *copy2 = strdup(string);
+                char *copy2 = strdup(string2);
                 int count1 = 0;
                 int count2 = 0;
 
@@ -888,7 +972,7 @@ char *callHandler(struct node *no, sym_tab *global, sym_tab *tabela) {
 
                 if (count1 == count2) {
                     char *copy1 = strdup(aux_list->parametrosString);
-                    char *copy2 = strdup(string);
+                    char *copy2 = strdup(string2);
                     int count3 = 0;
                     // printf("Parametros pretendidos -> %s\n", copy1);
                     // printf("Parametros recebidos -> %s\n", copy2);
@@ -913,7 +997,7 @@ char *callHandler(struct node *no, sym_tab *global, sym_tab *tabela) {
                         existe = 1;
                         strcpy(string, aux_list->parametrosString);
                         strcpy(func_type, aux_list->type);
-                        break;
+                        nCountFunction++;
                     }
                 }
             }
@@ -921,6 +1005,7 @@ char *callHandler(struct node *no, sym_tab *global, sym_tab *tabela) {
         }
     }
 
+    // printf("--->%d\n", nCountFunction);
     if (!existe) {
         printf("Line %d, col %d: Cannot find symbol %s%s\n", funcao->linha, funcao->coluna, funcao->name, string);
         // Undef no call
@@ -935,23 +1020,37 @@ char *callHandler(struct node *no, sym_tab *global, sym_tab *tabela) {
         strcpy(funcao->var, aux);
         return "undef";
     } else {
-        // Type do call
-        memset(aux, 0, 64);
-        strcpy(aux, no->var);
-        strcat(aux, " - ");
-        strcat(aux, func_type);
-        no->var = (char *)malloc(sizeof(aux));
-        strcpy(no->var, aux);
-        // Colocar a frente da funcao os seus argumentos
-        strcpy(aux, funcao->var);
-        strcat(aux, " - ");
-        strcat(aux, string);
-        if (DEBUG)
-            printf("'string' -> %s\n", string);
-        strcpy(funcao->var, aux);
-        char *str = (char *)malloc(sizeof(str));
-        str = &func_type[0];
-        return str;
+        if (nCountFunction > 1) {
+            printf("Line %d, col %d: Reference to method %s%s is ambiguous\n", funcao->linha, funcao->coluna, funcao->name, string2);
+            memset(aux, 0, 64);
+            strcpy(aux, no->var);
+            strcat(aux, " - undef");
+            no->var = (char *)malloc(sizeof(aux));
+            strcpy(no->var, aux);
+            // Colocar a frente da funcao os seus argumentos
+            strcpy(aux, funcao->var);
+            strcat(aux, " - undef");
+            strcpy(funcao->var, aux);
+            return "undef";
+        } else {
+            // Type do call
+            memset(aux, 0, 64);
+            strcpy(aux, no->var);
+            strcat(aux, " - ");
+            strcat(aux, func_type);
+            no->var = (char *)malloc(sizeof(aux));
+            strcpy(no->var, aux);
+            // Colocar a frente da funcao os seus argumentos
+            strcpy(aux, funcao->var);
+            strcat(aux, " - ");
+            strcat(aux, string);
+            if (DEBUG)
+                printf("'string' -> %s\n", string);
+            strcpy(funcao->var, aux);
+            char *str = (char *)malloc(sizeof(str));
+            str = &func_type[0];
+            return str;
+        }
     }
 }
 

@@ -30,7 +30,7 @@
     }info;
 }
 
-%token STRING COMMA LBRACE LPAR LSQ RBRACE RPAR RSQ SEMICOLON LSHIFT RSHIFT BOOL CLASS DOUBLE ELSE IF INT PRINT PUBLIC STATIC VOID WHILE
+%token STRING COMMA LBRACE LPAR LSQ RBRACE RPAR RSQ SEMICOLON BOOL CLASS DOUBLE ELSE IF INT PRINT PUBLIC STATIC VOID WHILE
 %token RESERVED ARROW 
 
 %token <info> ID
@@ -47,6 +47,8 @@
 %token <info> NE
 %token <info> MOD
 %token <info> MINUS
+%token <info> LSHIFT
+%token <info> RSHIFT
 %token <info> LT
 %token <info> LE
 %token <info> GT
@@ -237,8 +239,8 @@ Expr2           :       Expr2 PLUS Expr2                                    {$$ 
                 |       Expr2 AND Expr2                                     {$$ = newNode("And","", $2.line, $2.col); $$->child=$1; addBrother($1,$3);}
                 |       Expr2 OR Expr2                                      {$$ = newNode("Or","", $2.line, $2.col); $$->child=$1; addBrother($1,$3);}
                 |       Expr2 XOR Expr2                                     {$$ = newNode("Xor","", $2.line, $2.col); $$->child=$1; addBrother($1,$3);}
-                |       Expr2 LSHIFT Expr2                                  {$$ = newNode("Lshift","", contador_linhas, col); $$->child=$1; addBrother($1,$3);}
-                |       Expr2 RSHIFT Expr2                                  {$$ = newNode("Rshift","", contador_linhas, col); $$->child=$1; addBrother($1,$3);}
+                |       Expr2 LSHIFT Expr2                                  {$$ = newNode("Lshift","", $2.line, $2.col); $$->child=$1; addBrother($1,$3);}
+                |       Expr2 RSHIFT Expr2                                  {$$ = newNode("Rshift","", $2.line, $2.col); $$->child=$1; addBrother($1,$3);}
                 |       Expr2 EQ Expr2                                      {$$ = newNode("Eq","", $2.line, $2.col); $$->child=$1; addBrother($1,$3);}
                 |       Expr2 GE Expr2                                      {$$ = newNode("Ge","", $2.line, $2.col); $$->child=$1; addBrother($1,$3);}
                 |       Expr2 GT Expr2                                      {$$ = newNode("Gt","", $2.line, $2.col); $$->child=$1; addBrother($1,$3);}

@@ -144,8 +144,8 @@ REALLIT                 {REALLIT1}|{REALLIT2}|{REALLIT3}
 {RSQ}                         {if (flagLexx) printf("RSQ\n");contador_colunas+=yyleng; col += yyleng;               if(flagYacc) {return RSQ;}}
 {SEMICOLON}                   {if (flagLexx) printf("SEMICOLON\n");contador_colunas+=yyleng; col += yyleng;         if(flagYacc) {return SEMICOLON;}}
 {ARROW}                       {if (flagLexx) printf("ARROW\n");contador_colunas+=yyleng; col += yyleng;             if(flagYacc) {return ARROW;}}   
-{LSHIFT}                      {if (flagLexx) printf("LSHIFT\n");contador_colunas+=yyleng; col += yyleng;            if(flagYacc) {return LSHIFT;}}
-{RSHIFT}                      {if (flagLexx) printf("RSHIFT\n");contador_colunas+=yyleng; col += yyleng;            if(flagYacc) {return RSHIFT;}}
+{LSHIFT}                      {if (flagLexx) printf("LSHIFT\n");contador_colunas+=yyleng; col += yyleng;            if(flagYacc) {colocaDados(NULL, contador_linhas, col-yyleng);return LSHIFT;}}
+{RSHIFT}                      {if (flagLexx) printf("RSHIFT\n");contador_colunas+=yyleng; col += yyleng;            if(flagYacc) {colocaDados(NULL, contador_linhas, col-yyleng);return RSHIFT;}}
 {XOR}                         {if (flagLexx) printf("XOR\n");contador_colunas+=yyleng; col += yyleng;               if(flagYacc){colocaDados(NULL, contador_linhas, col-yyleng);return XOR;}}
 {BOOL}                        {if (flagLexx) printf("BOOL\n");contador_colunas+=yyleng; col += yyleng;              if(flagYacc) {return BOOL;}}
 {CLASS}                       {if (flagLexx) printf("CLASS\n");contador_colunas+=yyleng; col += yyleng;             if(flagYacc) {return CLASS;}}
