@@ -13,3 +13,7 @@
 - ./Comp2022.git/meta2/*.java
 
 
+# Meta 3
+`declarationErrors.out`
+- Line 20, col 18: Symbol _ is reserved
+
