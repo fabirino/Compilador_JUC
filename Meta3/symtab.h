@@ -59,7 +59,7 @@ int checkOoB_D(char *numero);
 
 void print_tabs(sym_tab_list *lista);
 
-char *add_symbol(sym_tab *tabela, char *name, char *type, struct parametros_funcao *parametros, struct node *no, int is_param);
+char *add_symbol(sym_tab *tabela, char *name, char *type, struct parametros_funcao *parametros, struct node *no,int line,int col, int is_param);
 
 sym_tab_list *add_sym_table(sym_tab_list *lista, sym_tab *tabela);
 

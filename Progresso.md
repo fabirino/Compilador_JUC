@@ -20,6 +20,7 @@
 - booelan_and_xor_ops
 - Call_me_maybe
 - CallError
+- declarationErrors
 - declit_out_bounds
 - divide
 - DoublePrecisionErros
@@ -46,7 +47,6 @@
 - widening
 
 ## Nao feitos
-- declarationErrors
 - e_dot_length (segfault)
 - params_in_redifined_method (int a dos parametros repetido)
 - simpleTest (nao e simples)
