@@ -207,11 +207,10 @@ sym_tab *create_sym_tab(struct node *no, char *parametros, int is_class) {
     return symbol_table;
 }
 
-param_list *create_param_list(param_list *lista, struct node *no) {
+param_list *create_param_list(param_list *lista, struct node *no,int first) {
 
     param_list *lista_parametros = lista;
     if (lista == NULL) {
-        // printf("parametros\n");
         lista = (struct parametros_funcao *)malloc(sizeof(struct parametros_funcao));
         lista->paramType = getType(no->var);
         lista->paramId = no->brother->name;
@@ -222,10 +221,6 @@ param_list *create_param_list(param_list *lista, struct node *no) {
     // Adicionar o simbolo ao ultimo da lista
     else {
         while (lista_parametros->next != NULL) {
-            // printf("parametros -> %s | %s\n", lista_parametros->paramId, no->name);
-            if (!strcmp(lista_parametros->paramId, no->name)) {
-                printf("Line %d, col %d: Symbol %s already defined", no->linha, no->coluna, no->name);
-            }
             lista_parametros = lista_parametros->next;
         }
         lista_parametros->next = (struct parametros_funcao *)malloc(sizeof(struct parametros_funcao));
@@ -544,7 +539,7 @@ char *getTypeOperation(struct node *no, sym_tab *global, sym_tab *tabela, int ch
             char *aux3 = strndup(no->child->brother->var, 2);
             if (!strcmp("Id", aux2) && !strcmp("Id", aux3)) {
                 if (!strcmp(searchType(no->child, global, tabela, 0), "boolean") && !strcmp(searchType(no->child->brother, global, tabela, 0), "boolean")) {
-                    //continua
+                    // continua
                 } else {
                     strcpy(string, "none");
                     return string;
@@ -1028,7 +1023,8 @@ char *getTypeOperation(struct node *no, sym_tab *global, sym_tab *tabela, int ch
 }
 
 char *verifyParams(param_list *lista, sym_tab *tabela) {
-    char *TIPO = NULL;
+    char *TIPO = (char*)malloc(sizeof(char)*128);
+    TIPO = NULL;
     symbol *lista_simbolos = tabela->symbols;
     if (lista_simbolos) {
         if (!strcmp(lista->paramId, lista_simbolos->name)) {
@@ -1045,7 +1041,6 @@ char *verifyParams(param_list *lista, sym_tab *tabela) {
     }
     if (TIPO) {
         printf("Line %d, col %d: Symbol %s already defined\n", lista->linha, lista->col, lista->paramId);
-        return TIPO;
     }
     return TIPO;
 }
@@ -1270,7 +1265,7 @@ void commentnodes(struct node *raiz, sym_tab *global, sym_tab_list *lista) {
                             if (DEBUG)
                                 printf("MethodParams\n");
 
-                            lista_parametros = create_param_list(lista_parametros, parametros->child);
+                            lista_parametros = create_param_list(lista_parametros, parametros->child,0);
 
                             //====================
                             parametros = parametros->brother;
@@ -1406,7 +1401,7 @@ sym_tab_list *create_symbol_tab_list(struct node *raiz) {
                             //==================
                             if (DEBUG)
                                 printf("MethodParams\n");
-                            lista_parametros = create_param_list(lista_parametros, parametros->child);
+                            lista_parametros = create_param_list(lista_parametros, parametros->child,1);
 
                             //====================
                             parametros = parametros->brother;
@@ -1436,15 +1431,29 @@ sym_tab_list *create_symbol_tab_list(struct node *raiz) {
 
                         param_list *lista = lista_parametros;
                         if (lista && strcmp(lista->paramType, "Vazio")) {
-                            if (verifyParams(lista, tabela) == NULL) {
-                                add_symbol(tabela, lista->paramId, lista->paramType, NULL, NULL, lista->linha, lista->col, 1);
-                            }
 
-                            while (lista->next != NULL) {
-                                lista = lista->next;
+                            while (lista != NULL) {
                                 if (verifyParams(lista, tabela) == NULL) {
                                     add_symbol(tabela, lista->paramId, lista->paramType, NULL, NULL, lista->linha, lista->col, 1);
                                 }
+                                lista = lista->next;
+                            }
+                        }
+                    }else{
+                        param_list *lista = lista_parametros;
+                        if (lista){
+                            int count = 1;
+                            while (lista->next != NULL) {//comeca a partir do segundo se existir
+                                lista = lista->next;
+                                param_list *listafor = lista_parametros;
+                                for (int i = 0; i < count; i++){
+                                    if(!strcmp(lista->paramId,listafor->paramId)){
+                                        printf("Line %d, col %d: Symbol %s already defined\n",lista->linha,lista->col,lista->paramId);
+                                        break;
+                                    }
+                                    listafor = listafor->next;
+                                }
+                                count++;
                             }
                         }
                     }

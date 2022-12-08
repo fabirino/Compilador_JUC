@@ -49,7 +49,7 @@
 - widening
 - e_dot_length
 - testsMethods
+- while_errors
 
 ## Nao feitos
 - params_in_redifined_method (int a dos parametros repetido)
-- while_errors (none)
