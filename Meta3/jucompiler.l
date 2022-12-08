@@ -221,6 +221,21 @@ int main(int argc, char *argv[]) {
                 }
             }
         }
+        else if(!strcmp(argv[1], "-e3")){
+            mostraTree=1;
+            flagYacc=1;
+            yyparse();
+            if(raiz != NULL){
+                if(erroSintax == 0){
+                    lista_tabelas = create_symbol_tab_list(raiz);
+                }else{
+                    freeSTree(raiz);
+                }
+            }
+        }else{
+                printf("Flag nao existe");
+                return 0;
+            }
     }
     
     if(argc == 3){

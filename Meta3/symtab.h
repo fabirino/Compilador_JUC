@@ -71,7 +71,7 @@ char *searchType(struct node *no, sym_tab *global, sym_tab *tabela, int altera);
 
 char *callHandler(struct node *no, sym_tab *global, sym_tab *tabela);
 
-char *getTypeOperation(struct node *no, sym_tab *global, sym_tab *tabela);
+char *getTypeOperation(struct node *no, sym_tab *global, sym_tab *tabela, int child);
 
 int searchFunc(struct simbolo *simbolo, sym_tab *global, char *parametrosString);
 
