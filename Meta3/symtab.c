@@ -125,8 +125,8 @@ char *add_symbol(sym_tab *tabela, char *name, char *type, struct parametros_func
             return NULL;
         }
     }
-    
-    if (no && parametros == NULL) {//erro anda para aqui
+
+    if (no && parametros == NULL) { // erro anda para aqui
         // Comparar se ja existe esse no!
         char *TIPO = NULL;
         symbol *lista_simbolos = tabela->symbols;
@@ -772,7 +772,6 @@ char *getTypeOperation(struct node *no, sym_tab *global, sym_tab *tabela) {
     } else if (!strcmp("Xor", aux1) || !strcmp("Or", aux1) || !strcmp("And", aux1)) {
         char *auxc = getTypeOperation(no->child, global, tabela);
         char *auxb = getTypeOperation(no->child->brother, global, tabela);
-
         if (auxc && auxb) {
             if (!strcmp(auxc, auxb) && (!strcmp(auxc, "boolean") || !strcmp(auxc, "int"))) {
                 strcpy(aux, no->var);
@@ -787,14 +786,14 @@ char *getTypeOperation(struct node *no, sym_tab *global, sym_tab *tabela) {
                 no->var = (char *)malloc(sizeof(char) * 128);
                 strcpy(no->var, aux);
                 // string = "undef";
-                strcpy(string, "undef");
+                strcpy(string, "boolean");
 
                 if (!strcmp("Xor", aux1))
                     printf("Line %d, col %d: Operator ^ cannot be applied to types %s, %s\n", no->linha, no->coluna, auxc, auxb);
                 else if (!strcmp("And", aux1))
-                    printf("Line %d, col %d: Operator & cannot be applied to types %s, %s\n", no->linha, no->coluna, auxc, auxb);
+                    printf("Line %d, col %d: Operator && cannot be applied to types %s, %s\n", no->linha, no->coluna, auxc, auxb);
                 else
-                    printf("Line %d, col %d: Operator | cannot be applied to types %s, %s\n", no->linha, no->coluna, auxc, auxb);
+                    printf("Line %d, col %d: Operator || cannot be applied to types %s, %s\n", no->linha, no->coluna, auxc, auxb);
             }
         } else {
             if (auxc == NULL && auxb == NULL) {
@@ -834,9 +833,9 @@ char *getTypeOperation(struct node *no, sym_tab *global, sym_tab *tabela) {
             if (!strcmp("Xor", aux1))
                 printf("Line %d, col %d: Operator ^ cannot be applied to types %s, %s\n", no->linha, no->coluna, auxc, auxb);
             else if (!strcmp("And", aux1))
-                printf("Line %d, col %d: Operator & cannot be applied to types %s, %s\n", no->linha, no->coluna, auxc, auxb);
+                printf("Line %d, col %d: Operator && cannot be applied to types %s, %s\n", no->linha, no->coluna, auxc, auxb);
             else
-                printf("Line %d, col %d: Operator | cannot be applied to types %s, %s\n", no->linha, no->coluna, auxc, auxb);
+                printf("Line %d, col %d: Operator || cannot be applied to types %s, %s\n", no->linha, no->coluna, auxc, auxb);
         }
 
     } else if (!strcmp("Par", aux1)) { // ParseArgs
@@ -981,7 +980,7 @@ char *getTypeOperation(struct node *no, sym_tab *global, sym_tab *tabela) {
                 } else if ((!strcmp(aux, "int") && !strcmp("double", tabela->symbols->type))) { // FIXME: A variavel existe !!
                     // continua                                                                                                                               // continua
                 } else if (strcmp(aux, tabela->symbols->type)) {
-                    if (auxin->child  && auxin->child->child && !strcmp(auxin->child->name, "")) {
+                    if (auxin->child && auxin->child->child && !strcmp(auxin->child->name, "")) {
                         printf("Line %d, col %d: Incompatible type %s in return statement\n", auxin->child->child->linha, auxin->child->child->coluna, aux);
                     } else if (auxin->child) {
                         printf("Line %d, col %d: Incompatible type %s in return statement\n", auxin->child->linha, auxin->child->coluna, aux);
@@ -1321,7 +1320,7 @@ void commentnodes(struct node *raiz, sym_tab *global, sym_tab_list *lista) {
                                         } else if ((!strcmp(aux, "int") && !strcmp("double", tabela->symbols->type))) {
                                             // continua
                                         } else if ((strcmp(aux, tabela->symbols->type))) {
-                                            if (varDeclOrReturn->child && varDeclOrReturn->child->child &&!strcmp(varDeclOrReturn->child->name, "")) {
+                                            if (varDeclOrReturn->child && varDeclOrReturn->child->child && !strcmp(varDeclOrReturn->child->name, "")) {
                                                 printf("Line %d, col %d: Incompatible type %s in return statement\n", varDeclOrReturn->child->child->linha, varDeclOrReturn->child->child->coluna, aux);
                                             } else if (varDeclOrReturn->child) {
                                                 printf("Line %d, col %d: Incompatible type %s in return statement\n", varDeclOrReturn->child->linha, varDeclOrReturn->child->coluna, aux);
