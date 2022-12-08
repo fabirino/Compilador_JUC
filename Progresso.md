@@ -45,11 +45,11 @@
 - relational_op_tests
 - shift_errors
 - widening
+- e_dot_length
+- testsMethods
 
 ## Nao feitos
-- e_dot_length (segfault)
 - params_in_redifined_method (int a dos parametros repetido)
 - simpleTest (nao e simples)
 - testeProblema (verificar o none)
-- testsMethods (segfault)
 - while_errors (none)

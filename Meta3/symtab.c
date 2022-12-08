@@ -224,7 +224,7 @@ param_list *create_param_list(param_list *lista, struct node *no) {
     // Adicionar o simbolo ao ultimo da lista
     else {
         while (lista_parametros->next != NULL) {
-            printf("parametros -> %s | %s\n", lista_parametros->paramId, no->name);
+            if (DEBUG) printf("parametros -> %s | %s\n", lista_parametros->paramId, no->name);
             if (!strcmp(lista_parametros->paramId, no->name)) {
                 printf("Line %d, col %d: Symbol %s already defined", no->linha, no->coluna, no->name);
             }
@@ -444,7 +444,9 @@ char *getTypeOperation(struct node *no, sym_tab *global, sym_tab *tabela) {
         strcat(aux, " - int");
         no->var = (char *)malloc(sizeof(char) * 64);
         strcpy(no->var, aux);
-        if (strcmp(auxc, "String[]")) {
+        if (auxc == NULL) {
+            printf("Line %d, col %d: Operator .length cannot be applied to type undef\n", no->linha, no->coluna);
+        } else if(strcmp(auxc, "String[]")){
             printf("Line %d, col %d: Operator .length cannot be applied to type %s\n", no->linha, no->coluna, auxc);
         }
         // string = "int";
@@ -1000,10 +1002,12 @@ char *getTypeOperation(struct node *no, sym_tab *global, sym_tab *tabela) {
             // printf("%s\n",auxin->var->name);
             auxin = auxin->brother;
         }
-    }
+    } // else if(!strcmp("und", aux1)){
+    //     strcpy(string, "undef");
+    // }
 
     if (DEBUG)
-        printf("getTypeOperation--> %s\n", string);
+        printf("getTypeOperation(%s)--> %s\n", no->name, string);
     return string;
 }
 
@@ -1054,10 +1058,13 @@ char *callHandler(struct node *no, sym_tab *global, sym_tab *tabela) {
         aux1 = strndup(argumentos->var, 2);
         if (!strcmp("Ca", aux1)) { // Id
             type = callHandler(argumentos, global, tabela);
-            strcat(string, type);
+            if(type) strcat(string, type);
+            else strcat(string, "undef");
         } else {
             type = getTypeOperation(argumentos, global, tabela);
-            strcat(string, type);
+            if(type) strcat(string, type);
+            else strcat(string, "undef");
+            
         }
 
         if (count > 1) {
