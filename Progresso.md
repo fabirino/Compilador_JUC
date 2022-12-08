@@ -43,13 +43,13 @@
 - printing_void
 - Problema_H
 - relational_op_tests
+- simpleTest
 - shift_errors
 - widening
 
 ## Nao feitos
 - e_dot_length (segfault)
 - params_in_redifined_method (int a dos parametros repetido)
-- simpleTest (nao e simples)
 - testeProblema (verificar o none)
 - testsMethods (segfault)
 - while_errors (none)

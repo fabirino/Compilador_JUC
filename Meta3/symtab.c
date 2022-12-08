@@ -73,7 +73,6 @@ char *add_symbol(sym_tab *tabela, char *name, char *type, struct parametros_func
     strcpy(aux->parametrosString, "");
     char string[1024];
     char *string2 = NULL;
-
     // Verificar se e reserved TODO: erro no print, estamos a mandar o no vazio
     if (name[0] == '_' && strlen(name) == 1) {
         if (no) {
@@ -83,11 +82,9 @@ char *add_symbol(sym_tab *tabela, char *name, char *type, struct parametros_func
         }
         return NULL;
     }
-
     // Colocar string com os argumentos da funcao
     param_list *methodParams = parametros;
     if (methodParams != NULL) {
-
         strcpy(string, "(");
         if (strcmp(methodParams->paramType, "Vazio")) {
 
@@ -128,17 +125,18 @@ char *add_symbol(sym_tab *tabela, char *name, char *type, struct parametros_func
             return NULL;
         }
     }
-    if (no && !strcmp(aux->parametrosString, "")) {
+    
+    if (no && parametros == NULL) {//erro anda para aqui
         // Comparar se ja existe esse no!
         char *TIPO = NULL;
         symbol *lista_simbolos = tabela->symbols;
         if (lista_simbolos) {
-            if (!strcmp(no->name, lista_simbolos->name)) {
+            if (!strcmp(no->name, lista_simbolos->name) && !strcmp(aux->parametrosString, lista_simbolos->parametrosString)) {
                 TIPO = lista_simbolos->type;
             } else {
                 while (lista_simbolos->next != NULL) {
                     lista_simbolos = lista_simbolos->next;
-                    if (!strcmp(no->name, lista_simbolos->name)) {
+                    if (!strcmp(no->name, lista_simbolos->name) && !strcmp(aux->parametrosString, lista_simbolos->parametrosString)) {
                         TIPO = lista_simbolos->type;
                         break;
                     }
@@ -224,7 +222,7 @@ param_list *create_param_list(param_list *lista, struct node *no) {
     // Adicionar o simbolo ao ultimo da lista
     else {
         while (lista_parametros->next != NULL) {
-            printf("parametros -> %s | %s\n", lista_parametros->paramId, no->name);
+            // printf("parametros -> %s | %s\n", lista_parametros->paramId, no->name);
             if (!strcmp(lista_parametros->paramId, no->name)) {
                 printf("Line %d, col %d: Symbol %s already defined", no->linha, no->coluna, no->name);
             }
@@ -885,7 +883,7 @@ char *getTypeOperation(struct node *no, sym_tab *global, sym_tab *tabela) {
             if (DEBUG)
                 printf("'<Assign-->' -> %s|%s\n", auxc, auxb);
 
-            if (!strcmp(auxc, auxb)) {
+            if (!strcmp(auxc, auxb) && (!strcmp(auxc, "int") || !strcmp(auxc, "double") || !strcmp(auxc, "boolean"))) {
                 strcpy(aux, no->var);
                 strcat(aux, " - ");
                 strcat(aux, auxb);
@@ -981,7 +979,9 @@ char *getTypeOperation(struct node *no, sym_tab *global, sym_tab *tabela) {
                 } else if ((!strcmp(aux, "int") && !strcmp("double", tabela->symbols->type))) { // FIXME: A variavel existe !!
                     // continua                                                                                                                               // continua
                 } else if (strcmp(aux, tabela->symbols->type)) {
-                    if (auxin->child) {
+                    if (auxin->child  && auxin->child->child && !strcmp(auxin->child->name, "")) {
+                        printf("Line %d, col %d: Incompatible type %s in return statement\n", auxin->child->child->linha, auxin->child->child->coluna, aux);
+                    } else if (auxin->child) {
                         printf("Line %d, col %d: Incompatible type %s in return statement\n", auxin->child->linha, auxin->child->coluna, aux);
                     } else {
                         printf("Line %d, col %d: Incompatible type %s in return statement\n", auxin->linha, auxin->coluna, aux);
@@ -1305,7 +1305,6 @@ void commentnodes(struct node *raiz, sym_tab *global, sym_tab_list *lista) {
                                         } else {
                                             aux = malloc(sizeof(char) * 128);
                                             strcpy(aux, "void");
-                                            // aux = "void";
                                         }
 
                                         if (aux == NULL) {
@@ -1315,7 +1314,9 @@ void commentnodes(struct node *raiz, sym_tab *global, sym_tab_list *lista) {
                                         } else if ((!strcmp(aux, "int") && !strcmp("double", tabela->symbols->type))) {
                                             // continua
                                         } else if ((strcmp(aux, tabela->symbols->type))) {
-                                            if (varDeclOrReturn->child) {
+                                            if (varDeclOrReturn->child && varDeclOrReturn->child->child &&!strcmp(varDeclOrReturn->child->name, "")) {
+                                                printf("Line %d, col %d: Incompatible type %s in return statement\n", varDeclOrReturn->child->child->linha, varDeclOrReturn->child->child->coluna, aux);
+                                            } else if (varDeclOrReturn->child) {
                                                 printf("Line %d, col %d: Incompatible type %s in return statement\n", varDeclOrReturn->child->linha, varDeclOrReturn->child->coluna, aux);
                                             } else {
                                                 printf("Line %d, col %d: Incompatible type %s in return statement\n", varDeclOrReturn->linha, varDeclOrReturn->coluna, aux);
