@@ -13,6 +13,7 @@
 typedef struct node{
     char * var; 
     char * name;
+    char * comment;
     int linha;
     int coluna;
     struct node * brother;

@@ -50,6 +50,4 @@
 - e_dot_length
 - testsMethods
 - while_errors
-
-## Nao feitos
-- params_in_redifined_method (int a dos parametros repetido)
+- params_in_redifined_method

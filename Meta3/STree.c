@@ -14,6 +14,7 @@ node * newNode(char * var,char * name, int linha, int coluna) {
     aux2->child = NULL;
     aux2->linha = linha;
     aux2->coluna = coluna;
+    aux2->comment = strdup("none");
 
     return aux2;
 
@@ -36,8 +37,13 @@ void printSTree(struct node *node, int prof){
         pontos[i]='.';
     }
     pontos [2 * prof] = '\0';
+    printf("%s%s", pontos, node->var);
+    if(!strcmp(node->comment,"none")){
+        printf("\n");
+    }else{
+        printf(" - %s\n",node->comment);
+    }
 
-    printf("%s%s\n", pontos, node->var);
     if (node->child)    printSTree(node->child, prof + 1);
     if (node->brother)  printSTree(node->brother, prof);
 
