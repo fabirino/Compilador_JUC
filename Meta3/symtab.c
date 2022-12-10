@@ -523,12 +523,12 @@ char *getTypeOperation(struct node *no, sym_tab *global, sym_tab *tabela, int ch
     if (!strcmp("Dec", aux1)) { // Declit
         no->comment = strdup("int");
         if (checkOoB_I(no->name))
-        printf("Line %d, col %d: Number %s out of bounds\n", no->linha, no->coluna, no->name);
+            printf("Line %d, col %d: Number %s out of bounds\n", no->linha, no->coluna, no->name);
         string = strdup("int");
     } else if (!strcmp("Rea", aux1)) { // Realit
         no->comment = strdup("double");
-        // if (checkOoB_D(no->name))
-        // printf("Line %d, col %d: Number %s out of bounds\n", no->linha, no->coluna, no->name);
+        // if (checkOoB_D(no->name)) //FIXME: Da erro pesado nisto
+        //     printf("Line %d, col %d: Number %s out of bounds\n", no->linha, no->coluna, no->name);
         string = strdup("double");
     } else if (!strcmp("Str", aux1)) { // StrLit
         no->comment = strdup("String");
