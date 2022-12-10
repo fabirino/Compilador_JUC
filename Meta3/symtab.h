@@ -33,13 +33,13 @@ typedef struct simbolo {
     struct simbolo *next;
     // opcional
     struct parametros_funcao *methodParams;
-    char parametrosString[1024];
+    char * parametrosString;
 } symbol;
 
 typedef struct tabela_simbolos {
     char *name;
     char *type;            // Method/Class
-    char parametros[1024]; // Argumentos da funcao se for o caso
+    char * parametros; // Argumentos da funcao se for o caso
     struct simbolo *symbols;
     int comment;
 

@@ -70,7 +70,8 @@ char *add_symbol(sym_tab *tabela, char *name, char *type, struct parametros_func
     aux->param = is_param;
     aux->methodParams = parametros;
     aux->next = NULL;
-    strcpy(aux->parametrosString, "");
+    aux->parametrosString = strdup("");
+    // strcpy(aux->parametrosString, "");
     char string[1024];
     char *string2 = NULL;
     // Verificar se e reserved TODO: erro no print, estamos a mandar o no vazio
@@ -112,7 +113,8 @@ char *add_symbol(sym_tab *tabela, char *name, char *type, struct parametros_func
         }
         strcat(string, ")");
 
-        strcpy(aux->parametrosString, string);
+        aux->parametrosString = strdup(string);
+        // strcpy(aux->parametrosString, string);
 
         string2 = (char *)malloc(sizeof(string));
         string2 = &string[0];
@@ -195,9 +197,12 @@ sym_tab *create_sym_tab(struct node *no, char *parametros, int is_class) {
     symbol_table->symbols = (struct simbolo *)malloc(sizeof(struct simbolo));
     symbol_table->symbols = NULL;
     if (parametros == NULL)
-        strcpy(symbol_table->parametros, "");
+        symbol_table->parametros = strdup("");
+    // strcpy(symbol_table->parametros, "");
     else
-        strcpy(symbol_table->parametros, parametros);
+        symbol_table->parametros = strdup(parametros);
+
+    // strcpy(symbol_table->parametros, parametros);
 
     if (is_class)
         symbol_table->type = "Class";
@@ -384,7 +389,7 @@ char *callHandler(struct node *no, sym_tab *global, sym_tab *tabela) {
     char aux[128];
     char *aux1 = malloc(sizeof(char) * 128);
     char *type = NULL;
-    char func_type[64];
+    char *func_type;
     int count = 0;
     int nCountFunction = 0;
     strcpy(string, "(");
@@ -429,7 +434,8 @@ char *callHandler(struct node *no, sym_tab *global, sym_tab *tabela) {
     while (aux_list) {
         if (!strcmp(aux_list->name, funcao->name) && !strcmp(aux_list->parametrosString, string)) {
             existe = 1;
-            strcpy(func_type, aux_list->type);
+            func_type = strdup(aux_list->type);
+            // strcpy(func_type, aux_list->type);
             break;
         }
         // printf("dentro--->%d\n",nCountFunction);
@@ -483,7 +489,8 @@ char *callHandler(struct node *no, sym_tab *global, sym_tab *tabela) {
                         // printf("passou os counts\n");
                         existe = 1;
                         strcpy(string, aux_list->parametrosString);
-                        strcpy(func_type, aux_list->type);
+                        func_type = strdup(aux_list->type);
+                        // strcpy(func_type, aux_list->type);
                         nCountFunction++;
                     }
                 }
@@ -532,13 +539,13 @@ char *getTypeOperation(struct node *no, sym_tab *global, sym_tab *tabela, int ch
 
     if (!strcmp("Dec", aux1)) { // Declit
         no->comment = strdup("int");
-        if (checkOoB_I(no->name))
-            printf("Line %d, col %d: Number %s out of bounds\n", no->linha, no->coluna, no->name);
+        // if (checkOoB_I(no->name))
+            // printf("Line %d, col %d: Number %s out of bounds\n", no->linha, no->coluna, no->name);
         string = strdup("int");
     } else if (!strcmp("Rea", aux1)) { // Realit
         no->comment = strdup("double");
-        if (checkOoB_D(no->name))
-            printf("Line %d, col %d: Number %s out of bounds\n", no->linha, no->coluna, no->name);
+        // if (checkOoB_D(no->name))
+            // printf("Line %d, col %d: Number %s out of bounds\n", no->linha, no->coluna, no->name);
         string = strdup("double");
     } else if (!strcmp("Str", aux1)) { // StrLit
         no->comment = strdup("String");
@@ -941,8 +948,7 @@ char *getTypeOperation(struct node *no, sym_tab *global, sym_tab *tabela, int ch
                     // continua                                                                                                                               // continua
                 } else if (strcmp(aux, tabela->symbols->type)) {
                     if (auxin->child && auxin->child->child) {
-                        char *allin = strndup(auxin->child->var, 4);
-                        if (!strcmp("Call", allin)) {
+                        if (!strcmp("Call", auxin->child->var)) {
                             printf("Line %d, col %d: Incompatible type %s in return statement\n", auxin->child->child->linha, auxin->child->child->coluna, aux);
                         } else {
                             printf("Line %d, col %d: Incompatible type %s in return statement\n", auxin->child->linha, auxin->child->coluna, aux);
@@ -1051,8 +1057,9 @@ void commentnodes(struct node *raiz, sym_tab *global, sym_tab_list *lista) {
                         }
                     } else {
                         lista_parametros = (struct parametros_funcao *)malloc(sizeof(struct parametros_funcao));
-                        lista_parametros->paramType = malloc(sizeof(char) * 128);
-                        strcpy(lista_parametros->paramType, "Vazio");
+                        // lista_parametros->paramType = malloc(sizeof(char) * 128);
+                        lista_parametros->paramType = strdup("Vazio");
+                        // strcpy(lista_parametros->paramType, "Vazio");
                         lista_parametros->next = NULL;
                     }
                     char parametrosString[1024];
@@ -1099,12 +1106,14 @@ void commentnodes(struct node *raiz, sym_tab *global, sym_tab_list *lista) {
                                         char *aux;
                                         int c = 0;
                                         if (varDeclOrReturn->child) {
-                                            aux = malloc(sizeof(char) * 128);
-                                            aux = getTypeOperation(varDeclOrReturn->child, global, tabela, 0);
+                                            // aux = malloc(sizeof(char) * 128);
+                                            aux = strdup(getTypeOperation(varDeclOrReturn->child, global, tabela, 0));
+                                            // aux = getTypeOperation(varDeclOrReturn->child, global, tabela, 0) ;
                                             c = 1;
                                         } else {
-                                            aux = malloc(sizeof(char) * 128);
-                                            strcpy(aux, "void");
+                                            // aux = malloc(sizeof(char) * 128);
+                                            aux = strdup("void");
+                                            // strcpy(aux, "void");
                                         }
 
                                         if (aux == NULL) {
@@ -1115,8 +1124,7 @@ void commentnodes(struct node *raiz, sym_tab *global, sym_tab_list *lista) {
                                             // continua
                                         } else if ((strcmp(aux, tabela->symbols->type))) {
                                             if (varDeclOrReturn->child && varDeclOrReturn->child->child) {
-                                                char *allin = strndup(varDeclOrReturn->child->var, 4);
-                                                if (!strcmp("Call", allin)) {
+                                                if (!strcmp("Call", varDeclOrReturn->child->var)) {
                                                     printf("Line %d, col %d: Incompatible type %s in return statement\n", varDeclOrReturn->child->child->linha, varDeclOrReturn->child->child->coluna, aux);
                                                 } else {
                                                     printf("Line %d, col %d: Incompatible type %s in return statement\n", varDeclOrReturn->child->linha, varDeclOrReturn->child->coluna, aux);
@@ -1187,8 +1195,9 @@ sym_tab_list *create_symbol_tab_list(struct node *raiz) {
                         }
                     } else {
                         lista_parametros = (struct parametros_funcao *)malloc(sizeof(struct parametros_funcao));
-                        lista_parametros->paramType = malloc(sizeof(char) * 128);
-                        strcpy(lista_parametros->paramType, "Vazio");
+                        // lista_parametros->paramType = malloc(sizeof(char) * 128);
+                        lista_parametros->paramType = strdup("Vazio");
+                        // strcpy(lista_parametros->paramType, "Vazio");
                         lista_parametros->next = NULL;
                     }
 
