@@ -186,6 +186,19 @@ void colocaDados(char * mensagem, int line, int col){
 
 int main(int argc, char *argv[]) {
 
+    if(argc == 1){
+        mostraTree=1;
+        flagYacc=1;
+        yyparse();
+        if(raiz != NULL){
+            if(erroSintax == 0){
+                lista_tabelas = create_symbol_tab_list(raiz);
+            }else{
+                freeSTree(raiz);
+            }
+        }
+    }
+
     if(argc == 2){
         if(!strcmp(argv[1], "-l")){
             flagLexx = 1;
