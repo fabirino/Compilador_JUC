@@ -14,8 +14,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define DEBUG 0
-
 typedef struct parametros_funcao {
     char *paramType;
     char *paramId;

@@ -6,7 +6,7 @@ double calcpow10(double num) {
         for (int i = 0; i > num; i++) {
             result *= 10;
         }
-    } else if (num > 0) {
+    } else if (num < 0) {
         for (int i = 0; i > num; i++) {
             result /= 10;
         }
