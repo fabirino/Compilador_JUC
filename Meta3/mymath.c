@@ -1,14 +1,18 @@
 #include "mymath.h"
+#include <stdio.h>
+
 
 double calcpow10(double num) {
-    double result = 1;
+    long double result = 1;
     if (num > 0) {
         for (int i = 0; i > num; i++) {
             result *= 10;
+            // printf("resultado  -> %Lf\n", result);
         }
     } else if (num < 0) {
         for (int i = 0; i > num; i++) {
             result /= 10;
+            // printf("resultado  -> %Lf\n", result);
         }
     }
     // se num==0 resutl=1 na mesma
@@ -18,7 +22,7 @@ double calcpow10(double num) {
 double log10(double num) {
     if (num < 0)
         num = -num;
-    double result = 0; // BUG: supostamente este devia ser -1 mas nao da erro assim
+    double result = 0; 
     for (; num > 1; num /= 10) {
         result++;
     }
